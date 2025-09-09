@@ -90,6 +90,7 @@ export interface Audio {
   id: string
   filename: string
   original_name: string
+  custom_name?: string
   file_path: string
   upload_date: string
   status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'ERROR'
@@ -169,6 +170,18 @@ export const db = {
     const { data, error } = await supabase
       .from('audios')
       .update({ status })
+      .eq('id', id)
+      .select()
+      .single()
+    
+    if (error) throw error
+    return data
+  },
+
+  async updateAudioCustomName(id: string, customName: string) {
+    const { data, error } = await supabase
+      .from('audios')
+      .update({ custom_name: customName })
       .eq('id', id)
       .select()
       .single()

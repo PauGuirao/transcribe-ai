@@ -59,6 +59,8 @@ export async function GET(
     if (audioFile.status === 'completed') {
       try {
         const jsonFileName = `${user.id}/${audioFile.id}.json`;
+        // Add timestamp to force cache refresh
+        const cacheBuster = `?t=${Date.now()}`;
          const { data: jsonData, error: storageError } = await supabase.storage
            .from('transcriptions')
            .download(jsonFileName);
@@ -73,7 +75,20 @@ export async function GET(
             originalText: transcriptionData.text || '',
             editedText: transcriptionData.text || '', // For now, same as original
             segments: transcriptionData.segments || [],
-            speakers: transcriptionData.speakers || [],
+            speakers: transcriptionData.speakers && transcriptionData.speakers.length > 0 
+              ? transcriptionData.speakers 
+              : [
+                  {
+                    id: 'speaker-logopeda',
+                    name: 'Logopeda',
+                    color: '#3B82F6'
+                  },
+                  {
+                    id: 'speaker-alumne',
+                    name: 'Alumne',
+                    color: '#EF4444'
+                  }
+                ],
             createdAt: audioFile.created_at,
             updatedAt: audioFile.updated_at,
           };
@@ -89,6 +104,7 @@ export async function GET(
       id: audioFile.id,
       filename: audioFile.filename,
       originalName: audioFile.original_filename,
+      customName: audioFile.custom_name,
       fileId: audioFile.id, // Using audio id as fileId for compatibility
       uploadDate: audioFile.created_at,
       status: audioFile.status,

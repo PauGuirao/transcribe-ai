@@ -70,6 +70,7 @@ export async function GET() {
         id: audio.id,
         filename: audio.filename,
         originalName: audio.original_filename,
+        customName: audio.custom_name,
         fileId: audio.id, // Using audio id as fileId for compatibility
         uploadDate: audio.created_at,
         status: audio.status,

@@ -1,24 +1,24 @@
 'use client';
 
-import React, { useState } from 'react';
-import { MainLayout } from '@/components/layout/MainLayout';
+import React from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import AppLayout from '@/components/layout/AppLayout';
 
 export default function DashboardPage() {
-  const [selectedAudioId, setSelectedAudioId] = useState<string | undefined>();
-
-  const handleAudioSelect = (audioId: string) => {
-    setSelectedAudioId(audioId);
-  };
-
-  const handleUploadComplete = (audioId: string) => {
-    setSelectedAudioId(audioId);
-  };
-
   return (
-    <MainLayout 
-      selectedAudioId={selectedAudioId}
-      onAudioSelect={handleAudioSelect}
-      onUploadComplete={handleUploadComplete}
-    />
+    <AppLayout>
+      <Card>
+        <CardContent className="pt-6">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              What will you do today?
+            </h2>
+            <p className="text-gray-600">
+              Choose an option from the sidebar to get started.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </AppLayout>
   );
 }

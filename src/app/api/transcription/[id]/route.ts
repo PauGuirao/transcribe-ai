@@ -8,17 +8,9 @@ export async function PATCH(
 ) {
   try {
     const { id } = await params;
-    console.log('[PATCH /api/transcription/[id]] Starting request for ID:', id);
-    
     const { editedText, editedSegments, speakers } = await request.json();
-    console.log('[PATCH /api/transcription/[id]] Request payload:', {
-      editedTextLength: editedText?.length,
-      editedSegmentsCount: editedSegments?.length,
-      hasEditedText: editedText !== undefined && editedText !== null
-    });
 
     if (editedText === undefined || editedText === null) {
-      console.log('[PATCH /api/transcription/[id]] Validation failed: editedText is required');
       return NextResponse.json(
         { success: false, error: 'Edited text is required' },
         { status: 400 }
@@ -46,7 +38,6 @@ export async function PATCH(
     );
 
     // Check authentication
-    console.log('[PATCH /api/transcription/[id]] Checking authentication...');
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) {
       console.log('[PATCH /api/transcription/[id]] Authentication failed:', userError?.message || 'No user');
@@ -55,10 +46,8 @@ export async function PATCH(
         { status: 401 }
       );
     }
-    console.log('[PATCH /api/transcription/[id]] User authenticated:', user.id);
 
     // Fetch the transcription and verify ownership
-    console.log('[PATCH /api/transcription/[id]] Fetching transcription and verifying ownership...');
     const { data: transcription, error: transcriptionError } = await supabase
       .from('transcriptions')
       .select(`
@@ -78,13 +67,7 @@ export async function PATCH(
         { status: 404 }
       );
     }
-    console.log('[PATCH /api/transcription/[id]] Transcription found:', transcription.id);
 
-    // Skip database update - only update JSON file
-    console.log('[PATCH /api/transcription/[id]] Skipping database update, only updating JSON file...');
-
-    // Also update the JSON file in Supabase Storage
-    console.log('[PATCH /api/transcription/[id]] Starting JSON file update...');
     try {
       const jsonFileName = `${user.id}/${transcription.audio_id}.json`;
       console.log('[PATCH /api/transcription/[id]] JSON file path:', jsonFileName);
@@ -115,13 +98,14 @@ export async function PATCH(
         };
         console.log('[PATCH /api/transcription/[id]] Updated JSON data prepared, segments count:', updatedJsonData.segments?.length || 0);
         
-        // Upload updated JSON file
+        // Upload updated JSON file with cache busting
         console.log('[PATCH /api/transcription/[id]] Uploading updated JSON file...');
         const { error: uploadError } = await supabase.storage
           .from('transcriptions')
           .upload(jsonFileName, JSON.stringify(updatedJsonData, null, 2), {
             contentType: 'application/json',
             upsert: true,
+            cacheControl: '0',
           });
 
         if (uploadError) {
@@ -163,32 +147,33 @@ export async function PATCH(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params;
+    const { id } = params;
 
-    // Create Supabase client
+    // Supabase (server) client
     const cookieStore = await cookies();
     const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value;
-          },
-          set(name: string, value: string, options: CookieOptions) {
-            cookieStore.set({ name, value, ...options });
-          },
-          remove(name: string, options: CookieOptions) {
-            cookieStore.set({ name, value: '', ...options });
-          },
-        },
-      }
-    );
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  {
+    cookies: {
+      get(name: string) {
+        return cookieStore.get(name)?.value;
+      },
+      set(name: string, value: string, options?: CookieOptions) {
+        cookieStore.set({ name, value, ...options });
+      },
+      // NOTE: 'delete' (not 'remove')
+      delete(name: string, options?: CookieOptions) {
+        cookieStore.set({ name, value: '', ...options });
+      },
+    },
+  }
+);
 
-    // Check authentication
+    // Auth
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) {
       return NextResponse.json(
@@ -197,14 +182,12 @@ export async function GET(
       );
     }
 
-    // Fetch the transcription and verify ownership
+    // Get transcription (for metadata + audio_id + ownership)
     const { data: transcription, error: transcriptionError } = await supabase
       .from('transcriptions')
       .select(`
         *,
-        audios!inner (
-          user_id
-        )
+        audios!inner ( user_id )
       `)
       .eq('id', id)
       .eq('audios.user_id', user.id)
@@ -217,20 +200,43 @@ export async function GET(
       );
     }
 
+    // ----- Read JSON from Storage as source of truth -----
+    const jsonPath = `${user.id}/${transcription.audio_id}.json`;
+
+    let editedTextFromJson: string | undefined;
+    let segmentsFromJson: any[] | undefined;
+    let speakersFromJson: any[] | undefined;
+    let updatedAtFromJson: string | undefined;
+
+    const { data: fileData, error: fileErr } = await supabase.storage
+      .from('transcriptions')
+      .download(jsonPath);
+
+    if (!fileErr && fileData) {
+      const text = await fileData.text();
+      const parsed = JSON.parse(text);
+      editedTextFromJson = parsed.text;
+      segmentsFromJson = parsed.segments;
+      speakersFromJson = parsed.speakers;
+      updatedAtFromJson = parsed.updated_at;
+    }
+
+    // Response prefers Storage JSON; falls back to DB columns
     const responseTranscription = {
       id: transcription.id,
       audioId: transcription.audio_id,
       originalText: transcription.original_text,
-      editedText: transcription.edited_text || transcription.original_text, // Use edited text if available, otherwise original
-      segments: transcription.segments,
+      editedText:
+        editedTextFromJson ??
+        transcription.edited_text ??
+        transcription.original_text,
+      segments: segmentsFromJson ?? transcription.segments ?? [],
+      speakers: speakersFromJson ?? transcription.speakers ?? [],
       createdAt: transcription.created_at,
-      updatedAt: transcription.updated_at,
+      updatedAt: updatedAtFromJson ?? transcription.updated_at,
     };
 
-    return NextResponse.json({
-      success: true,
-      transcription: responseTranscription,
-    });
+    return NextResponse.json({ success: true, transcription: responseTranscription });
   } catch (error) {
     console.error('Error fetching transcription:', error);
     return NextResponse.json(

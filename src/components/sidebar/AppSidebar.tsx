@@ -170,8 +170,8 @@ export function AppSidebar({ selectedAudioId, onAudioSelect, onUploadComplete }:
                     <div className="flex items-center space-x-2 min-w-0 flex-1">
                       <FileAudio className="h-3 w-3 text-blue-500 flex-shrink-0" />
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs font-medium truncate" title={audio.originalName}>
-                          {audio.originalName}
+                        <p className="text-xs font-medium truncate" title={audio.customName || audio.originalName}>
+                          {audio.customName || audio.originalName}
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {formatDate(audio.uploadDate)}

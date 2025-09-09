@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { AppSidebar } from '@/components/sidebar/AppSidebar';
+
 import { RightSidebar } from '@/components/sidebar/RightSidebar';
 import { AudioPlayer, AudioPlayerRef } from '@/components/transcription/AudioPlayer';
 import { EditableTranscriptionSegments } from '@/components/transcription/EditableTranscriptionSegments';
@@ -9,11 +9,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
 import { 
   FileText, 
   Loader2, 
   AlertCircle, 
-  Save 
+  Save,
+  Edit,
+  Check,
+  X
 } from 'lucide-react';
 import { Audio, Transcription, TranscriptionSegment, Speaker } from '@/types';
 
@@ -39,6 +43,11 @@ export function MainLayout({
   const [editedSegments, setEditedSegments] = useState<TranscriptionSegment[]>([]);
   const [speakers, setSpeakers] = useState<Speaker[]>([]);
   const [audioPlayerRef, setAudioPlayerRef] = useState<AudioPlayerRef | null>(null);
+  
+  // Title editing states
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editedTitle, setEditedTitle] = useState('');
+  const [savingTitle, setSavingTitle] = useState(false);
 
   // Fetch audio and transcription data
   const fetchData = useCallback(async () => {
@@ -66,7 +75,25 @@ export function MainLayout({
       setTranscription(data.transcription);
       setEditedText(data.transcription?.editedText || '');
       setEditedSegments(data.transcription?.segments || []);
-      setSpeakers(data.transcription?.speakers || []);
+      // Set speakers with defaults if none exist
+      const existingSpeakers = data.transcription?.speakers || [];
+      if (existingSpeakers.length === 0) {
+        const defaultSpeakers: Speaker[] = [
+          {
+            id: 'speaker-logopeda',
+            name: 'Logopeda',
+            color: '#3B82F6'
+          },
+          {
+            id: 'speaker-alumne',
+            name: 'Alumne',
+            color: '#EF4444'
+          }
+        ];
+        setSpeakers(defaultSpeakers);
+      } else {
+        setSpeakers(existingSpeakers);
+      }
       setHasUnsavedChanges(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -101,8 +128,14 @@ export function MainLayout({
     setHasUnsavedChanges(true);
   };
 
-  // Handle segment click for audio seeking
+  // Handle segment click for selection only
   const handleSegmentClick = (segment: TranscriptionSegment) => {
+    // Only handle selection, no audio playback
+    console.log('Segment selected:', segment);
+  };
+
+  // Handle segment double click for audio seeking
+  const handleSegmentDoubleClick = (segment: TranscriptionSegment) => {
     if (audioPlayerRef) {
       audioPlayerRef.seekTo(segment.start);
       audioPlayerRef.play();
@@ -145,8 +178,60 @@ export function MainLayout({
     }
   };
 
+  // Save custom title
+  const handleSaveTitle = async () => {
+    if (!audio || !editedTitle.trim() || editedTitle.trim() === (audio.customName || audio.originalName)) {
+      setIsEditingTitle(false);
+      return;
+    }
+
+    setSavingTitle(true);
+    try {
+      const response = await fetch(`/api/audio/${audio.id}/title`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ customName: editedTitle.trim() }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save title');
+      }
+
+      // Update local audio state
+      setAudio(prev => prev ? { ...prev, customName: editedTitle.trim() } : null);
+      setIsEditingTitle(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save title');
+    } finally {
+      setSavingTitle(false);
+    }
+  };
+
+  // Handle title editing
+  const handleStartEditingTitle = () => {
+    if (audio) {
+      setEditedTitle(audio.customName || audio.originalName);
+      setIsEditingTitle(true);
+    }
+  };
+
+  const handleCancelEditingTitle = () => {
+    setIsEditingTitle(false);
+    setEditedTitle('');
+  };
+
+  const handleTitleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSaveTitle();
+    } else if (e.key === 'Escape') {
+      handleCancelEditingTitle();
+    }
+  };
+
   // Handle export
-  const handleExport = async (format: 'pdf' | 'txt') => {
+  const handleExport = async (format: 'pdf' | 'txt' | 'docx') => {
     if (!transcription) return;
 
     try {
@@ -158,7 +243,7 @@ export function MainLayout({
         body: JSON.stringify({
           transcriptionId: transcription.id,
           format,
-          filename: audio?.originalName,
+          filename: audio?.customName || audio?.originalName,
         }),
       });
 
@@ -171,7 +256,7 @@ export function MainLayout({
       const a = document.createElement('a');
       a.style.display = 'none';
       a.href = url;
-      a.download = `${audio?.originalName || 'transcription'}.${format}`;
+      a.download = `${audio?.customName || audio?.originalName || 'transcription'}.${format}`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -184,27 +269,10 @@ export function MainLayout({
   const hasSegments = transcription?.segments && transcription.segments.length > 0;
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex h-full bg-background mr-80">
       {/* Left Sidebar */}
-      <div className="hidden md:block">
-        <AppSidebar
-          selectedAudioId={selectedAudioId}
-          onAudioSelect={onAudioSelect}
-          onUploadComplete={onUploadComplete}
-        />
-      </div>
-      
-      {/* Mobile sidebar overlay */}
-      <div className="md:hidden fixed inset-0 z-50 bg-background">
-        <AppSidebar
-          selectedAudioId={selectedAudioId}
-          onAudioSelect={onAudioSelect}
-          onUploadComplete={onUploadComplete}
-        />
-      </div>
-
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 pb-20">
         {!selectedAudioId ? (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
@@ -238,19 +306,55 @@ export function MainLayout({
         ) : (
           <>
             {/* Header */}
-            <div className="border-b p-4 md:p-6">
+            <div className="p-2 md:p-5 bg-gray-50 md:pb-1">
               <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
                 <div className="flex items-center space-x-4">
                   <div>
-                    <h1 className="text-2xl font-bold">{audio?.originalName}</h1>
-                    <div className="flex items-center space-x-4 mt-2">
-                      <Badge variant="secondary">{audio?.status}</Badge>
-                      {transcription && (
-                        <span className="text-sm text-muted-foreground">
-                          Última edición: {new Date(transcription.updatedAt).toLocaleDateString()}
-                        </span>
-                      )}
-                    </div>
+                    {isEditingTitle ? (
+                      <div className="flex items-center space-x-2">
+                        <Input
+                          value={editedTitle}
+                          onChange={(e) => setEditedTitle(e.target.value)}
+                          onKeyDown={handleTitleKeyPress}
+                          className="text-2xl font-bold border-none p-0 h-auto bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+                          autoFocus
+                        />
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={handleSaveTitle}
+                          disabled={savingTitle}
+                        >
+                          {savingTitle ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Check className="h-4 w-4" />
+                          )}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={handleCancelEditingTitle}
+                          disabled={savingTitle}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center space-x-2 group">
+                        <h1 className="text-2xl font-bold">
+                          {audio?.customName || audio?.originalName}
+                        </h1>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={handleStartEditingTitle}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -271,18 +375,13 @@ export function MainLayout({
                       )}
                       <span>{saving ? 'Guardando...' : 'Guardar'}</span>
                     </Button>
-
-                    {/* Segment Count */}
-                    <div className="text-sm text-muted-foreground">
-                      {`${transcription.segments?.length || 0} segmentos`}
-                    </div>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Transcription Content */}
-            <div className="flex-1 overflow-hidden">
+            <div className="flex-1 overflow-auto">
               {audio?.status === 'processing' ? (
                 <div className="flex items-center justify-center h-full">
                   <div className="text-center">
@@ -309,11 +408,12 @@ export function MainLayout({
                   </Card>
                 </div>
               ) : transcription ? (
-                <div className="h-full bg-gray-50">
+                <div className="min-h-0 flex-1 bg-gray-50">
                   <EditableTranscriptionSegments
                     segments={editedSegments}
                     speakers={speakers}
                     onSegmentClick={handleSegmentClick}
+                    onSegmentDoubleClick={handleSegmentDoubleClick}
                     onSegmentsChange={handleSegmentsChange}
                   />
                 </div>
@@ -327,17 +427,7 @@ export function MainLayout({
               )}
             </div>
 
-            {/* Audio Player - Fixed at bottom */}
-            {audio?.status === 'completed' && (
-              <div className="border-t bg-gray-100">
-                <div className="max-w-4xl mx-auto p-2">
-                  <AudioPlayer
-                    audioId={audio.id}
-                    onRef={setAudioPlayerRef}
-                  />
-                </div>
-              </div>
-            )}
+
           </>
         )}
       </div>
@@ -352,6 +442,18 @@ export function MainLayout({
         speakers={speakers}
         onSpeakersChange={setSpeakers}
       />
+      
+      {/* Fixed Audio Player at bottom */}
+      {audio?.status === 'completed' && (
+        <div className="fixed bottom-0 left-80 right-80 bg-gray-100 border-t z-30">
+          <div className="max-w-4xl mx-auto p-2">
+            <AudioPlayer
+              audioId={audio.id}
+              onRef={setAudioPlayerRef}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

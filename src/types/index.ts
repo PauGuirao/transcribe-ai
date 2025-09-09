@@ -2,6 +2,7 @@ export interface Audio {
   id: string;
   filename: string;
   originalName: string;
+  customName?: string;
   filePath: string;
   uploadDate: Date;
   status: 'pending' | 'processing' | 'completed' | 'error';

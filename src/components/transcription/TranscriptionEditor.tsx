@@ -14,7 +14,8 @@ import {
   Edit3, 
   CheckCircle,
   AlertCircle,
-  Loader2
+  Loader2,
+  FileDown
 } from 'lucide-react';
 import type { Audio, Transcription, TranscriptionSegment } from '@/types';
 import { cn } from '@/lib/utils';
@@ -52,7 +53,9 @@ export function TranscriptionEditor({ selectedAudioId }: TranscriptionEditorProp
     setError(null);
 
     try {
-      const response = await fetch(`/api/audio/${selectedAudioId}`);
+      // Add timestamp to prevent browser caching
+      const cacheBuster = `?t=${Date.now()}`;
+      const response = await fetch(`/api/audio/${selectedAudioId}${cacheBuster}`);
       if (!response.ok) {
         throw new Error('Failed to fetch audio data');
       }
@@ -128,9 +131,10 @@ export function TranscriptionEditor({ selectedAudioId }: TranscriptionEditorProp
         throw new Error('Failed to save transcription');
       }
 
+      const result = await response.json();
       setHasUnsavedChanges(false);
-      // Update the transcription object
-      setTranscription(prev => prev ? { ...prev, editedText, updatedAt: new Date() } : null);
+      // Refresh data to get the latest version
+      await fetchData();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save');
     } finally {
@@ -139,7 +143,7 @@ export function TranscriptionEditor({ selectedAudioId }: TranscriptionEditorProp
   };
 
   // Export functions
-  const handleExport = async (format: 'pdf' | 'txt') => {
+  const handleExport = async (format: 'pdf' | 'txt' | 'docx') => {
     if (!transcription) return;
 
     try {
@@ -151,7 +155,7 @@ export function TranscriptionEditor({ selectedAudioId }: TranscriptionEditorProp
         body: JSON.stringify({
           transcriptionId: transcription.id,
           format,
-          filename: audio?.originalName?.replace(/\.[^/.]+$/, '') || 'transcription',
+          filename: (audio?.customName || audio?.originalName)?.replace(/\.[^/.]+$/, '') || 'transcription',
         }),
       });
 
@@ -163,7 +167,7 @@ export function TranscriptionEditor({ selectedAudioId }: TranscriptionEditorProp
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${audio?.originalName?.replace(/\.[^/.]+$/, '') || 'transcription'}.${format}`;
+      a.download = `${(audio?.customName || audio?.originalName)?.replace(/\.[^/.]+$/, '') || 'transcription'}.${format}`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -385,6 +389,16 @@ export function TranscriptionEditor({ selectedAudioId }: TranscriptionEditorProp
                   >
                     <Download className="h-4 w-4" />
                     <span className="hidden sm:inline">PDF</span>
+                  </Button>
+                  
+                  <Button
+                    onClick={() => handleExport('docx')}
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center space-x-2"
+                  >
+                    <FileDown className="h-4 w-4" />
+                    <span className="hidden sm:inline">DOCX</span>
                   </Button>
                 </div>
               </div>

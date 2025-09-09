@@ -11,26 +11,21 @@ import { cn } from '@/lib/utils';
 interface TranscriptionSegmentsProps {
   segments: TranscriptionSegment[];
   onSegmentClick?: (segment: TranscriptionSegment) => void;
+  onSegmentDoubleClick?: (segment: TranscriptionSegment) => void;
   className?: string;
 }
 
 export function TranscriptionSegments({ 
   segments, 
   onSegmentClick, 
+  onSegmentDoubleClick,
   className 
 }: TranscriptionSegmentsProps) {
   const [selectedSegmentId, setSelectedSegmentId] = useState<number | null>(null);
 
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = Math.floor(seconds % 60);
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
 
-  const handleSegmentClick = (segment: TranscriptionSegment) => {
-    setSelectedSegmentId(segment.id === selectedSegmentId ? null : segment.id);
-    onSegmentClick?.(segment);
-  };
+
+
 
 
 
@@ -61,13 +56,15 @@ export function TranscriptionSegments({
               "cursor-pointer transition-all hover:shadow-md",
               selectedSegmentId === segment.id && "ring-2 ring-primary"
             )}
-            onClick={() => handleSegmentClick(segment)}
+            onClick={() => {
+              setSelectedSegmentId(segment.id === selectedSegmentId ? null : segment.id);
+              onSegmentClick?.(segment);
+            }}
+            onDoubleClick={() => onSegmentDoubleClick?.(segment)}
           >
             <CardContent className="p-3">
               <div className="flex items-center justify-between mb-2">
-                <Badge variant="outline" className="text-xs">
-                  {formatTime(segment.start)} - {formatTime(segment.end)}
-                </Badge>
+
                 <Button
                   variant="ghost"
                   size="sm"

@@ -4,14 +4,14 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Download, FileText, FileType, Settings, Info, Users, Plus, Edit3, Trash2, Check, X } from 'lucide-react';
+
+import { Download, Settings, Info, Users } from 'lucide-react';
 import { Audio, Transcription, Speaker } from '@/types';
 
 interface RightSidebarProps {
   audio: Audio | null;
   transcription: Transcription | null;
-  onExport: (format: 'pdf' | 'txt') => void;
+  onExport: (format: 'pdf' | 'txt' | 'docx') => void;
   wordCount: number;
   hasUnsavedChanges: boolean;
   speakers: Speaker[];
@@ -27,9 +27,7 @@ export function RightSidebar({
   speakers,
   onSpeakersChange
 }: RightSidebarProps) {
-  const [editingSpeakerId, setEditingSpeakerId] = useState<string | null>(null);
-  const [editSpeakerName, setEditSpeakerName] = useState('');
-  const [newSpeakerName, setNewSpeakerName] = useState('');
+
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -44,64 +42,11 @@ export function RightSidebar({
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
-  const generateSpeakerColor = () => {
-    const colors = [
-      '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6',
-      '#EC4899', '#06B6D4', '#84CC16', '#F97316', '#6366F1'
-    ];
-    return colors[Math.floor(Math.random() * colors.length)];
-  };
 
-  const addSpeaker = () => {
-    if (!newSpeakerName.trim()) return;
-    
-    const newSpeaker: Speaker = {
-      id: `speaker-${Date.now()}`,
-      name: newSpeakerName.trim(),
-      color: generateSpeakerColor()
-    };
-    
-    onSpeakersChange([...speakers, newSpeaker]);
-    setNewSpeakerName('');
-  };
-
-  const startEditingSpeaker = (speaker: Speaker) => {
-    setEditingSpeakerId(speaker.id);
-    setEditSpeakerName(speaker.name);
-  };
-
-  const saveEditSpeaker = () => {
-    if (!editSpeakerName.trim() || !editingSpeakerId) return;
-    
-    const updatedSpeakers = speakers.map(speaker => 
-      speaker.id === editingSpeakerId 
-        ? { ...speaker, name: editSpeakerName.trim() }
-        : speaker
-    );
-    
-    onSpeakersChange(updatedSpeakers);
-    setEditingSpeakerId(null);
-    setEditSpeakerName('');
-  };
-
-  const cancelEditSpeaker = () => {
-    setEditingSpeakerId(null);
-    setEditSpeakerName('');
-  };
-
-  const deleteSpeaker = (speakerId: string) => {
-    const updatedSpeakers = speakers.filter(speaker => speaker.id !== speakerId);
-    onSpeakersChange(updatedSpeakers);
-    
-    if (editingSpeakerId === speakerId) {
-      setEditingSpeakerId(null);
-      setEditSpeakerName('');
-    }
-  };
 
   if (!audio || !transcription) {
     return (
-      <div className="w-80 bg-background border-l p-6">
+      <div className="fixed top-[73px] right-0 bottom-0 w-80 bg-background border-l p-6 z-40">
         <div className="text-center text-muted-foreground">
           <Settings className="h-12 w-12 mx-auto mb-4 opacity-50" />
           <p>Selecciona un archivo de audio para ver las opciones</p>
@@ -111,9 +56,9 @@ export function RightSidebar({
   }
 
   return (
-    <div className="w-80 bg-background border-l flex flex-col h-full">
+    <div className="fixed top-[73px] right-0 bottom-0 w-80 bg-background border-l flex flex-col z-40">
       {/* Header */}
-      <div className="p-6 border-b">
+      <div className="p-3 border-b">
         <h2 className="text-lg font-semibold mb-2">Opciones</h2>
         <p className="text-sm text-muted-foreground">
           Exportar y configurar transcripción
@@ -133,7 +78,6 @@ export function RightSidebar({
               className="w-full justify-start"
               variant="outline"
             >
-              <FileText className="h-4 w-4 mr-2" />
               Exportar como PDF
             </Button>
             <Button 
@@ -141,8 +85,14 @@ export function RightSidebar({
               className="w-full justify-start"
               variant="outline"
             >
-              <FileType className="h-4 w-4 mr-2" />
               Exportar como TXT
+            </Button>
+            <Button 
+              onClick={() => onExport('docx')} 
+              className="w-full justify-start"
+              variant="outline"
+            >
+              Exportar como DOCX
             </Button>
           </div>
         </div>
@@ -156,25 +106,7 @@ export function RightSidebar({
             <h3 className="text-base font-medium">Speakers</h3>
           </div>
           
-          {/* Add New Speaker */}
-          <div className="space-y-3 mb-4">
-            <div className="flex space-x-2">
-              <Input
-                placeholder="Nombre del speaker"
-                value={newSpeakerName}
-                onChange={(e) => setNewSpeakerName(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && addSpeaker()}
-                className="flex-1"
-              />
-              <Button
-                onClick={addSpeaker}
-                size="sm"
-                disabled={!newSpeakerName.trim()}
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+
           
           {/* Speakers List */}
           <div className="space-y-2 max-h-32 overflow-y-auto">
@@ -185,55 +117,7 @@ export function RightSidebar({
                     className="w-3 h-3 rounded-full" 
                     style={{ backgroundColor: speaker.color }}
                   />
-                  {editingSpeakerId === speaker.id ? (
-                    <div className="flex space-x-1 flex-1">
-                      <Input
-                        value={editSpeakerName}
-                        onChange={(e) => setEditSpeakerName(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && saveEditSpeaker()}
-                        className="h-6 text-xs flex-1"
-                        autoFocus
-                      />
-                      <Button
-                        onClick={saveEditSpeaker}
-                        size="sm"
-                        variant="ghost"
-                        className="h-6 w-6 p-0 text-green-600"
-                      >
-                        <Check className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        onClick={cancelEditSpeaker}
-                        size="sm"
-                        variant="ghost"
-                        className="h-6 w-6 p-0 text-red-600"
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  ) : (
-                    <>
-                      <span className="text-sm font-medium flex-1">{speaker.name}</span>
-                      <div className="flex space-x-1">
-                        <Button
-                          onClick={() => startEditingSpeaker(speaker)}
-                          size="sm"
-                          variant="ghost"
-                          className="h-6 w-6 p-0 text-gray-600"
-                        >
-                          <Edit3 className="h-3 w-3" />
-                        </Button>
-                        <Button
-                          onClick={() => deleteSpeaker(speaker.id)}
-                          size="sm"
-                          variant="ghost"
-                          className="h-6 w-6 p-0 text-red-600"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </>
-                  )}
+                  <span className="text-sm font-medium flex-1">{speaker.name}</span>
                 </div>
               </div>
             ))}
@@ -276,31 +160,6 @@ export function RightSidebar({
         </div>
 
         <Separator />
-
-        {/* Transcription Stats */}
-        {transcription.segments && (
-          <div>
-            <h3 className="text-base font-medium mb-4">Estadísticas</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Segmentos:</span>
-                <span className="font-medium">{transcription.segments.length}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Creado:</span>
-                <span className="font-medium">
-                  {new Date(transcription.createdAt).toLocaleDateString()}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Actualizado:</span>
-                <span className="font-medium">
-                  {new Date(transcription.updatedAt).toLocaleDateString()}
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
