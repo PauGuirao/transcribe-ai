@@ -2,6 +2,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
+import type {
+  ReplicatePrediction,
+  ReplicateOutput,
+  ReplicateSegment,
+  TranscriptionOutput,
+  DatabaseStatus,
+  TranscriptionRecord,
+} from "@/types/replicate";
 
 export const runtime = "nodejs";
 
@@ -96,18 +104,18 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  let prediction: any;
+  let prediction: ReplicatePrediction;
   try {
     prediction = JSON.parse(payload);
-  } catch (e) {
+  } catch (_err) {
     return NextResponse.json(
       { error: "Invalid JSON payload" },
       { status: 400, headers: NO_CACHE_HEADERS }
     );
   }
 
-  const status: string = prediction.status;
-  const predictionId: string = prediction.id;
+  const status = prediction.status;
+  const predictionId = prediction.id;
 
   // Find mapping row for this prediction
   const { data: row, error: mapErr } = await supabaseAdmin
@@ -130,32 +138,45 @@ export async function POST(request: NextRequest) {
   const previousPath: string | undefined = row.json_path;
 
   try {
+    // Convert Replicate status to database status
+    let dbStatus: DatabaseStatus = "processing";
+
     if (status === "succeeded" || status === "completed") {
+      dbStatus = "completed";
+    } else if (
+      status === "failed" ||
+      status === "canceled" ||
+      status === "error"
+    ) {
+      dbStatus = "error";
+    }
+
+    if (dbStatus === "completed") {
       const output = prediction.output;
 
       // Extract text + segments robustly
       let text = "";
-      let segments: any[] = [];
+      let segments: ReplicateSegment[] = [];
 
       if (output) {
         if (Array.isArray(output)) {
           const candidate =
             output.find(
-              (item) =>
+              (item): item is ReplicateOutput =>
                 item &&
                 typeof item === "object" &&
                 ("text" in item || "segments" in item)
             ) || output[0];
 
           if (candidate && typeof candidate === "object") {
-            segments = (candidate as any).segments || [];
-            text = (candidate as any).text || "";
+            segments = (candidate as ReplicateOutput).segments || [];
+            text = (candidate as ReplicateOutput).text || "";
           } else if (typeof candidate === "string") {
             text = output.join(" ");
           }
-        } else if (typeof output === "object") {
-          segments = output.segments || [];
-          text = output.text || "";
+        } else if (typeof output === "object" && output !== null) {
+          segments = (output as ReplicateOutput).segments || [];
+          text = (output as ReplicateOutput).text || "";
         } else if (typeof output === "string") {
           text = output;
         }
@@ -163,7 +184,7 @@ export async function POST(request: NextRequest) {
 
       if (!text && Array.isArray(segments)) {
         text = segments
-          .map((segment: any) =>
+          .map((segment) =>
             typeof segment?.text === "string" ? segment.text : ""
           )
           .join(" ")
@@ -172,7 +193,11 @@ export async function POST(request: NextRequest) {
 
       // Build new versioned path and upload JSON
       const newPath = buildVersionedPath(userId, audioId);
-      const jsonString = JSON.stringify(output ?? { text, segments }, null, 2);
+      const outputData: TranscriptionOutput = {
+        text: text || "",
+        segments: segments || [],
+      };
+      const jsonString = JSON.stringify(output ?? outputData, null, 2);
 
       const { error: uploadError } = await supabaseAdmin.storage
         .from("transcriptions")
@@ -197,8 +222,8 @@ export async function POST(request: NextRequest) {
         .update({
           json_path: newPath,
           updated_at: new Date().toISOString(),
-          edited_text: text ?? null, // optional: mirror into columns
-          segments: Array.isArray(segments) ? segments : [],
+          edited_text: text || null, // optional: mirror into columns
+          segments: segments || [],
           status: "completed",
         })
         .eq("id", transcriptionId)
@@ -239,10 +264,11 @@ export async function POST(request: NextRequest) {
     }
 
     if (status === "failed" || status === "canceled" || status === "error") {
-      const message =
-        typeof prediction.error === "string"
+      const errorMessage = prediction.error
+        ? typeof prediction.error === "string"
           ? prediction.error
-          : JSON.stringify(prediction.error || {});
+          : JSON.stringify(prediction.error)
+        : "Unknown error";
 
       // Update statuses to error
       await supabaseAdmin
@@ -255,7 +281,7 @@ export async function POST(request: NextRequest) {
         .from("transcriptions")
         .update({
           status: "error",
-          error_message: message,
+          error_message: errorMessage,
           updated_at: new Date().toISOString(),
         })
         .eq("id", transcriptionId)

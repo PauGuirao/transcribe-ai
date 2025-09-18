@@ -7,6 +7,7 @@ import AppLayout from "@/components/layout/AppLayout";
 import { Input } from "@/components/ui/input";
 import { ToolsSidePanel } from "@/components/annotation/ToolsSidePanel";
 import { AudioUploadResult } from "@/components/audio-upload/AudioUpload";
+import type { Transcription, TranscriptionSegment, Speaker } from "@/types";
 
 interface Annotation {
   id: string;
@@ -252,22 +253,24 @@ export default function AnnotatePage() {
               <div className="relative z-10 pointer-events-none">
                 {transcription.segments && transcription.segments.length > 0 ? (
                   <div className="space-y-1">
-                    {transcription.segments.map((segment, index) => {
-                      const speaker = speakers.find(
-                        (s) => s.id === segment.speakerId
-                      );
-                      return (
-                        <div key={index} className="mb-4">
-                          <p className="text-gray-800 leading-relaxed">
-                            <span className="font-medium">{index + 1}.</span>
-                            <span className="font-semibold">
-                              {speaker?.name || "Unknown Speaker"}:
-                            </span>
-                            {segment.text}
-                          </p>
-                        </div>
-                      );
-                    })}
+                    {transcription.segments.map(
+                      (segment: TranscriptionSegment, index: number) => {
+                        const speaker = speakers.find(
+                          (s) => s.id === segment.speakerId
+                        );
+                        return (
+                          <div key={index} className="mb-4">
+                            <p className="text-gray-800 leading-relaxed">
+                              <span className="font-medium">{index + 1}.</span>
+                              <span className="font-semibold">
+                                {speaker?.name || "Unknown Speaker"}:
+                              </span>
+                              {segment.text}
+                            </p>
+                          </div>
+                        );
+                      }
+                    )}
                   </div>
                 ) : (
                   <div className="text-gray-800 leading-relaxed">
