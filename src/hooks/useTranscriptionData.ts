@@ -169,7 +169,29 @@ export function useTranscriptionData(audioId?: string) {
   };
 
   const saveTitle = async (newTitle: string) => {
-    // ...
+    if (!audio || !newTitle) return;
+
+    try {
+      const response = await fetch(`/api/audio/${audio.id}/title`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ customName: newTitle }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update title");
+      }
+
+      await fetchData(); // Refresh data to get the updated title
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to update title";
+      setError(errorMessage);
+      console.error("Failed to save title:", errorMessage);
+      throw err; // Re-throw to handle in the component
+    }
   };
 
   return {

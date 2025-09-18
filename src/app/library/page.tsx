@@ -37,7 +37,7 @@ interface AudioFile {
   customName?: string;
   fileId: string;
   uploadDate: string;
-  status: "completed" | "processing" | "failed" | "pending";
+  status: "completed" | "processing" | "failed" | "pending" | "uploaded";
   transcription?: {
     id: string;
     audioId: string;
@@ -226,35 +226,6 @@ export default function LibraryPage() {
     setNewFileName("");
   };
 
-  const handleDoubleClick = (fileId: string) => {
-    // Navigate to transcribe page
-    router.push(`/transcribe?audioId=${fileId}`);
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "text-green-600 bg-green-100";
-      case "processing":
-        return "text-yellow-600 bg-yellow-100";
-      case "failed":
-        return "text-red-600 bg-red-100";
-      case "pending":
-        return "text-blue-600 bg-blue-100";
-      default:
-        return "text-gray-600 bg-gray-100";
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
-
   const formatDateKey = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("es-ES", {
@@ -281,13 +252,6 @@ export default function LibraryPage() {
     });
 
     return sortedEntries;
-  };
-
-  const getDisplayFiles = () => {
-    if (filterType === "day") {
-      return groupFilesByDay(files);
-    }
-    return files;
   };
 
   const renderFileCard = (file: AudioFile) => {
@@ -323,11 +287,6 @@ export default function LibraryPage() {
                 <p className="text-sm font-semibold text-gray-900 truncate">
                   {file.customName || file.originalName}
                 </p>
-                {file.customName && (
-                  <p className="text-xs text-gray-500 truncate">
-                    {file.originalName}
-                  </p>
-                )}
               </div>
             </div>
             {getStatusBadge()}
@@ -336,67 +295,94 @@ export default function LibraryPage() {
 
         {/* --- SECCIÓN INFERIOR: Barra de Acciones a Ancho Completo --- */}
         <div className="flex w-full bg-gray-50 border-t border-gray-200">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+          {file.status === "uploaded" ? (
+            <>
               <Button
                 variant="ghost"
-                className="flex-1 text-xs h-12 rounded-none gap-2 text-gray-600 hover:bg-blue-100 hover:text-blue-700"
+                className="flex-4 text-xs h-12 rounded-none gap-2 text-blue-600 hover:bg-blue-100 hover:text-blue-700"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleTranscribe(file.id);
+                }}
               >
-                <Download className="h-4 w-4" />
+                <FileText className="h-4 w-4" />
+                <span>Transcriure</span>
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={() => handleDownloadPDF(file.transcription!.id)}
+              <Button
+                variant="ghost"
+                className="flex-1 text-xs h-12 rounded-none gap-2 text-red-600 hover:bg-red-100 hover:text-red-700"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(file.id);
+                }}
               >
-                Descargar PDF
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => handleDownloadDOCX(file.transcription!.id)}
-              >
-                Descargar Word
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </>
+          ) : (
+            <>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="flex-1 text-xs h-12 rounded-none gap-2 text-gray-600 hover:bg-blue-100 hover:text-blue-700"
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={() => handleDownloadPDF(file.transcription!.id)}
+                  >
+                    Descargar PDF
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleDownloadDOCX(file.transcription!.id)}
+                  >
+                    Descargar Word
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
 
-          {/* 👇 BOTÓN "ANOTAR" AÑADIDO DE NUEVO */}
-          {file.status === "completed" && (
-            <Button
-              variant="ghost"
-              className="flex-1 text-xs h-12 rounded-none gap-2 text-primary hover:bg-primary/10"
-              onClick={(e) => {
-                e.stopPropagation();
-                router.push(`/annotate?audioId=${file.id}`);
-              }}
-              title="Abrir en modo anotación"
-            >
-              <PenTool className="h-4 w-4" />
-              <span>Anotar</span>
-            </Button>
+              {file.status === "completed" && (
+                <Button
+                  variant="ghost"
+                  className="flex-1 text-xs h-12 rounded-none gap-2 text-primary hover:bg-primary/10"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    router.push(`/annotate?audioId=${file.id}`);
+                  }}
+                  title="Abrir en modo anotación"
+                >
+                  <PenTool className="h-4 w-4" />
+                  <span>Anotar</span>
+                </Button>
+              )}
+
+              <Button
+                variant="ghost"
+                className="flex-1 text-xs h-12 rounded-none gap-2 text-gray-600 hover:bg-gray-200"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleEdit(file);
+                }}
+              >
+                <Edit className="h-4 w-4" />
+                <span>Editar</span>
+              </Button>
+
+              <Button
+                variant="ghost"
+                className="flex-1 text-xs h-12 rounded-none gap-2 text-red-600 hover:bg-red-100 hover:text-red-700"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(file.id);
+                }}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </>
           )}
-
-          <Button
-            variant="ghost"
-            className="flex-1 text-xs h-12 rounded-none gap-2 text-gray-600 hover:bg-gray-200"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleEdit(file);
-            }}
-          >
-            <Edit className="h-4 w-4" />
-            <span>Editar</span>
-          </Button>
-
-          <Button
-            variant="ghost"
-            className="flex-1 text-xs h-12 rounded-none gap-2 text-red-600 hover:bg-red-100 hover:text-red-700"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleDelete(file.id);
-            }}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
         </div>
       </div>
     );
@@ -404,6 +390,10 @@ export default function LibraryPage() {
 
   const handleAudioSelect = (audioId: string) => {
     // Handle audio selection if needed
+  };
+
+  const handleTranscribe = async (audioId: string) => {
+    // Redirect to transcription page
   };
 
   const handleUploadComplete = (_result: AudioUploadResult) => {

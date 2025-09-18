@@ -92,7 +92,6 @@ export default function Navbar() {
               <p className="truncate text-sm text-muted-foreground">
                 {userEmail}
               </p>
-              <p className="text-xs font-medium text-primary">Plan actual</p>
             </div>
             <DropdownMenuSeparator className="my-0" />
             <div className="py-2">
