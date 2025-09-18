@@ -214,124 +214,146 @@ export function AudioPlayer({ audioId, className, onRef }: AudioPlayerProps) {
   }
 
   return (
-    <div className={cn("w-full", className)}>
-      <div className="p-4">
-        <audio
-          ref={audioRef}
-          src={`/api/audio/${audioId}/file`}
-          preload="metadata"
-        />
-        
-        <div className="flex items-center space-x-3">
-          {/* Time Display */}
-          <div className="flex items-center space-x-1 text-sm text-muted-foreground min-w-[80px] font-medium">
-            <span>{formatTime(currentTime)}</span>
-            <span>/</span>
-            <span>{formatTime(duration)}</span>
-          </div>
+  <div className={cn("w-full", className)}>
+    <div className="rounded-xl border bg-card/70 backdrop-blur p-4 shadow-sm">
+      <audio
+        ref={audioRef}
+        src={`/api/audio/${audioId}/file`}
+        preload="metadata"
+      />
 
-          {/* Main Controls */}
-          <div className="flex items-center space-x-1">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={skipBackward}
-              disabled={isLoading}
-              className="h-10 w-10 p-0"
-            >
-              <SkipBack className="h-5 w-5" />
-            </Button>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={skipForward}
-              disabled={isLoading}
-              className="h-10 w-10 p-0"
-            >
-              <SkipForward className="h-5 w-5" />
-            </Button>
-            
-            <Button
-              onClick={togglePlayPause}
-              disabled={isLoading}
-              size="sm"
-              className="h-12 w-12 p-0"
-            >
-              {isPlaying ? (
-                <Pause className="h-6 w-6" />
-              ) : (
-                <Play className="h-6 w-6" />
-              )}
-            </Button>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={skipForward}
-              disabled={isLoading}
-              className="h-5 w-5 p-0"
-            >
-              <SkipForward className="h-2.5 w-2.5" />
-            </Button>
-            
-            {/* Playback Speed */}
-            <select
-              value={playbackRate}
-              onChange={(e) => setPlaybackRate(Number(e.target.value))}
-              className="text-xs border rounded px-1 py-0.5 bg-background h-5 w-12"
-              disabled={isLoading}
-            >
-              <option value={0.5}>0.5x</option>
-              <option value={0.75}>0.75x</option>
-              <option value={1}>1x</option>
-              <option value={1.25}>1.25x</option>
-              <option value={1.5}>1.5x</option>
-              <option value={2}>2x</option>
-            </select>
-          </div>
+      <div className="flex items-center gap-4">
+        {/* Time */}
+        <div className="min-w-[110px] text-sm text-muted-foreground tabular-nums">
+          <span className="font-medium">{formatTime(currentTime)}</span>
+          <span className="mx-1">/</span>
+          <span>{formatTime(duration)}</span>
+        </div>
 
-          {/* Progress Bar - takes remaining space */}
-          <div className="flex-1 mx-2">
+        {/* Controls */}
+        <div className="flex items-center gap-1.5">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={skipBackward}
+            disabled={isLoading}
+            className="h-9 w-9"
+            title="Retroceder 10s"
+            aria-label="Retroceder 10 segundos"
+          >
+            <SkipBack className="h-4 w-4" />
+          </Button>
+
+          <Button
+            size="icon"
+            onClick={togglePlayPause}
+            disabled={isLoading}
+            className="h-11 w-11 rounded-full bg-black text-white hover:bg-black/90"
+            title={isPlaying ? "Pausa" : "Reproducir"}
+            aria-label={isPlaying ? "Pausa" : "Reproducir"}
+          >
+            {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
+          </Button>
+
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={skipForward}
+            disabled={isLoading}
+            className="h-9 w-9"
+            title="Avanzar 10s"
+            aria-label="Avanzar 10 segundos"
+          >
+            <SkipForward className="h-4 w-4" />
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={resetAudio}
+            disabled={isLoading}
+            className="h-9 w-9"
+            title="Reiniciar"
+            aria-label="Reiniciar"
+          >
+            <RotateCcw className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Speed */}
+        <div className="flex items-center gap-2">
+          <label htmlFor="rate" className="sr-only">Velocidad</label>
+          <select
+            id="rate"
+            value={playbackRate}
+            onChange={(e) => setPlaybackRate(Number(e.target.value))}
+            disabled={isLoading}
+            className="h-8 rounded-md border bg-background px-2 text-xs font-medium"
+            title="Velocidad de reproducción"
+          >
+            <option value={0.5}>0.5×</option>
+            <option value={0.75}>0.75×</option>
+            <option value={1}>1×</option>
+            <option value={1.25}>1.25×</option>
+            <option value={1.5}>1.5×</option>
+            <option value={2}>2×</option>
+          </select>
+        </div>
+
+        {/* Progress (flex grows) */}
+        <div className="mx-2 flex-1">
+          <Slider
+            value={[progressPercentage]}
+            onValueChange={handleSeek}
+            max={100}
+            step={0.1}
+            disabled={isLoading || !duration}
+            aria-label="Progreso"
+            className={cn(
+              // track
+              "[&>span:first-child]:h-2 [&>span:first-child]:rounded-full [&>span:first-child]:bg-muted",
+              // range (filled)
+              "[&>span:first-child>span]:bg-black",
+              // thumb
+              "[&_[role=slider]]:h-4 [&_[role=slider]]:w-4 [&_[role=slider]]:border [&_[role=slider]]:border-border [&_[role=slider]]:bg-background"
+            )}
+          />
+        </div>
+
+        {/* Volume */}
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleMute}
+            className="h-8 w-8"
+            title={isMuted || volume === 0 ? "Activar sonido" : "Silenciar"}
+            aria-label={isMuted || volume === 0 ? "Activar sonido" : "Silenciar"}
+          >
+            {isMuted || volume === 0 ? (
+              <VolumeX className="h-5 w-5" />
+            ) : (
+              <Volume2 className="h-5 w-5" />
+            )}
+          </Button>
+          <div className="w-24">
             <Slider
-              value={[progressPercentage]}
-              onValueChange={handleSeek}
+              value={[isMuted ? 0 : volume * 100]}
+              onValueChange={handleVolumeChange}
               max={100}
-              step={0.1}
-              className="w-full [&>span:first-child]:h-3 [&>span:first-child]:bg-blue-500 [&_[role=slider]]:h-5 [&_[role=slider]]:w-5 [&_[role=slider]]:bg-blue-600 [&_.slider-track]:bg-blue-500 [&_.slider-range]:bg-blue-600"
-              style={{
-                background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${progressPercentage}%, #e5e7eb ${progressPercentage}%, #e5e7eb 100%)`
-              }}
-              disabled={isLoading || !duration}
-            />
-          </div>
-
-          {/* Volume Controls - on the right */}
-          <div className="flex items-center space-x-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleMute}
-              className="h-8 w-8 p-0"
-            >
-              {isMuted || volume === 0 ? (
-                <VolumeX className="h-5 w-5" />
-              ) : (
-                <Volume2 className="h-5 w-5" />
+              step={1}
+              aria-label="Volumen"
+              className={cn(
+                "[&>span:first-child]:h-1.5 [&>span:first-child]:rounded-full [&>span:first-child]:bg-muted",
+                "[&>span:first-child>span]:bg-black",
+                "[&_[role=slider]]:h-3.5 [&_[role=slider]]:w-3.5 [&_[role=slider]]:border [&_[role=slider]]:border-border [&_[role=slider]]:bg-background"
               )}
-            </Button>
-            
-            <div className="w-16">
-              <Slider
-                value={[isMuted ? 0 : volume * 100]}
-                onValueChange={handleVolumeChange}
-                max={100}
-                step={1}
-              />
-            </div>
+            />
           </div>
         </div>
       </div>
     </div>
-  );
+  </div>
+);
+
 }

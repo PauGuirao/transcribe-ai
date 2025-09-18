@@ -208,25 +208,16 @@ export default function AnnotatePage() {
         onUploadComplete={handleUploadComplete}
       >
         <div className="flex h-full">
-          <div className="flex-1 p-6">
+          <div className="flex-1 p-6 flex items-center justify-center">
             <div className="text-center">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                Annotation Mode
+                Mode anotació
               </h2>
               <p className="text-gray-600">
-                Select an audio file from the sidebar to start annotating.
+                Selecciona una transcripció desde la teva biblioteca para començar a anotar.
               </p>
             </div>
           </div>
-          <ToolsSidePanel
-            selectedTool={selectedTool}
-            onToolSelect={setSelectedTool}
-            annotations={annotations}
-            onClearAnnotations={clearAnnotations}
-            onSaveAnnotations={saveAnnotations}
-            onExportAnnotations={exportAnnotations}
-            onRemoveAnnotation={removeAnnotation}
-          />
         </div>
       </AppLayout>
     );

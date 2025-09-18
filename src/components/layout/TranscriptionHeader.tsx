@@ -77,14 +77,15 @@ export function TranscriptionHeader({ audio, onSaveTitle, onSaveTranscription, h
               </Button>
             </div>
           ) : (
-            <div className="flex items-center space-x-2 group">
-              <h1 className="text-2xl font-bold">
-                {audio?.customName || audio?.originalName || 'Untitled'}
-              </h1>
-              <Button size="icon" variant="ghost" onClick={handleStartEditingTitle} className="opacity-0 group-hover:opacity-100 transition-opacity">
-                <Edit className="h-4 w-4" />
-              </Button>
-            </div>
+            // We replace 'space-x-80' with 'w-full' and 'justify-between'
+<div className="flex w-full items-center justify-between group">
+  <h1 className="text-xl font-bold">
+    {audio?.customName || audio?.originalName || 'Untitled'}
+  </h1>
+  <Button size="icon" variant="ghost" onClick={handleStartEditingTitle} className="opacity-0 group-hover:opacity-100 transition-opacity">
+    <Edit className="h-4 w-4" />
+  </Button>
+</div>
           )}
         {/* Save button */}
         <Button onClick={onSaveTranscription} disabled={!hasUnsavedChanges || isSaving} size="sm">

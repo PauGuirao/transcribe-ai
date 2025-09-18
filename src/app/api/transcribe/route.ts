@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
         const audioDataUrl = `data:${contentType};base64,${buffer.toString(
           "base64"
         )}`;
-        const origin = "https://e3036631696c.ngrok-free.app";
+        const origin = request.headers.get('origin') ?? new URL(request.url).origin;
 
         const prediction = await replicate.predictions.create({
           version: replicateWhisperVersion,

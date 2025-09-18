@@ -36,6 +36,7 @@ export interface Transcription {
   editedText: string;
   segments?: TranscriptionSegment[];
   speakers?: Speaker[];
+  alumneId?: string | null;
   createdAt: Date;
   updatedAt: Date;
   audio?: Audio;

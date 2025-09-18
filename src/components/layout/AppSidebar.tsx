@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { BookOpen, Home, Mic, Clock, Loader2, CheckCircle, AlertCircle, RefreshCw, PenTool } from 'lucide-react';
+import { BookOpen, Home, Mic, Clock, Loader2, CheckCircle, AlertCircle, RefreshCw, PenTool, User } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -89,6 +89,11 @@ export default function AppSidebar({ selectedAudioId, onAudioSelect, onUploadCom
       title: 'Biblioteca',
       icon: BookOpen,
       path: '/library',
+    },
+    {
+      title: 'Alumnes',
+      icon: User,
+      path: '/profiles',
     },
   ];
 

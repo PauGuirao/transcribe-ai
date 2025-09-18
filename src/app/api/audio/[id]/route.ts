@@ -57,6 +57,19 @@ export async function GET(
       );
     }
 
+    // Fetch existing alumne assignment if any
+    let alumneId: string | null = null
+    const { data: alumneRows } = await supabase
+      .from('transcriptions')
+      .select('alumne_id')
+      .eq('audio_id', audioFile.id)
+      .eq('user_id', user.id)
+      .limit(1)
+
+    if (alumneRows && alumneRows.length > 0) {
+      alumneId = alumneRows[0].alumne_id ?? null
+    }
+
     // Fetch transcription data from Storage bucket JSON file
     let transformedTranscription = null;
 
@@ -98,6 +111,7 @@ export async function GET(
                       color: "#EF4444",
                     },
                   ],
+            alumneId,
             createdAt: audioFile.created_at,
             updatedAt: audioFile.updated_at,
           };

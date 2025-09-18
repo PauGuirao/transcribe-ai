@@ -77,18 +77,6 @@ export default function Navbar() {
             <DropdownMenuSeparator className="my-0" />
             <div className="py-2">
               <DropdownMenuItem className="px-4">
-                <List className="h-4 w-4 text-orange-500" />
-                Mis generaciones
-              </DropdownMenuItem>
-              <DropdownMenuItem className="px-4">
-                <CreditCard className="h-4 w-4 text-orange-500" />
-                Comprar créditos
-              </DropdownMenuItem>
-              <DropdownMenuItem className="px-4">
-                <Settings className="h-4 w-4 text-orange-500" />
-                Ajustes
-              </DropdownMenuItem>
-              <DropdownMenuItem className="px-4">
                 <BadgeCheck className="h-4 w-4 text-orange-500" />
                 Gestionar suscripción
               </DropdownMenuItem>

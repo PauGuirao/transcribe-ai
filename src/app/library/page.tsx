@@ -11,7 +11,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { FileText, Download, Trash2, Edit, ChevronDown } from 'lucide-react';
+import { FileText, Download, Trash2, Edit, ChevronDown, PenTool } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import AppLayout from '@/components/layout/AppLayout';
 import { AudioUploadResult } from '@/components/audio-upload/AudioUpload';
@@ -56,7 +56,7 @@ export default function LibraryPage() {
   const [editingFile, setEditingFile] = useState<AudioFile | null>(null);
   const [newFileName, setNewFileName] = useState('');
   const [updating, setUpdating] = useState(false);
-  const [filterType, setFilterType] = useState<'default' | 'day'>('default');
+  const [filterType, setFilterType] = useState<'default' | 'day'>('day');
   const router = useRouter();
 
   const fetchFiles = async () => {
@@ -265,98 +265,100 @@ export default function LibraryPage() {
     return files;
   };
 
-  const renderFileCard = (file: AudioFile) => (
+ 
+  const renderFileCard = (file: AudioFile) => {
+  const getStatusBadge = () => {
+    const rawStatus = String(file.status ?? "").toLowerCase() as keyof typeof STATUS_MAP;
+    const meta = STATUS_MAP[rawStatus] ?? { label: file.status ?? "—", classes: "bg-gray-100 text-gray-800" };
+    return (
+      <div
+        className={`px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ${meta.classes}`}
+        title={String(file.status ?? "")}
+      >
+        {meta.label}
+      </div>
+    );
+  };
+
+  return (
     <div 
       key={file.id} 
-      className="bg-white border border-gray-200 rounded-lg hover:shadow-md hover:border-gray-300 transition-all cursor-pointer group h-32"
+      className="bg-white border border-gray-200 rounded-md overflow-hidden flex flex-col justify-between transition-all hover:shadow-lg hover:border-gray-300 h-40"
       onDoubleClick={() => handleDoubleClick(file.id)}
     >
-      <div className="p-4 h-full flex flex-col relative">
-        {/* Header with icon and status */}
-        <div className="flex items-start justify-between mb-2 gap-2">
-          <div className="flex items-center space-x-2 flex-1 min-w-0">
-            <FileText className="h-5 w-5 text-blue-600 flex-shrink-0" />
-            <div className="flex-1 min-w-0 overflow-hidden">
-                <p className="text-sm font-medium text-gray-900 truncate leading-tight break-all">
-                  {file.customName || file.originalName}
+      {/* --- SECCIÓN SUPERIOR: Título y Estado --- */}
+      <div className="p-4 flex flex-col justify-start flex-grow">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex items-center space-x-3 flex-1 min-w-0">
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-gray-900 truncate">
+                {file.customName || file.originalName}
+              </p>
+              {file.customName && (
+                <p className="text-xs text-gray-500 truncate">
+                  {file.originalName}
                 </p>
-                {file.customName && (
-                  <p className="text-xs text-gray-500 truncate leading-tight break-all">
-                    {file.originalName}
-                  </p>
-                )}
-              </div>
+              )}
+            </div>
           </div>
-          {(() => {
-  const raw = String(file.status ?? "").toLowerCase() as keyof typeof STATUS_MAP;
-  const meta = STATUS_MAP[raw] ?? { label: file.status ?? "—", classes: "bg-gray-100 text-gray-800" };
-  return (
-    <div
-      className={`px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ${meta.classes}`}
-      title={String(file.status ?? "")} // hover shows the raw status if you want
-    >
-      {meta.label}
-    </div>
-  );
-})()}
+          {getStatusBadge()}
         </div>
+      </div>
 
-        {/* File info */}
-        <div className="flex-1 flex flex-col justify-end">
-          <div className="text-md text-gray-500 mb-2">
-            <div>{formatDate(file.uploadDate)}</div>
-          </div>
-        </div>
+      {/* --- SECCIÓN INFERIOR: Barra de Acciones a Ancho Completo --- */}
+      <div className="flex w-full bg-gray-50 border-t border-gray-200">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="flex-1 text-xs h-12 rounded-none gap-2 text-gray-600 hover:bg-blue-100 hover:text-blue-700">
+              <Download className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => handleDownloadPDF(file.transcription!.id)}>
+              Descargar PDF
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleDownloadDOCX(file.transcription!.id)}>
+              Descargar Word
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
-        {/* Action buttons */}
-        <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex space-x-1">
-          {file.transcription && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-8 w-8 p-0 hover:bg-blue-100"
-                >
-                  <Download className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => handleDownloadPDF(file.transcription!.id)}>
-                  Download PDF
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleDownloadDOCX(file.transcription!.id)}>
-                  Download Word
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+        {/* 👇 BOTÓN "ANOTAR" AÑADIDO DE NUEVO */}
+        {file.status === 'completed' && (
           <Button
-            size="sm"
             variant="ghost"
+            className="flex-1 text-xs h-12 rounded-none gap-2 text-primary hover:bg-primary/10"
             onClick={(e) => {
               e.stopPropagation();
-              handleEdit(file);
+              router.push(`/annotate?audioId=${file.id}`);
             }}
-            className="h-8 w-8 p-0 hover:bg-gray-100"
+            title="Abrir en modo anotación"
           >
-            <Edit className="h-4 w-4" />
+            <PenTool className="h-4 w-4" />
+            <span>Anotar</span>
           </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleDelete(file.id);
-            }}
-            className="h-8 w-8 p-0 hover:bg-red-100 text-red-600"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
+        )}
+        
+        <Button 
+          variant="ghost" 
+          className="flex-1 text-xs h-12 rounded-none gap-2 text-gray-600 hover:bg-gray-200"
+          onClick={(e) => { e.stopPropagation(); handleEdit(file); }}
+        >
+          <Edit className="h-4 w-4" />
+          <span>Editar</span>
+        </Button>
+        
+        <Button 
+          variant="ghost" 
+          className="flex-1 text-xs h-12 rounded-none gap-2 text-red-600 hover:bg-red-100 hover:text-red-700"
+          onClick={(e) => { e.stopPropagation(); handleDelete(file.id); }}
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
       </div>
     </div>
   );
+};
 
   const handleAudioSelect = (audioId: string) => {
     // Handle audio selection if needed

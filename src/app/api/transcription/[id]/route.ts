@@ -24,16 +24,9 @@ export async function PATCH(
 ) {
   try {
     const { id } = await params;
-    const { editedText, editedSegments, speakers } = await request.json();
+    const body = await request.json();
+    const { editedText, editedSegments, speakers, alumneId } = body ?? {};
 
-    if (!editedText) {
-      return NextResponse.json(
-        { success: false, error: "Edited text is required" },
-        { status: 400, headers: NO_CACHE_HEADERS }
-      );
-    }
-
-    // User client (cookies getAll/setAll API)
     const cookieStore = await cookies();
     const supabaseUserClient = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -52,7 +45,6 @@ export async function PATCH(
       }
     );
 
-    // Auth
     const {
       data: { user },
       error: userError,
@@ -64,11 +56,10 @@ export async function PATCH(
       );
     }
 
-    // Verify ownership & fetch current pointer (json_path if exists)
     const { data: transcription, error: transcriptionError } =
       await supabaseUserClient
         .from("transcriptions")
-        .select("audio_id, json_path, updated_at")
+        .select("audio_id, json_path, updated_at, alumne_id")
         .eq("id", id)
         .eq("user_id", user.id)
         .single();
@@ -83,12 +74,53 @@ export async function PATCH(
       );
     }
 
+    if (alumneId !== undefined &&
+        editedText === undefined &&
+        editedSegments === undefined &&
+        speakers === undefined) {
+      const timestamp = new Date().toISOString();
+      const { data: updatedRow, error: alumneUpdateError } = await supabaseUserClient
+        .from("transcriptions")
+        .update({ alumne_id: alumneId || null, updated_at: timestamp })
+        .eq("id", id)
+        .eq("user_id", user.id)
+        .select("id, audio_id, alumne_id, updated_at")
+        .single();
+
+      if (alumneUpdateError) {
+        console.error("Failed to update alumne assignment", alumneUpdateError);
+        return NextResponse.json(
+          { success: false, error: "No se pudo actualizar el alumno asignado" },
+          { status: 500, headers: NO_CACHE_HEADERS }
+        );
+      }
+
+      return NextResponse.json(
+        {
+          success: true,
+          transcription: {
+            id,
+            audioId: updatedRow.audio_id,
+            alumneId: updatedRow.alumne_id,
+            updatedAt: updatedRow.updated_at,
+          },
+        },
+        { headers: NO_CACHE_HEADERS }
+      );
+    }
+
+    if (!editedText) {
+      return NextResponse.json(
+        { success: false, error: "Edited text is required" },
+        { status: 400, headers: NO_CACHE_HEADERS }
+      );
+    }
+
     const supabaseAdmin = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // Read existing (legacy path or pointer) to merge fields (optional)
     const legacyPath = `${user.id}/${transcription.audio_id}.json`;
     const oldPath = transcription.json_path || legacyPath;
 
@@ -112,13 +144,12 @@ export async function PATCH(
       updated_at: new Date().toISOString(),
     };
 
-    // Write a NEW versioned file
     const newPath = buildVersionedPath(user.id, transcription.audio_id);
     const { error: uploadError } = await supabaseAdmin.storage
       .from("transcriptions")
       .upload(newPath, JSON.stringify(updatedJsonData, null, 2), {
         contentType: "application/json",
-        upsert: false, // new file each time
+        upsert: false,
         cacheControl:
           "no-store, no-cache, must-revalidate, max-age=0, s-maxage=0",
       });
@@ -130,29 +161,31 @@ export async function PATCH(
       );
     }
 
-    // Update DB pointer to the NEW path
+    const updatePayload: Record<string, any> = {
+      json_path: newPath,
+      updated_at: updatedJsonData.updated_at,
+    };
+    if (alumneId !== undefined) {
+      updatePayload.alumne_id = alumneId || null;
+    }
+
     const { data: updatedRow, error: updateErr } = await supabaseUserClient
       .from("transcriptions")
-      .update({
-        json_path: newPath,
-        updated_at: updatedJsonData.updated_at,
-      })
+      .update(updatePayload)
       .eq("id", id)
       .eq("user_id", user.id)
-      .select("id, audio_id, json_path, updated_at")
+      .select("id, audio_id, json_path, updated_at, alumne_id")
       .single();
 
     if (updateErr) {
       console.error("DB pointer update error:", updateErr);
-      // Attempt cleanup of the new file to avoid orphaning
-      await supabaseAdmin.storage.from("transcriptions").remove([newPath]);
+      await supabaseAdmin.storage.from("transcriptions").remove([newPath]).catch(() => {});
       return NextResponse.json(
         { success: false, error: "Failed to update transcription record." },
         { status: 500, headers: NO_CACHE_HEADERS }
       );
     }
 
-    // Delete previous file if it exists and is different
     if (oldPath && oldPath !== newPath) {
       await supabaseAdmin.storage
         .from("transcriptions")
@@ -160,7 +193,6 @@ export async function PATCH(
         .catch(() => {});
     }
 
-    // Return fresh data so UI can update immediately
     return NextResponse.json(
       {
         success: true,
@@ -169,10 +201,11 @@ export async function PATCH(
           id,
           audioId: transcription.audio_id,
           jsonPath: newPath,
-          originalText: undefined, // not needed here
+          originalText: undefined,
           editedText: updatedJsonData.text,
           segments: updatedJsonData.segments ?? [],
           speakers: updatedJsonData.speakers ?? [],
+          alumneId: updatedRow.alumne_id ?? null,
           updatedAt: updatedJsonData.updated_at,
         },
       },

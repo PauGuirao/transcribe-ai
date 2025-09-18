@@ -50,6 +50,7 @@ export async function POST(request: NextRequest) {
 
   try {
     if (event.type === "checkout.session.completed") {
+      console.log("Handling checkout.session.completed event");
       const session = event.data.object as Stripe.Checkout.Session;
       const userId = session.metadata?.userId;
       const plan = session.metadata?.plan ?? "pro";
@@ -65,7 +66,12 @@ export async function POST(request: NextRequest) {
       if (userId) {
         const { error } = await supabaseAdmin
           .from("profiles")
-          .update({ is_suscribed: true, plan, tokens: tokensAllowance })
+          .update({
+            is_subscribed: true,
+            plan_type: plan,
+            tokens: tokensAllowance,
+            stripe_customer_id: session.customer,
+          })
           .eq("id", userId);
 
         if (error) {

@@ -18,43 +18,43 @@ const plans: Array<{
 }> = [
   {
     key: 'basic',
-    name: 'Básico',
-    price: '€9',
-    originalPrice: '€19',
-    description: 'Ideal para descubrir Transcriu en tu día a día.',
+    name: 'Bàsic',
+    price: '5€',
+    originalPrice: '9€',
+    description: 'Ideal per descobrir Transcriu en el teu dia a dia.',
     features: [
-      '30 transcripciones al mes',
-      'Modelos base de IA optimizados para español',
-      'Editor colaborativo',
-      'Soporte estándar',
+      '30 transcripcions al mes',
+      'Models base d\'IA optimitzats per a català i espanyol',
+      'Editor col·laboratiu',
+      'Suport estàndard',
     ],
     highlighted: false,
   },
   {
     key: 'pro',
     name: 'Pro',
-    price: '€29',
-    originalPrice: '€49',
-    description: 'Perfecto para equipos que trabajan con múltiples entrevistas.',
+    price: '9€',
+    originalPrice: '19€',
+    description: 'Perfecte per a equips que treballen amb múltiples entrevistes.',
     features: [
-      '120 transcripciones al mes',
-      'Modelos avanzados con diarización',
-      'Exportaciones ilimitadas (PDF, DOCX, TXT)',
-      'Soporte prioritario en menos de 2h',
+      '120 transcripcions al mes',
+      'Models avançats amb diarització',
+      'Exportacions il·limitades (PDF, DOCX, TXT)',
+      'Suport prioritari en menys de 2h',
     ],
     highlighted: true,
   },
   {
     key: 'premium',
     name: 'Premium',
-    price: '€59',
-    originalPrice: '€99',
-    description: 'Para organizaciones que necesitan velocidad y control.',
+    price: '19€',
+    originalPrice: '29€',
+    description: 'Per a organitzacions que necessiten velocitat i control.',
     features: [
-      '300 transcripciones al mes',
-      'Modelos personalizados y glosarios propios',
-      'Integraciones con Slack, Notion y Drive',
-      'Customer Success dedicado',
+      '300 transcripcions al mes',
+      'Models personalitzats i glossaris propis',
+      'Integracions amb Slack, Notion i Drive',
+      'Customer Success dedicat',
     ],
     highlighted: false,
   },
@@ -74,7 +74,7 @@ export default function PaymentPage() {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}))
-        throw new Error(data?.error || 'No se pudo iniciar el checkout')
+        throw new Error(data?.error || 'No s\'ha pogut iniciar el checkout')
       }
 
       const { url } = await response.json()
@@ -83,7 +83,7 @@ export default function PaymentPage() {
       }
     } catch (error) {
       console.error('Stripe checkout error:', error)
-      alert('Ocurrió un problema al redirigir a Stripe. Inténtalo nuevamente.')
+      alert('Hi ha hagut un problema en redirigir a Stripe. Torna-ho a provar.')
       setLoadingPlan(null)
     }
   }
@@ -93,13 +93,13 @@ export default function PaymentPage() {
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-6 text-center">
         <div className="space-y-4">
           <p className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
-            Planes flexibles
+            Plans flexibles
           </p>
           <h1 className="text-4xl font-bold tracking-tight text-balance sm:text-5xl">
-            Precios simples y transparentes
+            Preus simples i transparents
           </h1>
           <p className="mx-auto max-w-3xl text-lg text-muted-foreground">
-            Comienza con minutos gratuitos y escala cuando tu equipo lo necesite. Nuestros planes incluyen procesamiento seguro y herramientas colaborativas para acelerar la documentación de tus reuniones.
+            Comença amb minuts gratuïts i escala quan el teu equip ho necessiti. Els nostres plans inclouen processament segur i eines col·laboratives per accelerar la documentació de les teves sessions.
           </p>
         </div>
 
@@ -140,7 +140,7 @@ export default function PaymentPage() {
                   disabled={loadingPlan !== null && loadingPlan !== plan.key}
                   onClick={() => handleSelectPlan(plan.key)}
                 >
-                  {loadingPlan === plan.key ? 'Redirigiendo...' : 'Comenzar'}
+                  {loadingPlan === plan.key ? 'Redirigint...' : 'Començar'}
                 </Button>
               </CardContent>
             </Card>
