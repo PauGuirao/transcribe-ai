@@ -150,14 +150,9 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/40">
       <header className="sticky top-0 z-40 bg-background/80 backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-lg font-semibold"
-          >
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary">
-              <Headphones className="h-5 w-5" />
-            </div>
-            Transcriu
+          <Link href="/" className="flex items-center space-x-2">
+            <img src="/logo3.png" alt="TranscribeAI Logo" className="h-10" />
+            <h1 className="text-2xl font-semibold text-gray-900">transcriu</h1>
           </Link>
           <div className="flex items-center gap-3">
             {user ? (
