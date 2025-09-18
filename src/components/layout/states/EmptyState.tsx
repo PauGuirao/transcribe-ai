@@ -85,7 +85,7 @@ export function EmptyState({
           Puja un audio per començar
         </h2>
         <p className="text-muted-foreground text-md">
-          Arrossega el teu fitxer o selecciona'l des del teu ordinador. Podràs
+          Arrossega el teu fitxer o selecciona des del teu ordinador. Podràs
           revisar i netejar la transcripció un cop el procés hagi acabat.
         </p>
 
