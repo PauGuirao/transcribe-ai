@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { BookOpen, Home, Mic, Clock, Loader2, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import { BookOpen, Home, Mic, Clock, Loader2, CheckCircle, AlertCircle, RefreshCw, PenTool } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -11,17 +11,19 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { AudioUpload } from '@/components/audio-upload/AudioUpload';
+import { AudioUpload, AudioUploadResult } from '@/components/audio-upload/AudioUpload';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Audio } from '@/types';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
 
 interface AppSidebarProps {
   selectedAudioId?: string;
   onAudioSelect: (audioId: string) => void;
-  onUploadComplete: (audioId: string) => void;
+  onUploadComplete: (result: AudioUploadResult) => void;
 }
 
 const getStatusIcon = (status: Audio['status']) => {
@@ -60,6 +62,10 @@ export default function AppSidebar({ selectedAudioId, onAudioSelect, onUploadCom
   const [audioFiles, setAudioFiles] = useState<Audio[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [tokens, setTokens] = useState<number | null>(null);
+  const [tokensLoading, setTokensLoading] = useState(false);
+  const [tokensError, setTokensError] = useState<string | null>(null);
+  const { user } = useAuth();
   
   const isTranscribePage = pathname === '/transcribe';
 
@@ -70,12 +76,17 @@ export default function AppSidebar({ selectedAudioId, onAudioSelect, onUploadCom
       path: '/dashboard',
     },
     {
-      title: 'Transcribe',
+      title: 'Transcribir',
       icon: Mic,
       path: '/transcribe',
     },
     {
-      title: 'Library',
+      title: 'Anotar',
+      icon: PenTool,
+      path: '/annotate',
+    },
+    {
+      title: 'Biblioteca',
       icon: BookOpen,
       path: '/library',
     },
@@ -104,8 +115,46 @@ export default function AppSidebar({ selectedAudioId, onAudioSelect, onUploadCom
     }
   }, [isTranscribePage]);
 
-  const handleUploadComplete = (audioId: string) => {
-    onUploadComplete(audioId);
+  const fetchUserTokens = useCallback(async () => {
+    if (!user?.id) {
+      setTokens(null);
+      setTokensError(null);
+      return;
+    }
+
+    try {
+      setTokensLoading(true);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('tokens')
+        .eq('id', user.id)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          setTokens(0);
+          setTokensError(null);
+          return;
+        }
+        throw error;
+      }
+
+      setTokens(typeof data?.tokens === 'number' ? data.tokens : 0);
+      setTokensError(null);
+    } catch (err) {
+      console.error('Failed to load tokens:', err);
+      setTokensError('No pudimos cargar tus tokens');
+    } finally {
+      setTokensLoading(false);
+    }
+  }, [user?.id]);
+
+  useEffect(() => {
+    fetchUserTokens();
+  }, [fetchUserTokens]);
+
+  const handleUploadComplete = (result: AudioUploadResult) => {
+    onUploadComplete(result);
     fetchAudioFiles(); // Refresh the list
   };
 
@@ -124,115 +173,68 @@ export default function AppSidebar({ selectedAudioId, onAudioSelect, onUploadCom
   };
 
   return (
-    <Sidebar className="h-[calc(100vh)]">
-      <SidebarContent className="pt-18">
+    <Sidebar className="h-[calc(100vh)] flex flex-col">
+      <SidebarContent className="flex-1 overflow-y-auto pt-18 pb-24">
         <SidebarGroup>
           <SidebarMenu>
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.path;
-              
-              return (
-                <SidebarMenuItem key={item.path}>
-                  <SidebarMenuButton 
-                    onClick={() => router.push(item.path)}
-                    className={isActive ? 'bg-gray-100' : ''}
-                  >
-                    <Icon className="h-4 w-4" />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              );
-            })}
-          </SidebarMenu>
+  {menuItems.map((item) => {
+    const Icon = item.icon;
+    const active =
+      pathname === item.path || pathname.startsWith(item.path + "/");
+
+    return (
+      <SidebarMenuItem key={item.path}>
+        <SidebarMenuButton
+          onClick={() => router.push(item.path)}
+          aria-current={active ? "page" : undefined}
+          className={cn(
+            "group w-full flex items-center gap-2 rounded-sm px-3 py-2 text-sm transition-all",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30",
+            active
+              ? "bg-black/80 text-white shadow-sm hover:bg-black"
+              : "text-gray-900 hover:bg-gray-100 hover:text-black hover:translate-x-[2px]"
+          )}
+        >
+          <Icon
+            className={cn(
+              "h-4 w-4 transition-colors",
+              active ? "text-white" : "text-gray-800 group-hover:text-black"
+            )}
+          />
+          <span className={cn("truncate", active && "font-semibold")}>
+            {item.title}
+          </span>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    );
+  })}
+</SidebarMenu>
         </SidebarGroup>
-        
-        {isTranscribePage && (
-          <>
-            <Separator className="my-4" />
-            
-            {/* Upload Section */}
-            <SidebarGroup>
-              <div className="px-2">
-                <h3 className="text-sm font-semibold mb-2">Upload Audio</h3>
-                <AudioUpload
-                  onUploadComplete={handleUploadComplete}
-                  onUploadError={handleUploadError}
-                />
-              </div>
-            </SidebarGroup>
-            
-            <Separator className="my-4" />
-            
-            {/* Audio Files List */}
-            <SidebarGroup>
-              <div className="px-2">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-sm font-semibold">Audio Files</h3>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={fetchAudioFiles}
-                    disabled={loading}
-                  >
-                    <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
-                  </Button>
-                </div>
-                
-                <div className="space-y-2 max-h-96 overflow-y-auto">
-                  {loading ? (
-                    <div className="flex items-center justify-center py-4">
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      <span className="text-sm text-muted-foreground">Loading...</span>
-                    </div>
-                  ) : error ? (
-                    <div className="text-sm text-red-600 p-2 bg-red-50 rounded">
-                      {error}
-                    </div>
-                  ) : audioFiles.length === 0 ? (
-                    <div className="text-sm text-muted-foreground text-center py-4">
-                      No audio files yet
-                    </div>
-                  ) : (
-                    audioFiles.map((audio) => (
-                      <div
-                        key={audio.id}
-                        className={cn(
-                          "p-2 rounded-lg border cursor-pointer transition-colors",
-                          selectedAudioId === audio.id
-                            ? "bg-primary/10 border-primary"
-                            : "hover:bg-muted"
-                        )}
-                        onClick={() => onAudioSelect(audio.id)}
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium truncate">
-                              {audio.customName || audio.originalName}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {formatDate(audio.uploadDate)}
-                            </p>
-                          </div>
-                          <div className="flex items-center space-x-1 ml-2">
-                            <Badge
-                              variant="secondary"
-                              className={cn("text-xs", getStatusColor(audio.status))}
-                            >
-                              {audio.status}
-                            </Badge>
-                            {getStatusIcon(audio.status)}
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            </SidebarGroup>
-          </>
-        )}
       </SidebarContent>
+      <div className="mt-auto px-3 pb-4">
+        <div className="rounded-lg border bg-white p-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                Transcripcions disponibles
+              </p>
+              <div className="mt-1 text-2xl font-semibold">
+                {tokensLoading ? (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Cargando
+                  </div>
+                ) : (
+                  tokens ?? '—'
+                )}
+              </div>
+            </div>
+          </div>
+          {tokensError && (
+            <p className="mt-2 text-xs text-destructive">{tokensError}</p>
+          )}
+        </div>
+      </div>
     </Sidebar>
   );
 }

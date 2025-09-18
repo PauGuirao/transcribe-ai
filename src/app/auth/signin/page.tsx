@@ -1,65 +1,115 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react'
+import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/contexts/AuthContext'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Loader2, LogIn } from 'lucide-react'
 
 export default function SignIn() {
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
-  const { user, signInWithGoogle } = useAuth();
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
+  const { user, signInWithGoogle } = useAuth()
 
   useEffect(() => {
-    // Check if user is already signed in
     if (user) {
-      router.push('/dashboard');
+      router.push('/dashboard')
     }
-  }, [user, router]);
+  }, [user, router])
 
   const handleSignIn = async () => {
-    setLoading(true);
+    setLoading(true)
     try {
-      await signInWithGoogle();
+      await signInWithGoogle()
     } catch (error) {
-      console.error('Sign in error:', error);
+      console.error('Sign in error:', error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">TranscribeAI</CardTitle>
-          <CardDescription>
-            Inicia sesión para acceder a tus transcripciones
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Button
-            onClick={handleSignIn}
-            disabled={loading}
-            className="w-full"
-            size="lg"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Iniciando sesión...
-              </>
-            ) : (
-              'Iniciar sesión con Google'
-            )}
-          </Button>
-          <p className="text-xs text-center text-muted-foreground">
-            Al iniciar sesión, aceptas nuestros términos de servicio y política de privacidad.
+    <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[1.05fr_1fr]">
+      <div className="relative flex flex-col justify-between bg-primary text-primary-foreground px-10 py-12 lg:px-16">
+        <div>
+          <div className="flex items-center gap-3 text-sm font-medium uppercase tracking-wide text-primary-foreground/70">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-foreground/10">
+              <LogIn className="h-5 w-5" />
+            </div>
+            TranscribeAI
+          </div>
+          <h1 className="mt-14 text-4xl font-semibold leading-tight text-balance lg:text-5xl">
+            Transforma tus reuniones en insights útiles en cuestión de minutos.
+          </h1>
+        </div>
+        <div className="space-y-3">
+          <p className="text-sm text-primary-foreground/80">
+            92% de los equipos de producto mejoran su documentación después de la primera semana usando TranscribeAI.
           </p>
-        </CardContent>
-      </Card>
+          <div className="flex items-center gap-3">
+            <div className="flex -space-x-2">
+              {[1, 2, 3, 4, 5].map((item) => (
+                <div
+                  key={item}
+                  className="h-9 w-9 rounded-full border-2 border-primary/40 bg-primary-foreground/90"
+                />
+              ))}
+            </div>
+            <div className="text-sm">
+              <p className="font-semibold">Equipos felices</p>
+              <p className="text-primary-foreground/70">PM, UX y Customer Success</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-center bg-secondary/30 px-6 py-12">
+        <Card className="w-full max-w-md rounded-3xl border border-border/60 shadow-xl">
+          <CardContent className="space-y-8 p-8">
+            <div className="space-y-2 text-center">
+              <p className="text-sm font-medium text-primary">¡Bienvenido de nuevo!</p>
+              <h2 className="text-3xl font-semibold tracking-tight text-foreground">
+                Inicia sesión para continuar
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Accede a tu biblioteca de transcripciones y sigue donde lo dejaste.
+              </p>
+            </div>
+
+            <Button
+              onClick={handleSignIn}
+              disabled={loading}
+              size="lg"
+              className="w-full justify-center gap-3 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Conectando con Google...
+                </>
+              ) : (
+                <>
+                  <Image
+                    src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                    alt="Google"
+                    width={20}
+                    height={20}
+                    className="rounded-full"
+                    unoptimized
+                  />
+                  Continuar con Google
+                </>
+              )}
+            </Button>
+
+            <p className="text-xs text-center text-muted-foreground">
+              Al iniciar sesión aceptas nuestros términos y políticas de privacidad.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
-  );
+  )
 }

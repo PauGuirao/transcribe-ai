@@ -4,41 +4,85 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { User, Session } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 
+// Define the shape of the context's value
 interface AuthContextType {
   user: User | null
   session: Session | null
   loading: boolean
+  isSubscribed: boolean | null
+  checkingSubscription: boolean
   signInWithGoogle: () => Promise<void>
   signOut: () => Promise<void>
 }
 
+// Create the context
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
+// Create the provider component
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  
+  // State for subscription status
+  const [isSubscribed, setIsSubscribed] = useState<boolean | null>(null)
+  const [checkingSubscription, setCheckingSubscription] = useState(true)
 
   useEffect(() => {
-    // Get initial session
+    // This effect handles user authentication state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+      setUser(session?.user ?? null)
+      setLoading(false)
+    })
+
+    // Set the initial session on component mount
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-      setUser(session?.user ?? null)
-      setLoading(false)
+      if (!session) {
+        setLoading(false)
+      }
     })
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-      setUser(session?.user ?? null)
-      setLoading(false)
-    })
-
+    // Cleanup the subscription on unmount
     return () => subscription.unsubscribe()
   }, [])
 
+  useEffect(() => {
+    // This effect fetches the subscription status whenever the user object changes
+    const fetchSubscriptionStatus = async () => {
+      // If there's no user, reset subscription state
+      if (!user) {
+        setIsSubscribed(null)
+        setCheckingSubscription(false)
+        return
+      }
+
+      setCheckingSubscription(true)
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('is_subscribed')
+          .eq('id', user.id)
+          .single()
+
+        if (error) {
+          console.error('Failed to load subscription status:', error)
+          setIsSubscribed(false) // Default to false on error for security
+        } else {
+          setIsSubscribed(Boolean(data?.is_subscribed))
+        }
+      } catch (err) {
+        console.error('Unexpected subscription fetch error:', err)
+        setIsSubscribed(false)
+      } finally {
+        setCheckingSubscription(false)
+      }
+    }
+
+    fetchSubscriptionStatus()
+  }, [user]) // The dependency array ensures this runs only when `user` changes
+
+  // Function to initiate Google sign-in
   const signInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -51,6 +95,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  // Function to sign the user out
   const signOut = async () => {
     const { error } = await supabase.auth.signOut()
     if (error) {
@@ -58,10 +103,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  // The value provided to consuming components
   const value = {
     user,
     session,
     loading,
+    isSubscribed,
+    checkingSubscription,
     signInWithGoogle,
     signOut,
   }
@@ -69,6 +117,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
+// Custom hook to use the AuthContext
 export function useAuth() {
   const context = useContext(AuthContext)
   if (context === undefined) {

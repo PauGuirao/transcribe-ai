@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import AppLayout from '@/components/layout/AppLayout';
 import { MainLayout } from '@/components/layout/MainLayout';
+import { AudioUploadResult } from '@/components/audio-upload/AudioUpload';
 
 export default function DashboardPage() {
   const searchParams = useSearchParams();
@@ -20,8 +21,8 @@ export default function DashboardPage() {
     setSelectedAudioId(audioId);
   };
 
-  const handleUploadComplete = (audioId: string) => {
-    setSelectedAudioId(audioId);
+  const handleUploadComplete = (result: AudioUploadResult) => {
+    setSelectedAudioId(result.audioId);
   };
 
   return (

@@ -14,6 +14,7 @@ import {
 import { FileText, Download, Trash2, Edit, ChevronDown } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import AppLayout from '@/components/layout/AppLayout';
+import { AudioUploadResult } from '@/components/audio-upload/AudioUpload';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,6 +40,13 @@ interface AudioFile {
     updatedAt: string;
   } | null;
 }
+
+const STATUS_MAP = {
+  completed: { label: "Transcrit", classes: "bg-green-100 text-green-800" },
+  processing: { label: "Processant", classes: "bg-yellow-100 text-yellow-800" },
+  failed:    { label: "Fallit",     classes: "bg-red-100 text-red-800" },
+  uploaded:  { label: "Pujat",      classes: "bg-blue-100 text-gray-800" }, // keep gray like your default
+} as const;
 
 export default function LibraryPage() {
   const [files, setFiles] = useState<AudioFile[]>([]);
@@ -279,14 +287,18 @@ export default function LibraryPage() {
                 )}
               </div>
           </div>
-          <div className={`px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
-            file.status === 'completed' ? 'bg-green-100 text-green-800' :
-            file.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
-            file.status === 'failed' ? 'bg-red-100 text-red-800' :
-            'bg-gray-100 text-gray-800'
-          }`}>
-            {file.status}
-          </div>
+          {(() => {
+  const raw = String(file.status ?? "").toLowerCase() as keyof typeof STATUS_MAP;
+  const meta = STATUS_MAP[raw] ?? { label: file.status ?? "—", classes: "bg-gray-100 text-gray-800" };
+  return (
+    <div
+      className={`px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ${meta.classes}`}
+      title={String(file.status ?? "")} // hover shows the raw status if you want
+    >
+      {meta.label}
+    </div>
+  );
+})()}
         </div>
 
         {/* File info */}
@@ -350,7 +362,7 @@ export default function LibraryPage() {
     // Handle audio selection if needed
   };
 
-  const handleUploadComplete = () => {
+  const handleUploadComplete = (_result: AudioUploadResult) => {
     fetchFiles(); // Refresh the files list
   };
 
@@ -390,10 +402,10 @@ export default function LibraryPage() {
       <div className="space-y-6 p-10">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Library</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Biblioteca</h1>
           </div>
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-500">View:</span>
+            <span className="text-sm text-gray-500">Vista:</span>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="h-8">
@@ -461,17 +473,14 @@ export default function LibraryPage() {
       {/* Edit Filename Modal */}
       <Sheet open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
         <SheetContent>
-          <SheetHeader>
-            <SheetTitle>Edit Filename</SheetTitle>
+          <SheetHeader className="mt-4 p-4">
+            <SheetTitle>Edita el nom del fitxer</SheetTitle>
             <SheetDescription>
-              Change the display name for this audio file.
+              Canvia el nom de visualització d'aquest fitxer d'àudio.
             </SheetDescription>
           </SheetHeader>
-          <div className="mt-6 space-y-4 p-4">
+          <div className="mt-0 space-y-1 p-4 pt-0">
             <div>
-              <label htmlFor="filename" className="block text-sm font-medium text-gray-700 mb-2">
-                Filename
-              </label>
               <Input
                 id="filename"
                 value={newFileName}
@@ -486,7 +495,7 @@ export default function LibraryPage() {
                 disabled={!newFileName.trim() || updating}
                 className="flex-1"
               >
-                {updating ? 'Saving...' : 'Confirm'}
+                {updating ? 'Guardant...' : 'Confirmar'}
               </Button>
               <Button
                 variant="outline"
@@ -494,7 +503,7 @@ export default function LibraryPage() {
                 disabled={updating}
                 className="flex-1"
               >
-                Cancel
+                Cancelar
               </Button>
             </div>
           </div>

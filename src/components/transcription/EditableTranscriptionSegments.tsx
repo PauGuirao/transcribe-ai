@@ -297,7 +297,7 @@ export function EditableTranscriptionSegments({
 
   return (
     <div className={cn("h-full flex flex-col bg-gray-50", className)}>
-      <div className="flex-1 space-y-2 p-4 overflow-y-auto">
+      <div className="flex-1 space-y-2 p-4 overflow-y-auto mr-80">
         {editedSegments.map((segment, index) => (
           <div 
             key={segment.id} 

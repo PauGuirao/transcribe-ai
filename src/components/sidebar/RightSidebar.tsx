@@ -45,14 +45,7 @@ export function RightSidebar({
 
 
   if (!audio || !transcription) {
-    return (
-      <div className="fixed top-[73px] right-0 bottom-0 w-80 bg-background border-l p-6 z-40">
-        <div className="text-center text-muted-foreground">
-          <Settings className="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <p>Selecciona un archivo de audio para ver las opciones</p>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return (

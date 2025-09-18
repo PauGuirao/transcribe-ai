@@ -1,24 +1,51 @@
 'use client';
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import Link from 'next/link';
 import AppLayout from '@/components/layout/AppLayout';
+import { Mic, PencilLine, Library, ArrowRight } from 'lucide-react';
 
 export default function DashboardPage() {
+  const tools = [
+    { title: 'Transcribir', desc: 'Convierte tu audio a texto con IA', href: '/transcribe', Icon: Mic },
+    { title: 'Anotar', desc: 'Edita, marca y organiza la transcripción', href: '/annotate', Icon: PencilLine },
+    { title: 'Biblioteca', desc: 'Gestiona todos tus audios y transcripciones', href: '/library', Icon: Library },
+  ] as const;
+
   return (
     <AppLayout>
-      <Card>
-        <CardContent className="pt-6">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              What will you do today?
-            </h2>
-            <p className="text-gray-600">
-              Choose an option from the sidebar to get started.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="max-w-6xl mx-auto px-4">
+        {/* Header */}
+        <div className="text-center">
+          <h2 className="mt-20 text-2xl font-bold text-gray-900">¿Qué vas a hacer hoy?</h2>
+          <p className="mt-2 text-gray-600">Elige una de nuestras herramientas para comenzar tu proyecto</p>
+        </div>
+
+        {/* Bloques */}
+        <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center p-5">
+          {tools.map(({ title, desc, href, Icon }) => (
+            <Link key={title} href={href} className="group block w-full max-w-[520px]" aria-label={title}>
+              <div className="rounded-2xl border border-gray-200 bg-white p-6 transition-all hover:-translate-y-0.5 hover:shadow-md hover:border-gray-300">
+                <div className="flex items-start gap-4">
+                  {/* Pastilla naranja */}
+                  <div className="h-10 w-10 rounded-xl bg-gray-500 text-white grid place-content-center shrink-0">
+                    <Icon className="h-5 w-5" />
+                  </div>
+
+                  {/* Texto */}
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-lg font-semibold text-gray-900 leading-snug">{title}</h3>
+                    <p className="text-sm text-gray-600 leading-snug">{desc}</p>
+                  </div>
+
+                  {/* Flecha con micro-animación */}
+                  <ArrowRight className="h-5 w-5 text-gray-400 transition-transform duration-200 ease-out group-hover:translate-x-1" />
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
     </AppLayout>
   );
 }

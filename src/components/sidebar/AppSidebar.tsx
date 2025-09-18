@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { AudioUpload } from '@/components/audio-upload/AudioUpload';
+import { AudioUpload, AudioUploadResult } from '@/components/audio-upload/AudioUpload';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 interface AppSidebarProps {
   selectedAudioId?: string;
   onAudioSelect: (audioId: string) => void;
-  onUploadComplete: (audioId: string) => void;
+  onUploadComplete: (result: AudioUploadResult) => void;
 }
 
 const getStatusIcon = (status: Audio['status']) => {
@@ -72,8 +72,8 @@ export function AppSidebar({ selectedAudioId, onAudioSelect, onUploadComplete }:
     fetchAudioFiles();
   }, []);
 
-  const handleUploadComplete = (audioId: string) => {
-    onUploadComplete(audioId);
+  const handleUploadComplete = (result: AudioUploadResult) => {
+    onUploadComplete(result);
     fetchAudioFiles(); // Refresh the list
   };
 
