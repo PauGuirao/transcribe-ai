@@ -418,7 +418,7 @@ export default function Home() {
               Plans i preus
             </p>
             <h2 className="mt-2 text-3xl font-bold tracking-tight">
-              Escull el pla que millor s'adapti a les teves necessitats
+              Escull el pla que millor s&apos;adapti a les teves necessitats
             </h2>
             <p className="mt-3 text-muted-foreground">
               Preus transparents i sense sorpreses. Comença gratis i escala quan

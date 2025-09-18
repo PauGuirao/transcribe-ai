@@ -3,6 +3,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
+import type { TranscriptionSegment, Speaker } from "@/types";
+
+interface TranscriptionData {
+  text: string;
+  segments?: TranscriptionSegment[];
+  speakers?: Speaker[];
+  updated_at?: string;
+}
+
+interface TranscriptionRecord extends TranscriptionData {
+  id: string;
+  audio_id: string;
+  json_path?: string;
+  original_text?: string;
+  edited_text?: string;
+  created_at?: string;
+  updated_at?: string;
+}
 
 export const runtime = "nodejs";
 
@@ -74,18 +92,21 @@ export async function PATCH(
       );
     }
 
-    if (alumneId !== undefined &&
-        editedText === undefined &&
-        editedSegments === undefined &&
-        speakers === undefined) {
+    if (
+      alumneId !== undefined &&
+      editedText === undefined &&
+      editedSegments === undefined &&
+      speakers === undefined
+    ) {
       const timestamp = new Date().toISOString();
-      const { data: updatedRow, error: alumneUpdateError } = await supabaseUserClient
-        .from("transcriptions")
-        .update({ alumne_id: alumneId || null, updated_at: timestamp })
-        .eq("id", id)
-        .eq("user_id", user.id)
-        .select("id, audio_id, alumne_id, updated_at")
-        .single();
+      const { data: updatedRow, error: alumneUpdateError } =
+        await supabaseUserClient
+          .from("transcriptions")
+          .update({ alumne_id: alumneId || null, updated_at: timestamp })
+          .eq("id", id)
+          .eq("user_id", user.id)
+          .select("id, audio_id, alumne_id, updated_at")
+          .single();
 
       if (alumneUpdateError) {
         console.error("Failed to update alumne assignment", alumneUpdateError);
@@ -124,15 +145,25 @@ export async function PATCH(
     const legacyPath = `${user.id}/${transcription.audio_id}.json`;
     const oldPath = transcription.json_path || legacyPath;
 
-    let existingData: any = {};
+    let existingData: TranscriptionData = {
+      text: "",
+      segments: [],
+      speakers: [],
+    };
     const { data: existingBlob } = await supabaseAdmin.storage
       .from("transcriptions")
       .download(oldPath);
     if (existingBlob) {
       try {
-        existingData = JSON.parse(await existingBlob.text());
+        existingData = JSON.parse(
+          await existingBlob.text()
+        ) as TranscriptionData;
       } catch {
-        existingData = {};
+        existingData = {
+          text: "",
+          segments: [],
+          speakers: [],
+        };
       }
     }
 
@@ -161,7 +192,11 @@ export async function PATCH(
       );
     }
 
-    const updatePayload: Record<string, any> = {
+    const updatePayload: {
+      json_path: string;
+      updated_at: string;
+      alumne_id?: string | null;
+    } = {
       json_path: newPath,
       updated_at: updatedJsonData.updated_at,
     };
@@ -179,7 +214,10 @@ export async function PATCH(
 
     if (updateErr) {
       console.error("DB pointer update error:", updateErr);
-      await supabaseAdmin.storage.from("transcriptions").remove([newPath]).catch(() => {});
+      await supabaseAdmin.storage
+        .from("transcriptions")
+        .remove([newPath])
+        .catch(() => {});
       return NextResponse.json(
         { success: false, error: "Failed to update transcription record." },
         { status: 500, headers: NO_CACHE_HEADERS }
@@ -257,17 +295,20 @@ export async function GET(
     }
 
     // Get transcription, including pointer
-    const { data: transcription, error: transcriptionError } = await supabase
+    const { data: transcription, error: transcriptionError } = (await supabase
       .from("transcriptions")
       .select(
         `
-        id, audio_id, created_at, updated_at, json_path,
+        id, audio_id, created_at, updated_at, json_path, original_text, edited_text, segments, speakers,
         audios!inner ( user_id )
       `
       )
       .eq("id", id)
       .eq("audios.user_id", user.id)
-      .single();
+      .single()) as {
+      data: TranscriptionRecord | null;
+      error: Error | null;
+    };
 
     if (transcriptionError || !transcription) {
       return NextResponse.json(
@@ -305,8 +346,8 @@ export async function GET(
     }
 
     let editedTextFromJson: string | undefined;
-    let segmentsFromJson: any[] | undefined;
-    let speakersFromJson: any[] | undefined;
+    let segmentsFromJson: TranscriptionSegment[] | undefined;
+    let speakersFromJson: Speaker[] | undefined;
     let updatedAtFromJson: string | undefined;
 
     const { data: fileData } = await supabaseAdmin.storage

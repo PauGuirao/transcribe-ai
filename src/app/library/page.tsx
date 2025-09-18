@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import type { TranscriptionSegment } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -42,7 +43,7 @@ interface AudioFile {
     audioId: string;
     originalText: string;
     editedText: string;
-    segments: any[];
+    segments: TranscriptionSegment[];
     createdAt: string;
     updatedAt: string;
   } | null;
@@ -528,7 +529,7 @@ export default function LibraryPage() {
           <SheetHeader className="mt-4 p-4">
             <SheetTitle>Edita el nom del fitxer</SheetTitle>
             <SheetDescription>
-              Canvia el nom de visualització d'aquest fitxer d'àudio.
+              Canvia el nom de visualització d&apos;aquest fitxer d&apos;àudio.
             </SheetDescription>
           </SheetHeader>
           <div className="mt-0 space-y-1 p-4 pt-0">

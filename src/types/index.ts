@@ -5,7 +5,7 @@ export interface Audio {
   customName?: string;
   filePath: string;
   uploadDate: Date;
-  status: 'pending' | 'processing' | 'completed' | 'error';
+  status: "pending" | "processing" | "completed" | "error";
   transcription?: Transcription;
 }
 
@@ -44,17 +44,17 @@ export interface Transcription {
 
 export interface UploadProgress {
   progress: number;
-  status: 'uploading' | 'processing' | 'completed' | 'error';
+  status: "uploading" | "processing" | "completed" | "error";
   message?: string;
 }
 
 export interface ExportOptions {
-  format: 'pdf' | 'txt';
+  format: "pdf" | "txt";
   filename?: string;
   includeTimestamps?: boolean;
 }
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;

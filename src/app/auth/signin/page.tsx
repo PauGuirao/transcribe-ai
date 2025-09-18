@@ -1,34 +1,34 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import Image from 'next/image'
-import { useRouter } from 'next/navigation'
-import { useAuth } from '@/contexts/AuthContext'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Loader2, LogIn } from 'lucide-react'
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Loader2, LogIn } from "lucide-react";
 
 export default function SignIn() {
-  const [loading, setLoading] = useState(false)
-  const router = useRouter()
-  const { user, signInWithGoogle } = useAuth()
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const { user, signInWithGoogle } = useAuth();
 
   useEffect(() => {
     if (user) {
-      router.push('/dashboard')
+      router.push("/dashboard");
     }
-  }, [user, router])
+  }, [user, router]);
 
   const handleSignIn = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      await signInWithGoogle()
+      await signInWithGoogle();
     } catch (error) {
-      console.error('Sign in error:', error)
+      console.error("Sign in error:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[1.05fr_1fr]">
@@ -42,7 +42,7 @@ export default function SignIn() {
           </div>
           {/* Text actualitzat per a logopedes */}
           <h1 className="mt-14 text-4xl font-semibold leading-tight text-balance lg:text-5xl">
-            L'eina essencial per a les teves transcripcions de logopèdia.
+            L&apos;eina essencial per a les teves transcripcions de logopèdia.
           </h1>
         </div>
         <div className="space-y-3">
@@ -57,12 +57,15 @@ export default function SignIn() {
         <Card className="w-full max-w-md rounded-3xl border border-border/60 shadow-xl">
           <CardContent className="space-y-8 p-8">
             <div className="space-y-2 text-center">
-              <p className="text-sm font-medium text-primary">Benvingut/da de nou!</p>
+              <p className="text-sm font-medium text-primary">
+                Benvingut/da de nou!
+              </p>
               <h2 className="text-3xl font-semibold tracking-tight text-foreground">
                 Inicia sessió per continuar
               </h2>
               <p className="text-sm text-muted-foreground">
-                Accedeix a la teva biblioteca de transcripcions i segueix on ho vas deixar.
+                Accedeix a la teva biblioteca de transcripcions i segueix on ho
+                vas deixar.
               </p>
             </div>
 
@@ -93,11 +96,12 @@ export default function SignIn() {
             </Button>
 
             <p className="text-xs text-center text-muted-foreground">
-              En iniciar sessió acceptes els nostres termes i polítiques de privacitat.
+              En iniciar sessió acceptes els nostres termes i polítiques de
+              privacitat.
             </p>
           </CardContent>
         </Card>
       </div>
     </div>
-  )
+  );
 }

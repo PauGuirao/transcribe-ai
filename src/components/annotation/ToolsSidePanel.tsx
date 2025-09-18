@@ -159,7 +159,7 @@ export function ToolsSidePanel({
                         {index + 1}
                         {annotation.text && (
                           <span className="ml-2 text-xs font-normal text-gray-600">
-                            "{annotation.text}"
+                            &quot;{annotation.text}&quot;
                           </span>
                         )}
                       </p>

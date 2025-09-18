@@ -1,50 +1,58 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { 
-  Save, 
-  Download, 
-  FileText, 
-  Clock, 
-  Edit3, 
+import React, { useState, useEffect, useCallback } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import {
+  Save,
+  Download,
+  FileText,
+  Clock,
+  Edit3,
   CheckCircle,
   AlertCircle,
   Loader2,
-  FileDown
-} from 'lucide-react';
-import type { Audio, Transcription, TranscriptionSegment } from '@/types';
-import { cn } from '@/lib/utils';
-import { AudioPlayer } from './AudioPlayer';
-import { TranscriptionSegments } from './TranscriptionSegments';
-import { EditableTranscriptionSegments } from './EditableTranscriptionSegments';
+  FileDown,
+} from "lucide-react";
+import type { Audio, Transcription, TranscriptionSegment } from "@/types";
+import { cn } from "@/lib/utils";
+import { AudioPlayer } from "./AudioPlayer";
+import { TranscriptionSegments } from "./TranscriptionSegments";
+import { EditableTranscriptionSegments } from "./EditableTranscriptionSegments";
 
 interface TranscriptionEditorProps {
   selectedAudioId?: string;
 }
 
-export function TranscriptionEditor({ selectedAudioId }: TranscriptionEditorProps) {
+export function TranscriptionEditor({
+  selectedAudioId,
+}: TranscriptionEditorProps) {
   const [audio, setAudio] = useState<Audio | null>(null);
-  const [transcription, setTranscription] = useState<Transcription | null>(null);
-  const [editedText, setEditedText] = useState('');
+  const [transcription, setTranscription] = useState<Transcription | null>(
+    null
+  );
+  const [editedText, setEditedText] = useState("");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [wordCount, setWordCount] = useState(0);
-  const [viewMode, setViewMode] = useState<'segments' | 'editable-segments' | 'text'>('segments');
-  const [editedSegments, setEditedSegments] = useState<TranscriptionSegment[]>([]);
+  const [viewMode, setViewMode] = useState<
+    "segments" | "editable-segments" | "text"
+  >("segments");
+  const [editedSegments, setEditedSegments] = useState<TranscriptionSegment[]>(
+    []
+  );
 
   // Fetch audio and transcription data
   const fetchData = useCallback(async () => {
     if (!selectedAudioId) {
       setAudio(null);
       setTranscription(null);
-      setEditedText('');
+      setEditedText("");
       setError(null);
       return;
     }
@@ -55,19 +63,21 @@ export function TranscriptionEditor({ selectedAudioId }: TranscriptionEditorProp
     try {
       // Add timestamp to prevent browser caching
       const cacheBuster = `?t=${Date.now()}`;
-      const response = await fetch(`/api/audio/${selectedAudioId}${cacheBuster}`);
+      const response = await fetch(
+        `/api/audio/${selectedAudioId}${cacheBuster}`
+      );
       if (!response.ok) {
-        throw new Error('Failed to fetch audio data');
+        throw new Error("Failed to fetch audio data");
       }
 
       const data = await response.json();
       setAudio(data.audio);
       setTranscription(data.transcription);
-      setEditedText(data.transcription?.editedText || '');
+      setEditedText(data.transcription?.editedText || "");
       setEditedSegments(data.transcription?.segments || []);
       setHasUnsavedChanges(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load data');
+      setError(err instanceof Error ? err.message : "Failed to load data");
     } finally {
       setLoading(false);
     }
@@ -79,19 +89,22 @@ export function TranscriptionEditor({ selectedAudioId }: TranscriptionEditorProp
 
   // Update word count when text changes
   useEffect(() => {
-    const words = editedText.trim().split(/\s+/).filter(word => word.length > 0);
+    const words = editedText
+      .trim()
+      .split(/\s+/)
+      .filter((word) => word.length > 0);
     setWordCount(words.length);
   }, [editedText]);
 
   // Handle text changes
   const handleTextChange = (value: string) => {
     setEditedText(value);
-    setHasUnsavedChanges(value !== (transcription?.editedText || ''));
+    setHasUnsavedChanges(value !== (transcription?.editedText || ""));
   };
 
   // Handle segment click (for future audio seeking functionality)
   const handleSegmentClick = (segment: TranscriptionSegment) => {
-    console.log('Segment clicked:', segment);
+    console.log("Segment clicked:", segment);
     // TODO: Implement audio seeking to segment.start time
   };
 
@@ -102,33 +115,40 @@ export function TranscriptionEditor({ selectedAudioId }: TranscriptionEditorProp
   };
 
   // Determine if we should show segments view
-  const hasSegments = transcription?.segments && transcription.segments.length > 0;
-  const shouldShowSegments = hasSegments && viewMode === 'segments';
-  const shouldShowEditableSegments = hasSegments && viewMode === 'editable-segments';
+  const hasSegments =
+    transcription?.segments && transcription.segments.length > 0;
+  const shouldShowSegments = hasSegments && viewMode === "segments";
+  const shouldShowEditableSegments =
+    hasSegments && viewMode === "editable-segments";
 
   // Save transcription
+  interface TranscriptionUpdateRequest {
+    editedText: string;
+    editedSegments?: TranscriptionSegment[];
+  }
+
   const handleSave = async () => {
     if (!transcription || !hasUnsavedChanges) return;
 
     setSaving(true);
     try {
-      const requestBody: any = { editedText };
-      
+      const requestBody: TranscriptionUpdateRequest = { editedText };
+
       // If we have edited segments, include them in the save request
       if (shouldShowEditableSegments && editedSegments.length > 0) {
         requestBody.editedSegments = editedSegments;
       }
 
       const response = await fetch(`/api/transcription/${transcription.id}`, {
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save transcription');
+        throw new Error("Failed to save transcription");
       }
 
       const result = await response.json();
@@ -136,62 +156,67 @@ export function TranscriptionEditor({ selectedAudioId }: TranscriptionEditorProp
       // Refresh data to get the latest version
       await fetchData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save');
+      setError(err instanceof Error ? err.message : "Failed to save");
     } finally {
       setSaving(false);
     }
   };
 
   // Export functions
-  const handleExport = async (format: 'pdf' | 'txt' | 'docx') => {
+  const handleExport = async (format: "pdf" | "txt" | "docx") => {
     if (!transcription) return;
 
     try {
-      const response = await fetch('/api/export', {
-        method: 'POST',
+      const response = await fetch("/api/export", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           transcriptionId: transcription.id,
           format,
-          filename: (audio?.customName || audio?.originalName)?.replace(/\.[^/.]+$/, '') || 'transcription',
+          filename:
+            (audio?.customName || audio?.originalName)?.replace(
+              /\.[^/.]+$/,
+              ""
+            ) || "transcription",
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Export failed');
+        throw new Error("Export failed");
       }
 
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
-      a.download = `${(audio?.customName || audio?.originalName)?.replace(/\.[^/.]+$/, '') || 'transcription'}.${format}`;
+      a.download = `${
+        (audio?.customName || audio?.originalName)?.replace(/\.[^/.]+$/, "") ||
+        "transcription"
+      }.${format}`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Export failed');
+      setError(err instanceof Error ? err.message : "Export failed");
     }
   };
-
-
 
   const formatDate = (date: Date | string) => {
     return new Date(date).toLocaleString();
   };
 
-  const getStatusIcon = (status: Audio['status']) => {
+  const getStatusIcon = (status: Audio["status"]) => {
     switch (status) {
-      case 'pending':
+      case "pending":
         return <Clock className="h-4 w-4 text-yellow-500" />;
-      case 'processing':
+      case "processing":
         return <Loader2 className="h-4 w-4 text-blue-500 animate-spin" />;
-      case 'completed':
+      case "completed":
         return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'error':
+      case "error":
         return <AlertCircle className="h-4 w-4 text-red-500" />;
       default:
         return <Clock className="h-4 w-4 text-gray-500" />;
@@ -251,9 +276,7 @@ export function TranscriptionEditor({ selectedAudioId }: TranscriptionEditorProp
               <div className="flex items-center space-x-4 mt-2">
                 <div className="flex items-center space-x-2">
                   {audio && getStatusIcon(audio.status)}
-                  <Badge variant="secondary">
-                    {audio?.status}
-                  </Badge>
+                  <Badge variant="secondary">{audio?.status}</Badge>
                 </div>
                 <span className="text-sm text-muted-foreground">
                   Uploaded {audio && formatDate(audio.uploadDate)}
@@ -266,23 +289,19 @@ export function TranscriptionEditor({ selectedAudioId }: TranscriptionEditorProp
               </div>
             </div>
           </div>
-
         </div>
       </div>
 
       {/* Audio Player */}
-      {audio?.status === 'completed' && (
+      {audio?.status === "completed" && (
         <div className="border-b p-4">
-          <AudioPlayer
-            audioId={audio.id}
-            className="max-w-md mx-auto"
-          />
+          <AudioPlayer audioId={audio.id} className="max-w-md mx-auto" />
         </div>
       )}
 
       {/* Content */}
       <div className="flex-1 overflow-hidden">
-        {audio?.status === 'processing' ? (
+        {audio?.status === "processing" ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
               <Loader2 className="h-12 w-12 animate-spin mx-auto mb-4" />
@@ -292,16 +311,22 @@ export function TranscriptionEditor({ selectedAudioId }: TranscriptionEditorProp
               </p>
             </div>
           </div>
-        ) : audio?.status === 'error' ? (
+        ) : audio?.status === "error" ? (
           <div className="flex items-center justify-center h-full">
             <Card className="border-destructive max-w-md">
               <CardContent className="p-6 text-center">
                 <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
-                <h2 className="text-lg font-semibold mb-2">Transcription Failed</h2>
+                <h2 className="text-lg font-semibold mb-2">
+                  Transcription Failed
+                </h2>
                 <p className="text-sm text-muted-foreground mb-4">
-                  There was an error processing your audio file. Please try uploading again.
+                  There was an error processing your audio file. Please try
+                  uploading again.
                 </p>
-                <Button onClick={() => window.location.reload()} variant="outline">
+                <Button
+                  onClick={() => window.location.reload()}
+                  variant="outline"
+                >
                   Refresh Page
                 </Button>
               </CardContent>
@@ -317,23 +342,29 @@ export function TranscriptionEditor({ selectedAudioId }: TranscriptionEditorProp
                     {hasSegments ? (
                       <div className="flex items-center space-x-2">
                         <Button
-                          variant={viewMode === 'segments' ? 'default' : 'outline'}
+                          variant={
+                            viewMode === "segments" ? "default" : "outline"
+                          }
                           size="sm"
-                          onClick={() => setViewMode('segments')}
+                          onClick={() => setViewMode("segments")}
                         >
                           View
                         </Button>
                         <Button
-                          variant={viewMode === 'editable-segments' ? 'default' : 'outline'}
+                          variant={
+                            viewMode === "editable-segments"
+                              ? "default"
+                              : "outline"
+                          }
                           size="sm"
-                          onClick={() => setViewMode('editable-segments')}
+                          onClick={() => setViewMode("editable-segments")}
                         >
                           Edit Segments
                         </Button>
                         <Button
-                          variant={viewMode === 'text' ? 'default' : 'outline'}
+                          variant={viewMode === "text" ? "default" : "outline"}
                           size="sm"
-                          onClick={() => setViewMode('text')}
+                          onClick={() => setViewMode("text")}
                         >
                           Text Editor
                         </Button>
@@ -341,13 +372,17 @@ export function TranscriptionEditor({ selectedAudioId }: TranscriptionEditorProp
                     ) : (
                       <>
                         <Edit3 className="h-4 w-4" />
-                        <span className="text-sm font-medium">Edit Transcription</span>
+                        <span className="text-sm font-medium">
+                          Edit Transcription
+                        </span>
                       </>
                     )}
                   </div>
                   <Separator orientation="vertical" className="h-4" />
                   <span className="text-sm text-muted-foreground">
-                    {hasSegments && shouldShowSegments ? `${transcription.segments?.length} segments` : `${wordCount} words`}
+                    {hasSegments && shouldShowSegments
+                      ? `${transcription.segments?.length} segments`
+                      : `${wordCount} words`}
                   </span>
                   {hasUnsavedChanges && (
                     <Badge variant="outline" className="text-xs">
@@ -355,7 +390,7 @@ export function TranscriptionEditor({ selectedAudioId }: TranscriptionEditorProp
                     </Badge>
                   )}
                 </div>
-                
+
                 <div className="flex flex-wrap items-center gap-2">
                   <Button
                     onClick={handleSave}
@@ -370,9 +405,9 @@ export function TranscriptionEditor({ selectedAudioId }: TranscriptionEditorProp
                     )}
                     <span className="hidden sm:inline">Save</span>
                   </Button>
-                  
+
                   <Button
-                    onClick={() => handleExport('txt')}
+                    onClick={() => handleExport("txt")}
                     variant="outline"
                     size="sm"
                     className="flex items-center space-x-2"
@@ -380,9 +415,9 @@ export function TranscriptionEditor({ selectedAudioId }: TranscriptionEditorProp
                     <FileText className="h-4 w-4" />
                     <span className="hidden sm:inline">TXT</span>
                   </Button>
-                  
+
                   <Button
-                    onClick={() => handleExport('pdf')}
+                    onClick={() => handleExport("pdf")}
                     variant="outline"
                     size="sm"
                     className="flex items-center space-x-2"
@@ -390,9 +425,9 @@ export function TranscriptionEditor({ selectedAudioId }: TranscriptionEditorProp
                     <Download className="h-4 w-4" />
                     <span className="hidden sm:inline">PDF</span>
                   </Button>
-                  
+
                   <Button
-                    onClick={() => handleExport('docx')}
+                    onClick={() => handleExport("docx")}
                     variant="outline"
                     size="sm"
                     className="flex items-center space-x-2"
@@ -436,9 +471,11 @@ export function TranscriptionEditor({ selectedAudioId }: TranscriptionEditorProp
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
               <FileText className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-              <h2 className="text-xl font-semibold mb-2">No Transcription Available</h2>
+              <h2 className="text-xl font-semibold mb-2">
+                No Transcription Available
+              </h2>
               <p className="text-muted-foreground">
-                This audio file hasn't been transcribed yet.
+                This audio file hasn&apos;t been transcribed yet.
               </p>
             </div>
           </div>

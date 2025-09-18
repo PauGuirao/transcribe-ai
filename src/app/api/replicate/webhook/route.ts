@@ -8,7 +8,6 @@ import type {
   ReplicateSegment,
   TranscriptionOutput,
   DatabaseStatus,
-  TranscriptionRecord,
 } from "@/types/replicate";
 
 export const runtime = "nodejs";
@@ -107,7 +106,7 @@ export async function POST(request: NextRequest) {
   let prediction: ReplicatePrediction;
   try {
     prediction = JSON.parse(payload);
-  } catch (_err) {
+  } catch (err) {
     return NextResponse.json(
       { error: "Invalid JSON payload" },
       { status: 400, headers: NO_CACHE_HEADERS }
