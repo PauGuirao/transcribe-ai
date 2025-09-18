@@ -39,14 +39,14 @@ export default function Navbar() {
     <div className="fixed top-0 left-0 right-0 w-full bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center z-50">
       <div className="flex items-center space-x-3">
         <Mic className="h-6 w-6 text-blue-600" />
-        <h1 className="text-xl font-semibold text-gray-900">TranscribeAI</h1>
+        <h1 className="text-xl font-semibold text-gray-900">Transcriu</h1>
       </div>
       <div className="flex items-center gap-3">
         {user && isSubscribed === false && (
           <Button asChild size="sm" className="gap-2 rounded-sm bg-primary text-primary-foreground hover:bg-primary/90">
             <Link href="/payment">
               <Sparkles className="h-4 w-4" />
-              {checkingSubscription ? 'Cargando...' : 'Mejorar a Pro'}
+              {checkingSubscription ? 'Cargando...' : 'Millorar a Pro'}
             </Link>
           </Button>
         )}

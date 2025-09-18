@@ -95,7 +95,7 @@ export function AppSidebar({ selectedAudioId, onAudioSelect, onUploadComplete }:
     <div className="w-80 h-screen bg-background border-r flex flex-col">
       {/* Header */}
       <div className="p-4 border-b">
-        <h1 className="text-xl font-bold text-foreground">TranscribeAI</h1>
+        <h1 className="text-xl font-bold text-foreground">Transcriu</h1>
         <p className="text-xs text-muted-foreground mt-1">
           Upload and transcribe audio files
         </p>

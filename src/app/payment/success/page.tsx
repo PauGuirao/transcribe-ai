@@ -9,7 +9,7 @@ export default function PaymentSuccessPage() {
         <CheckCircle2 className="mx-auto mb-4 h-12 w-12 text-primary" />
         <h1 className="text-3xl font-semibold">¡Pago completado!</h1>
         <p className="mt-3 text-muted-foreground">
-          Ya puedes disfrutar de todas las ventajas de TranscribeAI Pro. Si no ves cambios inmediatos,
+          Ya puedes disfrutar de todas las ventajas de Transcriu Pro. Si no ves cambios inmediatos,
           actualiza la página en unos segundos.
         </p>
         <div className="mt-8 flex justify-center gap-3">

@@ -71,12 +71,12 @@ export default function AppSidebar({ selectedAudioId, onAudioSelect, onUploadCom
 
   const menuItems = [
     {
-      title: 'Home',
+      title: 'Inici',
       icon: Home,
       path: '/dashboard',
     },
     {
-      title: 'Transcribir',
+      title: 'Transcriure',
       icon: Mic,
       path: '/transcribe',
     },

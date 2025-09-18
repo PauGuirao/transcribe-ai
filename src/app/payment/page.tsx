@@ -21,7 +21,7 @@ const plans: Array<{
     name: 'Básico',
     price: '€9',
     originalPrice: '€19',
-    description: 'Ideal para descubrir TranscribeAI en tu día a día.',
+    description: 'Ideal para descubrir Transcriu en tu día a día.',
     features: [
       '30 transcripciones al mes',
       'Modelos base de IA optimizados para español',

@@ -1,4 +1,4 @@
-# TranscribeAI
+# Transcriu
 
 A modern, AI-powered audio transcription application built with Next.js 14, TypeScript, and OpenAI's Whisper API. Upload audio files, get accurate transcriptions, edit them, and export to PDF or TXT formats.
 
@@ -34,42 +34,46 @@ Before you begin, ensure you have the following installed:
 ## Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd transcribe-ai
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Set up environment variables**
-   
+
    Copy the example environment file:
+
    ```bash
    cp .env.example .env
    ```
-   
+
    Update the `.env` file with your configuration:
+
    ```env
    # Database
    DATABASE_URL="postgresql://username:password@localhost:5432/transcribeai"
-   
+
    # OpenAI API
    OPENAI_API_KEY="your-openai-api-key-here"
-   
+
    # Supabase (optional - for file storage)
    NEXT_PUBLIC_SUPABASE_URL="your-supabase-url-here"
    NEXT_PUBLIC_SUPABASE_ANON_KEY="your-supabase-anon-key-here"
-   
+
    # File Upload Settings
    MAX_FILE_SIZE=25000000
    UPLOAD_DIR="./uploads"
    ```
 
 4. **Set up Supabase**
-   
+
    - Create a new project at [supabase.com](https://supabase.com)
    - Copy your project URL and anon key to the `.env` file
    - Set up authentication with Google provider in the Supabase dashboard
@@ -84,12 +88,13 @@ Before you begin, ensure you have the following installed:
 ## Getting Started
 
 1. **Start the development server**
+
    ```bash
    npm run dev
    ```
 
 2. **Open your browser**
-   
+
    Navigate to [http://localhost:3000](http://localhost:3000)
 
 3. **Upload and transcribe**
@@ -119,15 +124,15 @@ Before you begin, ensure you have the following installed:
 
 ## Environment Variables
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `OPENAI_API_KEY` | OpenAI API key for Whisper | Yes |
-| `REPLICATE_API_TOKEN` | Replicate API token for alternative transcription | No |
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL | Yes |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key | Yes |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key | Yes |
-| `MAX_FILE_SIZE` | Maximum upload file size in bytes | No |
-| `UPLOAD_DIR` | Directory for uploaded files | No |
+| Variable                        | Description                                       | Required |
+| ------------------------------- | ------------------------------------------------- | -------- |
+| `OPENAI_API_KEY`                | OpenAI API key for Whisper                        | Yes      |
+| `REPLICATE_API_TOKEN`           | Replicate API token for alternative transcription | No       |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Supabase project URL                              | Yes      |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key                            | Yes      |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Supabase service role key                         | Yes      |
+| `MAX_FILE_SIZE`                 | Maximum upload file size in bytes                 | No       |
+| `UPLOAD_DIR`                    | Directory for uploaded files                      | No       |
 
 ## Database Schema
 

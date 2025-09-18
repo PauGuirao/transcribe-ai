@@ -38,30 +38,18 @@ export default function SignIn() {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-foreground/10">
               <LogIn className="h-5 w-5" />
             </div>
-            TranscribeAI
+            Transcriu
           </div>
+          {/* Text actualitzat per a logopedes */}
           <h1 className="mt-14 text-4xl font-semibold leading-tight text-balance lg:text-5xl">
-            Transforma tus reuniones en insights útiles en cuestión de minutos.
+            L'eina essencial per a les teves transcripcions de logopèdia.
           </h1>
         </div>
         <div className="space-y-3">
+          {/* Text actualitzat per a logopedes */}
           <p className="text-sm text-primary-foreground/80">
-            92% de los equipos de producto mejoran su documentación después de la primera semana usando TranscribeAI.
+            Dedica més temps als teus nens i menys a la documentació.
           </p>
-          <div className="flex items-center gap-3">
-            <div className="flex -space-x-2">
-              {[1, 2, 3, 4, 5].map((item) => (
-                <div
-                  key={item}
-                  className="h-9 w-9 rounded-full border-2 border-primary/40 bg-primary-foreground/90"
-                />
-              ))}
-            </div>
-            <div className="text-sm">
-              <p className="font-semibold">Equipos felices</p>
-              <p className="text-primary-foreground/70">PM, UX y Customer Success</p>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -69,12 +57,12 @@ export default function SignIn() {
         <Card className="w-full max-w-md rounded-3xl border border-border/60 shadow-xl">
           <CardContent className="space-y-8 p-8">
             <div className="space-y-2 text-center">
-              <p className="text-sm font-medium text-primary">¡Bienvenido de nuevo!</p>
+              <p className="text-sm font-medium text-primary">Benvingut/da de nou!</p>
               <h2 className="text-3xl font-semibold tracking-tight text-foreground">
-                Inicia sesión para continuar
+                Inicia sessió per continuar
               </h2>
               <p className="text-sm text-muted-foreground">
-                Accede a tu biblioteca de transcripciones y sigue donde lo dejaste.
+                Accedeix a la teva biblioteca de transcripcions i segueix on ho vas deixar.
               </p>
             </div>
 
@@ -87,7 +75,7 @@ export default function SignIn() {
               {loading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Conectando con Google...
+                  Connectant amb Google...
                 </>
               ) : (
                 <>
@@ -99,13 +87,13 @@ export default function SignIn() {
                     className="rounded-full"
                     unoptimized
                   />
-                  Continuar con Google
+                  Continuar amb Google
                 </>
               )}
             </Button>
 
             <p className="text-xs text-center text-muted-foreground">
-              Al iniciar sesión aceptas nuestros términos y políticas de privacidad.
+              En iniciar sessió acceptes els nostres termes i polítiques de privacitat.
             </p>
           </CardContent>
         </Card>

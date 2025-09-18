@@ -21,59 +21,59 @@ import {
 
 const features = [
   {
-    title: 'Notas clínicas en minutos',
+    title: 'Notes clíniques en minuts',
     description:
-      'Transcribe las sesiones de logopedia con IA adaptada al español, lista para que añadas observaciones y objetivos terapéuticos.',
+      "Transcriu les sessions de logopèdia amb IA adaptada al català/castellà, a punt perquè hi afegeixis observacions i objectius terapèutics.",
     icon: BrainCircuit,
   },
   {
-    title: 'Limpieza inteligente',
+    title: 'Neteja intel·ligent',
     description:
-      'Elimina muletillas, repeticiones y segmentos irrelevantes automáticamente para obtener informes claros que puedas compartir con las familias.',
+      'Elimina crossos, repeticions i segments irrellevants automàticament per obtenir informes clars que puguis compartir amb les famílies.',
     icon: Sparkles,
   },
   {
-    title: 'Seguimiento seguro',
+    title: 'Seguiment segur',
     description:
-      'Almacena historiales, evolutivos y acuerdos de intervención con cifrado y controles de acceso que cumplen las normativas sanitarias.',
+      "Emmagatzema historials, evolutius i acords d'intervenció amb xifrat i controls d'accés que compleixen la normativa sanitària.",
     icon: ShieldCheck,
   },
 ]
 
 const workflow = [
   {
-    title: 'Registra tu sesión',
-    description: 'Importa las grabaciones de tus sesiones individuales o grupales desde cualquier dispositivo en segundos.',
+    title: 'Enregistra la sessió',
+    description: 'Importa les gravacions de sessions individuals o grupals des de qualsevol dispositiu en segons.',
     icon: FileAudio2,
   },
   {
-    title: 'Analiza y anota',
-    description: 'Escucha mientras lees, etiqueta hitos del plan terapéutico y añade observaciones clínicas desde el editor.',
+    title: 'Analitza i anota',
+    description: 'Escolta mentre llegeixes, etiqueta fites del pla terapèutic i afegeix observacions clíniques des de l’editor.',
     icon: Headphones,
   },
   {
-    title: 'Comparte avances',
-    description: 'Exporta informes para familias, colegios u otros profesionales y sincroniza el progreso de cada alumno.',
+    title: 'Comparteix avenços',
+    description: 'Exporta informes per a famílies, escoles o altres professionals i sincronitza el progrés de cada alumne.',
     icon: CheckCircle2,
   },
 ]
 
 const quickActions = [
   {
-    title: 'Transcribir sesión',
-    description: 'Convierte el audio en texto editable y listo para el informe clínico.',
+    title: 'Transcriure sessió',
+    description: 'Converteix l’àudio en text editable i llest per a l’informe clínic.',
     icon: Mic,
     href: '/transcribe',
   },
   {
-    title: 'Anotar intervención',
-    description: 'Marca objetivos, etiquetas y observaciones mientras revisas la sesión.',
+    title: 'Anotar intervenció',
+    description: 'Marca objectius, etiquetes i observacions mentre revises la sessió.',
     icon: PenTool,
     href: '/annotate',
   },
   {
-    title: 'Biblioteca terapéutica',
-    description: 'Consulta historiales, exporta informes y comparte avances con tu equipo.',
+    title: 'Biblioteca terapèutica',
+    description: 'Consulta historials, exporta informes i comparteix avenços amb el teu equip.',
     icon: BookOpen,
     href: '/library',
   },
@@ -96,7 +96,7 @@ export default function Home() {
     try {
       await signInWithGoogle()
     } catch (error) {
-      console.error('Error iniciando sesión:', error)
+      console.error('Error iniciant sessió:', error)
       setAuthLoading(false)
     }
   }
@@ -109,28 +109,28 @@ export default function Home() {
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary">
               <Headphones className="h-5 w-5" />
             </div>
-            TranscribeAI
+            Transcriu
           </Link>
           <div className="flex items-center gap-3">
             {user ? (
               <Button variant="ghost" onClick={() => router.push('/dashboard')}>
-                Ir al panel
+                Anar al panell
               </Button>
             ) : (
               <Button asChild variant="ghost">
-                <Link href="/auth/signin">Iniciar sesión</Link>
+                <Link href="/auth/signin">Inicia sessió</Link>
               </Button>
             )}
             <Button onClick={handlePrimaryAction} disabled={authLoading || loading}>
               {authLoading || loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Preparando...
+                  Preparant...
                 </>
               ) : user ? (
-                'Abrir TranscribeAI'
+                'Obrir Transcriu'
               ) : (
-                'Comenzar gratis'
+                'Comença gratis'
               )}
             </Button>
           </div>
@@ -142,14 +142,14 @@ export default function Home() {
           <div className="space-y-8">
             <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
               <Clock3 className="h-4 w-4" />
-              Documenta cada intervención sin perder tiempo
+              Documenta cada sessió sense perdre temps
             </div>
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tight text-balance sm:text-5xl">
-                Transcribe, analiza y comparte el progreso de tus alumnos de logopedia en cuestión de minutos.
+                Transcriu, analitza i comparteix el progrés dels teus alumnes de logopèdia en qüestió de minuts.
               </h1>
               <p className="text-lg text-muted-foreground">
-                TranscribeAI te ayuda a transformar el audio de tus sesiones en informes clínicos editables, listos para planificar objetivos, compartir con las familias y coordinarte con otros especialistas.
+                Transcriu t’ajuda a transformar l’àudio de les sessions en informes clínics editables, a punt per planificar objectius, compartir amb les famílies i coordinar-te amb altres especialistes.
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -157,20 +157,20 @@ export default function Home() {
                 {authLoading || loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Preparando experiencia
+                    Preparant l’experiència
                   </>
                 ) : user ? (
-                  'Ir al panel'
+                  'Anar al panell'
                 ) : (
-                  'Probar con una sesión gratuita'
+                  'Prova amb una sessió gratuïta'
                 )}
               </Button>
               <Button size="lg" variant="outline" asChild>
-                <Link href="#caracteristicas">Ver características</Link>
+                <Link href="#caracteristicas">Veure característiques</Link>
               </Button>
             </div>
             <p className="text-sm text-muted-foreground">
-              Sin costos ocultos. Empieza con minutos gratuitos y decide después si quieres digitalizar todos tus informes clínicos.
+              Sense costos ocults. Comença amb minuts gratuïts i decideix després si vols digitalitzar tots els teus informes clínics.
             </p>
           </div>
 
@@ -180,19 +180,19 @@ export default function Home() {
             <div className="relative rounded-3xl border bg-card/80 p-6 shadow-xl shadow-primary/10 backdrop-blur">
               <div className="flex items-center justify-between border-b pb-4">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Proyecto</p>
-                  <h2 className="text-lg font-semibold">Sesión de articulación /r/</h2>
+                  <p className="text-sm font-medium text-muted-foreground">Projecte</p>
+                  <h2 className="text-lg font-semibold">Sessió d’articulació /r/</h2>
                 </div>
                 <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
                   <Sparkles className="h-3.5 w-3.5" />
-                  Plan logopédico
+                  Pla logopèdic
                 </span>
               </div>
               <div className="mt-6 space-y-4">
                 <div className="space-y-2 rounded-2xl bg-muted/60 p-4">
-                  <p className="text-xs uppercase tracking-wide text-muted-foreground">Resumen</p>
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">Resum</p>
                   <p className="text-sm text-muted-foreground">
-                    Se trabajó en vibrante múltiple. El alumno mantiene el objetivo con apoyo visual y necesita reforzar respiración costo-diafragmática.
+                    Es va treballar la vibrant múltiple. L’alumne manté l’objectiu amb suport visual i necessita reforçar la respiració costo-diaphragmàtica.
                   </p>
                 </div>
                 <div className="space-y-3">
@@ -201,7 +201,7 @@ export default function Home() {
                     <div>
                       <p className="text-sm font-medium">00:06:12</p>
                       <p className="text-sm text-muted-foreground">
-                        Mantiene posición lingual /r/ con espejo y esquema corporal. Refuerzo positivo efectivo.
+                        Manté posició lingual /r/ amb mirall i esquema corporal. Reforç positiu efectiu.
                       </p>
                     </div>
                   </div>
@@ -210,7 +210,7 @@ export default function Home() {
                     <div>
                       <p className="text-sm font-medium">00:12:45</p>
                       <p className="text-sm text-muted-foreground">
-                        Se recomienda tarea de lecturas guiadas en casa con audio de referencia.
+                        Es recomana tasca de lectures guiades a casa amb àudio de referència.
                       </p>
                     </div>
                   </div>
@@ -222,10 +222,10 @@ export default function Home() {
 
         <section className="mt-24 rounded-3xl bg-muted/40 px-6 py-10 sm:px-10">
           <div className="text-center">
-            <p className="text-sm font-semibold uppercase tracking-wide text-primary">¿Qué necesitas hoy?</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight">Elige la herramienta para tu siguiente sesión</h2>
+            <p className="text-sm font-semibold uppercase tracking-wide text-primary">Què necessites avui?</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight">Tria l’eina per a la teva propera sessió</h2>
             <p className="mt-3 text-muted-foreground">
-              Accede rápidamente a los flujos más usados por logopedas y equipos de apoyo.
+              Accedeix ràpidament als fluxos més utilitzats per logopedes i equips de suport.
             </p>
           </div>
           <div className="mt-10 grid gap-6 md:grid-cols-3">
@@ -243,7 +243,7 @@ export default function Home() {
                   <p className="mt-1 text-sm text-muted-foreground">{action.description}</p>
                 </div>
                 <span className="mt-4 text-sm font-semibold text-primary group-hover:underline">
-                  Comenzar
+                  Començar
                 </span>
               </Link>
             ))}
@@ -252,10 +252,10 @@ export default function Home() {
 
         <section id="caracteristicas" className="mt-24 space-y-16">
           <div className="text-center">
-            <p className="text-sm font-semibold uppercase tracking-wide text-primary">Para logopedas y equipos de apoyo</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight">Documenta el progreso terapéutico sin perderte ningún detalle</h2>
+            <p className="text-sm font-semibold uppercase tracking-wide text-primary">Per a logopedes i equips de suport</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight">Documenta el progrés terapèutic sense perdre cap detall</h2>
             <p className="mt-3 text-muted-foreground">
-              Desde la carga del audio hasta el informe final, TranscribeAI te acompaña para que toda tu información clínica quede organizada y disponible cuando la necesites.
+              Des de la càrrega de l’àudio fins a l’informe final, Transcriu t’acompanya perquè tota la informació clínica quedi organitzada i disponible quan la necessitis.
             </p>
           </div>
           <div className="grid gap-8 md:grid-cols-3">
@@ -276,21 +276,21 @@ export default function Home() {
 
         <section className="mt-24 grid gap-10 rounded-3xl bg-gradient-to-br from-primary/10 via-background to-secondary/60 p-10 md:grid-cols-[1fr_1fr] md:items-center">
           <div className="space-y-4">
-            <p className="text-sm font-semibold uppercase tracking-wide text-primary">Cómo funciona</p>
-            <h2 className="text-3xl font-bold">Un flujo pensado para logopedas en consulta y en aula</h2>
+            <p className="text-sm font-semibold uppercase tracking-wide text-primary">Com funciona</p>
+            <h2 className="text-3xl font-bold">Un flux pensat per a logopedes a consulta i a l’aula</h2>
             <p className="text-muted-foreground">
-              TranscribeAI elimina pasos manuales y te da visibilidad completa sobre cada sesión: ideal para consultas privadas, centros educativos y equipos multidisciplinares.
+              Transcriu elimina passos manuals i et dona visibilitat completa sobre cada sessió: ideal per a consultes privades, centres educatius i equips multidisciplinaris.
             </p>
             <Button size="lg" onClick={handlePrimaryAction} disabled={authLoading || loading}>
               {authLoading || loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Preparando experiencia
+                  Preparant l’experiència
                 </>
               ) : user ? (
-                'Volver al panel'
+                'Tornar al panell'
               ) : (
-                'Crear mi primera ficha clínica'
+                'Crea la meva primera fitxa clínica'
               )}
             </Button>
           </div>
@@ -311,25 +311,25 @@ export default function Home() {
 
         <section className="mt-24 rounded-3xl border bg-card p-10 text-center shadow-lg">
           <div className="mx-auto max-w-2xl space-y-4">
-            <h2 className="text-3xl font-bold">Es hora de transcribir sin fricciones</h2>
+            <h2 className="text-3xl font-bold">És hora de transcriure sense friccions</h2>
             <p className="text-muted-foreground">
-              Únete a logopedas que ya están digitalizando sus sesiones, evolucionando planes terapéuticos y comunicando avances con TranscribeAI. Empieza gratis y escala solo cuando lo necesites.
+              Uneix-te a logopedes que ja estan digitalitzant les seves sessions, evolucionant plans terapèutics i comunicant avenços amb Transcriu. Comença gratis i escala només quan ho necessitis.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
               <Button size="lg" onClick={handlePrimaryAction} disabled={authLoading || loading}>
                 {authLoading || loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Iniciando
+                    Iniciant
                   </>
                 ) : user ? (
-                  'Ir al panel'
+                  'Anar al panell'
                 ) : (
-                  'Crear cuenta con Google'
+                  'Crea un compte amb Google'
                 )}
               </Button>
               <Button size="lg" variant="outline" asChild>
-                <Link href="/auth/signin">Ver opciones de acceso</Link>
+                <Link href="/auth/signin">Veure opcions d’accés</Link>
               </Button>
             </div>
           </div>
@@ -338,16 +338,16 @@ export default function Home() {
 
       <footer className="border-t bg-background/80">
         <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-4 px-6 py-8 text-sm text-muted-foreground sm:flex-row">
-          <p>© {new Date().getFullYear()} TranscribeAI. Todos los derechos reservados.</p>
+          <p>© {new Date().getFullYear()} Transcriu. Tots els drets reservats.</p>
           <div className="flex gap-6">
             <Link href="mailto:hola@transcribeai.app" className="hover:text-foreground">
-              Contacto
+              Contacte
             </Link>
             <Link href="/" className="hover:text-foreground">
-              Privacidad
+              Privadesa
             </Link>
             <Link href="/" className="hover:text-foreground">
-              Términos
+              Termes
             </Link>
           </div>
         </div>

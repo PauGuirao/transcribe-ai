@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TranscribeAI",
+  title: "Transcriu",
   description: "Transcribe and edit your audio files with AI-powered accuracy",
 };
 
