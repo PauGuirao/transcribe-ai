@@ -5,14 +5,11 @@ import { cookies } from "next/headers";
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/dashboard";
-
   // Enhanced logging for production debugging
   const logData = {
     timestamp: new Date().toISOString(),
     url: request.url,
     code: code ? `present (${code.substring(0, 10)}...)` : "missing",
-    next,
     origin,
     allParams: Object.fromEntries(searchParams.entries()),
     userAgent: request.headers.get('user-agent'),
@@ -44,13 +41,12 @@ export async function GET(request: NextRequest) {
 
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      const redirectUrl = `${origin}${next}`;
+      const redirectUrl = `${origin}/dashboard`;
       console.log("=== AUTH SUCCESS ===");
       console.log(JSON.stringify({
         timestamp: new Date().toISOString(),
         action: "successful_redirect",
         redirectUrl,
-        next,
         origin
       }, null, 2));
       return NextResponse.redirect(redirectUrl);
