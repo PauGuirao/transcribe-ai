@@ -370,7 +370,7 @@ export function EditableTranscriptionSegments({
                 >
                   <SelectTrigger className="h-7 text-xs w-auto min-w-[120px]">
                     <SelectValue 
-                      placeholder="Sin speaker"
+                      placeholder="Sense persona"
                     >
                       {segment.speakerId ? (
                         <div className="flex items-center gap-2">
@@ -381,12 +381,12 @@ export function EditableTranscriptionSegments({
                           {getSpeakerById(segment.speakerId)?.name}
                         </div>
                       ) : (
-                        "Sin speaker"
+                        "Sense persona"
                       )}
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">Sin speaker</SelectItem>
+                    <SelectItem value="none">Sense persona</SelectItem>
                     {speakers.map((speaker) => (
                       <SelectItem key={speaker.id} value={speaker.id}>
                         <div className="flex items-center gap-2">

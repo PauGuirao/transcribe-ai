@@ -11,9 +11,11 @@ interface AuthContextType {
   loading: boolean;
   isSubscribed: boolean | null;
   planType: string | null;
+  tokens: number | null;
   checkingSubscription: boolean;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
+  refreshTokens: () => Promise<void>;
 }
 
 // Create the context
@@ -28,6 +30,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // State for subscription status and plan
   const [isSubscribed, setIsSubscribed] = useState<boolean | null>(null);
   const [planType, setPlanType] = useState<string | null>(null);
+  const [tokens, setTokens] = useState<number | null>(null);
   const [checkingSubscription, setCheckingSubscription] = useState(true);
 
   useEffect(() => {
@@ -57,6 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // If there's no user, reset subscription state
       if (!user) {
         setIsSubscribed(null);
+
         setCheckingSubscription(false);
         return;
       }
@@ -65,17 +69,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const { data, error } = await supabase
           .from("profiles")
-          .select("is_subscribed, plan_type")
+          .select("is_subscribed, plan_type, tokens")
           .eq("id", user.id)
           .single();
+
+        console.log(user.id);
+        console.log("Subscription data:", data, "Error:", error);
 
         if (error) {
           console.error("Failed to load subscription status:", error);
           setIsSubscribed(false); // Default to false on error for security
           setPlanType(null);
+          setTokens(null);
         } else {
           setIsSubscribed(Boolean(data?.is_subscribed));
           setPlanType(data?.plan_type || null);
+          setTokens(data?.tokens || null);
         }
       } catch (err) {
         console.error("Unexpected subscription fetch error:", err);
@@ -109,6 +118,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Function to refresh tokens manually
+  const refreshTokens = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("is_subscribed, plan_type, tokens")
+        .eq("id", user.id)
+        .single();
+
+      if (error) {
+        console.error("Failed to refresh tokens:", error);
+      } else {
+        setIsSubscribed(Boolean(data?.is_subscribed));
+        setPlanType(data?.plan_type || null);
+        setTokens(data?.tokens || null);
+      }
+    } catch (err) {
+      console.error("Unexpected token refresh error:", err);
+    }
+  };
+
   // The value provided to consuming components
   const value = {
     user,
@@ -116,9 +148,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     loading,
     isSubscribed,
     planType,
+    tokens,
     checkingSubscription,
     signInWithGoogle,
     signOut,
+    refreshTokens,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

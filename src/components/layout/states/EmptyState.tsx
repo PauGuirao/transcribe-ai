@@ -7,7 +7,9 @@ import {
   AudioUploadResult,
 } from "@/components/audio-upload/AudioUpload";
 import { Button } from "@/components/ui/button";
-import { FileText, Loader2, AlertCircle, ArrowRight } from "lucide-react";
+import { FileText, Loader2, AlertCircle, ArrowRight, CreditCard, Check, Zap } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 
 interface EmptyStateProps {
   onUploadComplete: (result: AudioUploadResult) => void;
@@ -26,6 +28,8 @@ export function EmptyState({
   const [manualTranscribeError, setManualTranscribeError] = useState<
     string | null
   >(null);
+  const { tokens } = useAuth();
+  const router = useRouter();
 
   const handleManualUploadComplete = (result: AudioUploadResult) => {
     setPendingUpload(result);
@@ -77,6 +81,93 @@ export function EmptyState({
       setManualTranscribeLoading(false);
     }
   };
+
+  const handleGoToPayment = () => {
+    router.push("/payment");
+  };
+
+  // If user has no tokens, show subscription message
+  if (tokens === 0 || tokens === null) {
+    return (
+      <div className="flex-1 overflow-y-auto">
+        <div className="mx-auto flex max-w-4xl flex-col items-center px-6 py-16 text-center">
+          <div className="mb-3 rounded-full bg-gradient-to-br from-blue-100 to-blue-100 p-4">
+            <CreditCard className="h-4 w-4 text-blue-400" />
+          </div>
+          
+          <h2 className="text-2xl font-bold mb-3 bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+            No et queden tokens
+          </h2>
+          <p className="text-muted-foreground text-lg mb-8 max-w-2xl">
+            Has esgotat les transcripciones gratuites. Suscriute per continuar transcribint audios 
+          </p>
+
+          {/* Pricing Card */}
+          <div className="w-full max-w-md mb-8">
+            <div className="relative rounded-2xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10 p-6 shadow-lg">
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                <span className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-medium flex items-center gap-1">
+                  <Zap className="h-3 w-3" />
+                  Más Popular
+                </span>
+              </div>
+              
+              <div className="text-center mb-6">
+                <h3 className="text-xl font-bold mb-2">Plan Pro</h3>
+                <div className="flex items-baseline justify-center gap-1">
+                  <span className="text-3xl font-bold">5€</span>
+                  <span className="text-muted-foreground">/mes</span>
+                </div>
+                <p className="text-sm text-muted-foreground mt-1">Cancela cuando quieras</p>
+              </div>
+
+              <div className="space-y-3 mb-6">
+                <div className="flex items-center gap-3">
+                  <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
+                  <span className="text-sm">100 transcripciones al mes</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
+                  <span className="text-sm">Transcripción en tiempo real</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
+                  <span className="text-sm">Exportación en múltiples formatos</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
+                  <span className="text-sm">Edición avanzada de transcripciones</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
+                  <span className="text-sm">Soporte prioritario</span>
+                </div>
+              </div>
+
+              <Button 
+                onClick={handleGoToPayment}
+                className="w-full gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg"
+                size="lg"
+              >
+                <CreditCard className="h-4 w-4" />
+                Suscribirse ahora
+              </Button>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground mb-2">
+              ¿Necesitas más transcripciones?
+            </p>
+            <p className="text-xs text-muted-foreground">
+              También tenemos planes Premium desde 15€/mes con hasta 500 transcripciones
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 overflow-y-auto">
       <div className="mx-auto flex max-w-3xl flex-col items-center px-6 py-16 text-center">

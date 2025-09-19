@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { supabase } from "@/lib/supabase"; // 👈 Import your Supabase client
 import { Audio, Transcription, TranscriptionSegment, Speaker } from "@/types";
+import { useAuth } from "@/contexts/AuthContext";
 
 /**
  * Custom hook to manage fetching and state for transcription data.
@@ -23,6 +24,8 @@ export function useTranscriptionData(audioId?: string) {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  const { refreshTokens } = useAuth();
 
   // The fetchData function remains exactly the same
   const fetchData = useCallback(async () => {
@@ -94,6 +97,10 @@ export function useTranscriptionData(audioId?: string) {
               `[REALTIME] Status changed to '${newStatus}'. Fetching data...`
             );
             fetchData();
+            // Refresh tokens when transcription is completed
+            if (newStatus === "completed") {
+              refreshTokens();
+            }
           }
         }
       )

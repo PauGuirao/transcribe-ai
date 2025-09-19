@@ -150,9 +150,9 @@ export function AppSidebar({ selectedAudioId, onAudioSelect, onUploadComplete }:
             <div className="text-center py-8">
               <FileAudio className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <p className="text-sm text-muted-foreground">
-                No audio files yet.
+                Encara no hi ha transcripcions
                 <br />
-                Upload your first file to get started.
+                Puja el teu primer fitxer per començar.
               </p>
             </div>
           ) : (

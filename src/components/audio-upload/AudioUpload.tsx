@@ -186,9 +186,9 @@ export function AudioUpload({
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">
-                  {uploadProgress.status === "uploading" && "Uploading..."}
-                  {uploadProgress.status === "completed" && "Upload Complete!"}
-                  {uploadProgress.status === "error" && "Upload Failed"}
+                  {uploadProgress.status === "uploading" && "Pujant..."}
+                  {uploadProgress.status === "completed" && "Pujada Completada!"}
+                  {uploadProgress.status === "error" && "Pujada fallida"}
                 </span>
                 <Badge
                   variant={

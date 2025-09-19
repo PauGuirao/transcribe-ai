@@ -19,6 +19,12 @@ import {
   Edit,
   ChevronDown,
   PenTool,
+  Calendar,
+  Clock,
+  User,
+  GraduationCap,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import AppLayout from "@/components/layout/AppLayout";
@@ -29,6 +35,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 
 interface AudioFile {
   id: string;
@@ -38,6 +53,7 @@ interface AudioFile {
   fileId: string;
   uploadDate: string;
   status: "completed" | "processing" | "failed" | "pending" | "uploaded";
+  alumneId?: string | null;
   transcription?: {
     id: string;
     audioId: string;
@@ -46,6 +62,7 @@ interface AudioFile {
     segments: TranscriptionSegment[];
     createdAt: string;
     updatedAt: string;
+    alumneId?: string | null;
   } | null;
 }
 
@@ -65,6 +82,14 @@ export default function LibraryPage() {
   const [newFileName, setNewFileName] = useState("");
   const [updating, setUpdating] = useState(false);
   const [filterType, setFilterType] = useState<"default" | "day">("day");
+  
+  // Alumne assignment state
+  const [alumnes, setAlumnes] = useState<{id: string, name: string, age: number | null}[]>([]);
+  const [alumnesLoading, setAlumnesLoading] = useState(false);
+  const [alumnesError, setAlumnesError] = useState<string | null>(null);
+  const [selectedAlumne, setSelectedAlumne] = useState<string>('none');
+  const [assigningAlumne, setAssigningAlumne] = useState(false);
+  
   const router = useRouter();
 
   const fetchFiles = async () => {
@@ -177,6 +202,71 @@ export default function LibraryPage() {
     setEditingFile(file);
     setNewFileName(file.customName || file.originalName);
     setIsEditModalOpen(true);
+    
+    // Set the currently assigned alumne
+    const assignedAlumneId = file.alumneId || file.transcription?.alumneId;
+    setSelectedAlumne(assignedAlumneId || 'none');
+    
+    loadAlumnes();
+  };
+
+  const loadAlumnes = async () => {
+    try {
+      setAlumnesLoading(true);
+      setAlumnesError(null);
+      const res = await fetch('/api/alumne');
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.error || 'No se pudieron cargar los alumnos');
+      }
+      const data = await res.json();
+      setAlumnes(data.profiles || []);
+    } catch (error) {
+      setAlumnesError(error instanceof Error ? error.message : 'No se pudieron cargar los alumnos');
+    } finally {
+      setAlumnesLoading(false);
+    }
+  };
+
+  const handleAssignAlumne = async (value: string) => {
+    if (!editingFile?.transcription?.id) return;
+    
+    setSelectedAlumne(value);
+    setAssigningAlumne(true);
+    setAlumnesError(null);
+
+    try {
+      const res = await fetch(`/api/transcription/${editingFile.transcription.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ alumneId: value === 'none' ? null : value }),
+      });
+      
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.error || 'No se pudo asignar el alumno');
+      }
+
+      // Update the file in local state
+      setFiles(files.map(file => 
+        file.id === editingFile.id 
+          ? { 
+              ...file, 
+              alumneId: value === 'none' ? null : value,
+              transcription: file.transcription ? {
+                ...file.transcription,
+                alumneId: value === 'none' ? null : value
+              } : file.transcription
+            }
+          : file
+      ));
+    } catch (error) {
+      setAlumnesError(error instanceof Error ? error.message : 'No se pudo asignar el alumno');
+      // Revert selection on error
+      setSelectedAlumne(editingFile.transcription?.alumneId || editingFile.alumneId || 'none');
+    } finally {
+      setAssigningAlumne(false);
+    }
   };
 
   const handleSaveEdit = async () => {
@@ -224,6 +314,8 @@ export default function LibraryPage() {
     setIsEditModalOpen(false);
     setEditingFile(null);
     setNewFileName("");
+    setSelectedAlumne('none');
+    setAlumnesError(null);
   };
 
   const formatDateKey = (dateString: string) => {
@@ -452,7 +544,7 @@ export default function LibraryPage() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="h-8">
-                  {filterType === "default" ? "Default" : "By Day"}
+                  {filterType === "default" ? "Normal" : "Per dia"}
                   <ChevronDown className="ml-2 h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -461,13 +553,13 @@ export default function LibraryPage() {
                   onClick={() => setFilterType("default")}
                   className={filterType === "default" ? "bg-gray-100" : ""}
                 >
-                  Default
+                  Normal
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => setFilterType("day")}
                   className={filterType === "day" ? "bg-gray-100" : ""}
                 >
-                  By Day
+                  Per dia
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -479,13 +571,13 @@ export default function LibraryPage() {
             <div className="mx-auto max-w-sm">
               <FileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                No audio files yet
+                Encara no hi ha transcripcions
               </h3>
               <p className="text-gray-600 mb-4">
-                Upload your first audio file to get started with transcription.
+                Puja el teu primer fitxer d&apos;àudio per començar a transcriure.
               </p>
               <Button onClick={() => (window.location.href = "/transcribe")}>
-                Start Transcribing
+                Comença a transcriure
               </Button>
             </div>
           </div>
@@ -513,40 +605,171 @@ export default function LibraryPage() {
         )}
       </div>
 
-      {/* Edit Filename Modal */}
+      {/* Enhanced Edit Panel Modal */}
       <Sheet open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <SheetContent>
-          <SheetHeader className="mt-4 p-4">
-            <SheetTitle>Edita el nom del fitxer</SheetTitle>
-            <SheetDescription>
-              Canvia el nom de visualització d&apos;aquest fitxer d&apos;àudio.
-            </SheetDescription>
-          </SheetHeader>
-          <div className="mt-0 space-y-1 p-4 pt-0">
-            <div>
-              <Input
-                id="filename"
-                value={newFileName}
-                onChange={(e) => setNewFileName(e.target.value)}
-                placeholder="Enter new filename"
-                onKeyPress={(e) => e.key === "Enter" && handleSaveEdit()}
-              />
+        <SheetContent className="sm:max-w-md">
+          <SheetHeader className="space-y-4 pt-6 pb-1 px-5">
+            <div className="flex items-center gap-3">
+              <div>
+                <SheetTitle className="text-xl">Editar transcripció</SheetTitle>
+                <SheetDescription className="text-sm text-muted-foreground">
+                  Personalitza el nom i assigna un alumne a aquesta transcripció
+                </SheetDescription>
+              </div>
             </div>
-            <div className="flex space-x-2 pt-4">
+          </SheetHeader>
+
+          <div className="space-y-6 p-5">
+            {/* File Information Section */}
+            <div className="space-y-4 p-4 bg-muted/30 rounded-lg border">
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <FileText className="h-4 w-4" />
+                Informació del fitxer
+              </div>
+              
+              <div className="space-y-3 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Nom original:</span>
+                  <span className="font-medium text-right max-w-[200px] truncate" title={editingFile?.originalName}>
+                    {editingFile?.originalName}
+                  </span>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground flex items-center gap-1">
+                    <Calendar className="h-3 w-3" />
+                    Data de pujada:
+                  </span>
+                  <span className="font-medium">
+                    {editingFile ? new Date(editingFile.uploadDate).toLocaleDateString('ca-ES') : '—'}
+                  </span>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground flex items-center gap-1">
+                    <Clock className="h-3 w-3" />
+                    Estat:
+                  </span>
+                  <div className="flex items-center gap-2">
+                    {editingFile && (() => {
+                      const rawStatus = String(editingFile.status ?? "").toLowerCase() as keyof typeof STATUS_MAP;
+                      const meta = STATUS_MAP[rawStatus] ?? {
+                        label: editingFile.status ?? "—",
+                        classes: "bg-gray-100 text-gray-800",
+                      };
+                      return (
+                        <div className={`px-2 py-1 rounded-full text-xs font-medium ${meta.classes}`}>
+                          {meta.label}
+                        </div>
+                      );
+                    })()}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* File Name Edit Section */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <User className="h-4 w-4 text-muted-foreground" />
+                Nom personalitzat
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="filename" className="text-sm text-muted-foreground">
+                  Canvia el nom de visualització d&apos;aquest fitxer
+                </Label>
+                <Input
+                  id="filename"
+                  value={newFileName}
+                  onChange={(e) => setNewFileName(e.target.value)}
+                  placeholder="Introdueix un nou nom..."
+                  onKeyPress={(e) => e.key === "Enter" && handleSaveEdit()}
+                  className="h-11"
+                />
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Alumne Assignment Section */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <GraduationCap className="h-4 w-4 text-muted-foreground" />
+                  Assignar alumne
+                </div>
+                {assigningAlumne && (
+                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                )}
+              </div>
+              
+              <div className="space-y-2">
+                <Label className="text-sm text-muted-foreground">
+                  Vincula aquesta transcripció amb un alumne
+                </Label>
+                <Select
+                  value={selectedAlumne}
+                  onValueChange={handleAssignAlumne}
+                  disabled={alumnesLoading || assigningAlumne || !editingFile?.transcription?.id}
+                >
+                  <SelectTrigger className="h-11">
+                    <SelectValue placeholder={alumnesLoading ? 'Carregant alumnes...' : 'Selecciona un alumne'} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Sense assignar</SelectItem>
+                    {alumnes.map((alumne) => (
+                      <SelectItem key={alumne.id} value={alumne.id}>
+                        {alumne.name}
+                        {alumne.age !== null ? ` · ${alumne.age} anys` : ''}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                
+                {!editingFile?.transcription?.id && (
+                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3" />
+                    L&apos;assignació d&apos;alumnes només està disponible per fitxers transcrits
+                  </p>
+                )}
+                
+                {alumnesError && (
+                  <p className="text-xs text-destructive flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3" />
+                    {alumnesError}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Action Buttons */}
+            <div className="flex gap-3 pt-2">
               <Button
                 onClick={handleSaveEdit}
                 disabled={!newFileName.trim() || updating}
-                className="flex-1"
+                className="flex-1 h-11"
               >
-                {updating ? "Guardant..." : "Confirmar"}
+                {updating ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Guardant...
+                  </>
+                ) : (
+                  'Guardar canvis'
+                )}
               </Button>
               <Button
                 variant="outline"
                 onClick={handleCancelEdit}
                 disabled={updating}
-                className="flex-1"
+                className="flex-1 h-11"
               >
-                Cancelar
+                Cancel·lar
               </Button>
             </div>
           </div>

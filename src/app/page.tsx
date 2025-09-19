@@ -146,6 +146,16 @@ export default function Home() {
     }
   };
 
+  const handlePricingPlanClick = (planKey: string) => {
+    if (loading) return;
+
+    if (user) {
+      router.push("/dashboard");
+    } else {
+      router.push("/auth/signin");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/40">
       <header className="sticky top-0 z-40 bg-background/80 backdrop-blur">
@@ -464,9 +474,9 @@ export default function Home() {
                   <Button
                     variant={plan.highlighted ? "default" : "outline"}
                     className="w-full"
-                    asChild
+                    onClick={() => handlePricingPlanClick(plan.key)}
                   >
-                    <Link href="/payment">Triar pla</Link>
+                    Triar pla
                   </Button>
                   <ul className="space-y-4">
                     {plan.features.map((feature) => (

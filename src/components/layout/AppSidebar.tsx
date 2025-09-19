@@ -241,11 +241,11 @@ export default function AppSidebar({
       <div className="mt-auto px-2 pb-4 flex flex-col gap-3">
         <div className="rounded-lg border bg-white p-3">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+            <p className="text-xs font-bold uppercase tracking-wide text-foreground">
               Pla actual
             </p>
             <div className="mt-1">
-              <Badge variant="secondary" className="text-sm capitalize">
+              <Badge variant="secondary" className="text-sm uppercase bg-blue-500 text-white">
                 {planType || "Gratuït"}
               </Badge>
             </div>
@@ -253,7 +253,7 @@ export default function AppSidebar({
         </div>
         <div className="rounded-lg border bg-white p-3">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+            <p className="text-xs font-bold uppercase tracking-wide text-foreground">
               Transcripcions disponibles
             </p>
             <div className="mt-1 text-2xl font-semibold">
