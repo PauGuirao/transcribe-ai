@@ -116,8 +116,20 @@ export async function POST(request: NextRequest) {
         const audioDataUrl = `data:${contentType};base64,${buffer.toString(
           "base64"
         )}`;
-        // Use your ngrok URL or another tunneling service URL here
-        const origin = process.env.VERCEL_URL;
+        // Use the correct production URL for webhooks
+        const origin = process.env.VERCEL_URL 
+          ? `https://${process.env.VERCEL_URL}` 
+          : 'https://transcriu.com';
+
+        const webhookUrl = `${origin}/api/replicate/webhook`;
+        console.log("=== REPLICATE WEBHOOK CONFIG ===");
+        console.log(JSON.stringify({
+          timestamp: new Date().toISOString(),
+          origin,
+          webhookUrl,
+          vercelUrl: process.env.VERCEL_URL,
+          audioId
+        }, null, 2));
 
         const prediction = await replicate.predictions.create({
           version: replicateWhisperVersion,
@@ -134,7 +146,7 @@ export async function POST(request: NextRequest) {
             compression_ratio_threshold: 2.4,
             temperature_increment_on_fallback: 0.2,
           },
-          webhook: `${origin}/api/replicate/webhook`,
+          webhook: webhookUrl,
           webhook_events_filter: ["completed"],
         });
 
