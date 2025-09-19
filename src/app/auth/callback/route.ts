@@ -7,12 +7,20 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get("code");
   const next = searchParams.get("next") ?? "/dashboard";
 
+  // Enhanced logging for production debugging
+  const logData = {
+    timestamp: new Date().toISOString(),
+    url: request.url,
+    code: code ? `present (${code.substring(0, 10)}...)` : "missing",
+    next,
+    origin,
+    allParams: Object.fromEntries(searchParams.entries()),
+    userAgent: request.headers.get('user-agent'),
+    referer: request.headers.get('referer')
+  };
+  
   console.log("=== AUTH CALLBACK ROUTE HIT ===");
-  console.log("Full URL:", request.url);
-  console.log("Auth callback - Code:", code ? `present (${code.substring(0, 10)}...)` : "missing");
-  console.log("Auth callback - Next:", next);
-  console.log("Auth callback - Origin:", origin);
-  console.log("All search params:", Object.fromEntries(searchParams.entries()));
+  console.log(JSON.stringify(logData, null, 2));
 
   if (code) {
     const cookieStore = await cookies();
@@ -36,16 +44,38 @@ export async function GET(request: NextRequest) {
 
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      console.log("Auth callback - Success, redirecting to:", `${origin}${next}`);
-      return NextResponse.redirect(`${origin}${next}`);
+      const redirectUrl = `${origin}${next}`;
+      console.log("=== AUTH SUCCESS ===");
+      console.log(JSON.stringify({
+        timestamp: new Date().toISOString(),
+        action: "successful_redirect",
+        redirectUrl,
+        next,
+        origin
+      }, null, 2));
+      return NextResponse.redirect(redirectUrl);
     }
 
-    console.error("Auth callback error:", error);
+    console.log("=== AUTH ERROR ===");
+    console.log(JSON.stringify({
+      timestamp: new Date().toISOString(),
+      action: "auth_error",
+      error: error.message,
+      errorCode: error.status,
+      redirectUrl: `${origin}/auth/auth-code-error`
+    }, null, 2));
     // If there's an error with the code exchange, redirect to error page
     return NextResponse.redirect(`${origin}/auth/auth-code-error`);
   }
 
-  console.log("Auth callback - No code, redirecting to error page");
+  // No code parameter - this shouldn't happen in normal OAuth flow
+  console.log("=== NO AUTH CODE ===");
+  console.log(JSON.stringify({
+    timestamp: new Date().toISOString(),
+    action: "no_code_redirect",
+    redirectUrl: `${origin}/auth/auth-code-error`,
+    searchParams: Object.fromEntries(searchParams.entries())
+  }, null, 2));
   // Return the user to an error page with instructions
   return NextResponse.redirect(`${origin}/auth/auth-code-error`);
 }
