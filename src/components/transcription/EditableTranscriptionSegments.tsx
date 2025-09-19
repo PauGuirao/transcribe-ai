@@ -447,10 +447,6 @@ export function EditableTranscriptionSegments({
                         e.preventDefault();
                         // Enter: move to next segment
                         saveEditAndMoveToNext();
-                      } else if (e.key === 'Shift') {
-                        e.preventDefault();
-                        // Shift: move to previous segment
-                        saveEditAndMoveToPrevious();
                       }
                     }}
                     className="min-h-[50px] text-sm leading-relaxed p-2 border-2 border-blue-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-lg transition-all duration-200 resize-none"

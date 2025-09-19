@@ -3,6 +3,7 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import jsPDF from "jspdf";
 import { Document, Packer, Paragraph, TextRun } from "docx";
+import { resolveLatestTranscriptionPath } from "@/helpers/resolveLatestTranscriptionPath";
 
 import type { TranscriptionSegment, Speaker } from "@/types";
 
@@ -125,8 +126,13 @@ export async function POST(request: Request) {
       );
     }
 
-    // Download transcription JSON from Supabase Storage
-    const jsonFileName = `${user.id}/${audioFile.id}.json`;
+    // Download transcription JSON from Supabase Storage using versioned path
+    console.log("[EXPORT] Resolving transcription file path for audioId:", audioFile.id);
+    const jsonFileName = await resolveLatestTranscriptionPath(
+      supabase,
+      user.id,
+      audioFile.id
+    );
     console.log("[EXPORT] Downloading transcription JSON:", jsonFileName);
     const { data: jsonData, error: downloadError } = await supabase.storage
       .from("transcriptions")
@@ -137,6 +143,9 @@ export async function POST(request: Request) {
         "[EXPORT] Failed to download JSON file:",
         downloadError?.message || "No data"
       );
+      console.log("[EXPORT] Attempted file path:", jsonFileName);
+      console.log("[EXPORT] User ID:", user.id);
+      console.log("[EXPORT] Audio ID:", audioFile.id);
       return NextResponse.json(
         { success: false, error: "Transcription file not found" },
         { status: 404 }
