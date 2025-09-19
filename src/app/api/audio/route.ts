@@ -47,7 +47,6 @@ export async function GET() {
           confidence,
           status,
           error_message,
-          alumne_id,
           created_at,
           updated_at
         )
@@ -75,14 +74,12 @@ export async function GET() {
         fileId: audio.id, // Using audio id as fileId for compatibility
         uploadDate: audio.created_at,
         status: audio.status,
-        alumneId: audio.alumne_id, // Include alumne_id from audio table
         transcription: transcription ? {
           id: transcription.id,
           audioId: audio.id,
           originalText: transcription.original_text,
           editedText: transcription.edited_text || transcription.original_text,
           segments: transcription.segments,
-          alumneId: transcription.alumne_id, // Include alumne_id from transcription table
           createdAt: transcription.created_at,
           updatedAt: transcription.updated_at,
         } : null,

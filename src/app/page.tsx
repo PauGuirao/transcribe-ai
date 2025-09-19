@@ -16,6 +16,8 @@ import {
   Mic,
   PenTool,
   BookOpen,
+  Menu,
+  X,
 } from "lucide-react";
 
 const features = [
@@ -128,6 +130,7 @@ export default function Home() {
   const router = useRouter();
   const { user, loading, signInWithGoogle } = useAuth();
   const [authLoading, setAuthLoading] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handlePrimaryAction = async () => {
     if (loading || authLoading) return;
@@ -146,16 +149,6 @@ export default function Home() {
     }
   };
 
-  const handlePricingPlanClick = (planKey: string) => {
-    if (loading) return;
-
-    if (user) {
-      router.push("/dashboard");
-    } else {
-      router.push("/auth/signin");
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/40">
       <header className="sticky top-0 z-40 bg-background/80 backdrop-blur">
@@ -164,7 +157,9 @@ export default function Home() {
             <img src="/logo3.png" alt="TranscribeAI Logo" className="h-10" />
             <h1 className="text-2xl font-semibold text-gray-900">transcriu</h1>
           </Link>
-          <div className="flex items-center gap-3">
+          
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-3">
             {user ? (
               <Button variant="ghost" onClick={() => router.push("/dashboard")}>
                 Anar al panell
@@ -190,10 +185,78 @@ export default function Home() {
               )}
             </Button>
           </div>
+
+          {/* Mobile Hamburger Menu */}
+          <div className="md:hidden">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2"
+            >
+              {isMobileMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </Button>
+          </div>
         </div>
+
+        {/* Mobile Navigation Panel */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden bg-gray-100 border-t border-gray-200">
+            <div className="mx-auto max-w-6xl px-6 py-4 space-y-3">
+              {user ? (
+                <Button 
+                  variant="ghost" 
+                  onClick={() => {
+                    router.push("/dashboard");
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full justify-start"
+                >
+                  Anar al panell
+                </Button>
+              ) : (
+                <Button 
+                  asChild 
+                  variant="ghost"
+                  className="w-full justify-start"
+                >
+                  <Link 
+                    href="/auth/signin"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Inicia sessió
+                  </Link>
+                </Button>
+              )}
+              <Button
+                onClick={() => {
+                  handlePrimaryAction();
+                  setIsMobileMenuOpen(false);
+                }}
+                disabled={authLoading || loading}
+                className="w-full"
+              >
+                {authLoading || loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Preparant...
+                  </>
+                ) : user ? (
+                  "Obrir Transcriu"
+                ) : (
+                  "Comença gratis"
+                )}
+              </Button>
+            </div>
+          </div>
+        )}
       </header>
 
-      <main className="mx-auto w-full max-w-6xl px-6 pb-24 pt-16">
+      <main className="mx-auto w-full max-w-6xl px-6 pb-24 pt-4">
         <section className="grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:items-center">
           <div className="space-y-8">
             <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
@@ -474,9 +537,9 @@ export default function Home() {
                   <Button
                     variant={plan.highlighted ? "default" : "outline"}
                     className="w-full"
-                    onClick={() => handlePricingPlanClick(plan.key)}
+                    asChild
                   >
-                    Triar pla
+                    <Link href="/payment">Triar pla</Link>
                   </Button>
                   <ul className="space-y-4">
                     {plan.features.map((feature) => (

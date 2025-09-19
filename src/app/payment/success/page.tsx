@@ -1,19 +1,8 @@
-'use client'
-
-import { useEffect } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { CheckCircle2 } from 'lucide-react'
-import { useAuth } from '@/contexts/AuthContext'
 
 export default function PaymentSuccessPage() {
-  const { refreshTokens } = useAuth()
-
-  useEffect(() => {
-    // Refresh tokens when the success page loads
-    refreshTokens()
-  }, [refreshTokens])
-
   return (
     <div className="flex min-h-screen items-center justify-center bg-secondary/30 px-6">
       <div className="max-w-lg rounded-3xl border border-border/60 bg-background p-10 text-center shadow-xl">
