@@ -117,9 +117,7 @@ export async function POST(request: NextRequest) {
           "base64"
         )}`;
         // Use the correct production URL for webhooks
-        const origin = process.env.VERCEL_URL 
-          ? `https://${process.env.VERCEL_URL}` 
-          : 'https://transcriu.com';
+        const origin = 'https://www.transcriu.com';
 
         const webhookUrl = `${origin}/api/replicate/webhook`;
         console.log("=== REPLICATE WEBHOOK CONFIG ===");
