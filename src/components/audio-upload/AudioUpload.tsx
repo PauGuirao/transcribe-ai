@@ -31,6 +31,10 @@ const ACCEPTED_AUDIO_TYPES = {
   "audio/mp4": [".m4a"],
   "audio/ogg": [".ogg"],
   "audio/webm": [".webm"],
+  "audio/flac": [".flac"],
+  "audio/aac": [".aac"],
+  "audio/x-ms-wma": [".wma"],
+  "audio/aiff": [".aiff"],
 };
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
@@ -172,7 +176,7 @@ export function AudioUpload({
                 Arrossega i deixa anar o fes clic per seleccionar
               </p>
               <p className="text-xs text-muted-foreground">
-                MP3, WAV, M4A, OGG, WebM (máx. 25 MB)
+                MP3, WAV, M4A, OGG, WebM, FLAC, AAC, WMA, AIFF (máx. 25 MB)
               </p>
             </div>
           </div>

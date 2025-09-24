@@ -3,7 +3,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Circle, Highlighter, Save, Download, Trash2 } from "lucide-react";
+import { Circle, Highlighter, Save, Download, Trash2, FileText } from "lucide-react";
 
 interface Annotation {
   id: string;
@@ -34,6 +34,7 @@ interface ToolsSidePanelProps {
   onSaveAnnotations: () => void;
   onExportAnnotations: () => void;
   onRemoveAnnotation: (id: string) => void;
+  exportToPDF: () => void;
 }
 export function ToolsSidePanel({
   selectedTool,
@@ -45,6 +46,7 @@ export function ToolsSidePanel({
   onSaveAnnotations,
   onExportAnnotations,
   onRemoveAnnotation,
+  exportToPDF,
 }: ToolsSidePanelProps) {
   return (
     <div className="w-80 bg-gray-50 border-l border-gray-200 flex flex-col h-full">
@@ -104,6 +106,14 @@ export function ToolsSidePanel({
               className="w-full justify-start gap-2"
             >
               <Download className="h-4 w-4" /> Exportar
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={exportToPDF}
+              className="w-full justify-start gap-2"
+            >
+              <FileText className="h-4 w-4" /> Exportar PDF
             </Button>
             <Button
               variant="outline"

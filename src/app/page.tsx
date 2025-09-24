@@ -82,47 +82,32 @@ const quickActions = [
 
 const plans = [
   {
-    key: "basic",
-    name: "Bàsic",
-    price: "5€",
-    originalPrice: "9€",
-    description: "Ideal per descobrir Transcriu en el teu dia a dia.",
+    key: "free",
+    name: "Gratuït",
+    price: "0€",
+    description: "Perfecte per començar amb Transcriu.",
     features: [
-      "30 transcripcions al mes",
+      "5 transcripcions gratuïtes",
       `Models base d'IA optimitzats per a català i espanyol`,
-      `Editor col·laboratiu`,
-      "Suport estàndard",
+      `Editor bàsic`,
+      "Suport per email",
     ],
     highlighted: false,
   },
   {
-    key: "pro",
+    key: "paid",
     name: "Pro",
-    price: "9€",
-    originalPrice: "19€",
+    price: "10€",
     description:
-      "Perfecte per a equips que treballen amb múltiples entrevistes.",
+      "Transcripcions il·limitades per a professionals.",
     features: [
-      "120 transcripcions al mes",
+      "Transcripcions il·limitades",
       "Models avançats amb diarització",
       "Exportacions il·limitades (PDF, DOCX, TXT)",
-      "Suport prioritari en menys de 2h",
+      "Editor col·laboratiu avançat",
+      "Suport prioritari",
     ],
     highlighted: true,
-  },
-  {
-    key: "premium",
-    name: "Premium",
-    price: "19€",
-    originalPrice: "29€",
-    description: "Per a organitzacions que necessiten velocitat i control.",
-    features: [
-      "300 transcripcions al mes",
-      "Models personalitzats i glossaris propis",
-      "Integracions amb Slack, Notion i Drive",
-      "Customer Success dedicat",
-    ],
-    highlighted: false,
   },
 ];
 
@@ -498,11 +483,11 @@ export default function Home() {
               ho necessitis.
             </p>
           </div>
-          <div className="mt-10 grid gap-8 md:grid-cols-3">
+          <div className="mt-10 grid gap-8 md:grid-cols-2 justify-items-center max-w-4xl mx-auto">
             {plans.map((plan) => (
               <div
                 key={plan.key}
-                className={`relative rounded-3xl border bg-card p-8 ${
+                className={`relative rounded-3xl border bg-card p-8 w-full max-w-sm ${
                   plan.highlighted
                     ? "border-primary shadow-lg shadow-primary/10"
                     : ""
@@ -518,18 +503,12 @@ export default function Home() {
                     <h3 className="text-2xl font-bold">{plan.name}</h3>
                     <div className="mt-4 flex items-baseline gap-2">
                       <span className="text-3xl font-bold">{plan.price}</span>
-                      <span className="text-sm text-muted-foreground">
-                        /mes
-                      </span>
+                      {plan.key !== "free" && (
+                        <span className="text-sm text-muted-foreground">
+                          /mes
+                        </span>
+                      )}
                     </div>
-                    {plan.originalPrice && (
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        <span className="line-through">
-                          {plan.originalPrice}
-                        </span>{" "}
-                        de descompte per llançament
-                      </p>
-                    )}
                     <p className="mt-4 text-sm text-muted-foreground">
                       {plan.description}
                     </p>

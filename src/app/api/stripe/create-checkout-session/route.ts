@@ -14,9 +14,7 @@ const stripe = new Stripe(stripeSecretKey, {
 });
 
 const priceMap: Record<string, string | undefined> = {
-  basic: process.env.STRIPE_PRICE_BASIC,
-  pro: process.env.STRIPE_PRICE_PRO,
-  premium: process.env.STRIPE_PRICE_PREMIUM,
+  paid: process.env.STRIPE_PRICE_PRO,
 };
 
 export async function POST(request: NextRequest) {

@@ -5,58 +5,45 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Check } from 'lucide-react'
 
-type PlanKey = 'basic' | 'pro' | 'premium'
+type PlanKey = 'free' | 'paid'
 
 const plans: Array<{
   key: PlanKey
   name: string
   price: string
-  originalPrice: string
+  originalPrice?: string
   description: string
   features: string[]
   highlighted?: boolean
+  isFree?: boolean
 }> = [
   {
-    key: 'basic',
-    name: 'Bàsic',
-    price: '5€',
-    originalPrice: '9€',
-    description: 'Ideal per descobrir Transcriu en el teu dia a dia.',
+    key: 'free',
+    name: 'Gratuït',
+    price: '0€',
+    description: 'Perfecte per començar amb Transcriu.',
     features: [
-      '30 transcripcions al mes',
+      '5 transcripcions gratuïtes',
       'Models base d\'IA optimitzats per a català i espanyol',
-      'Editor col·laboratiu',
-      'Suport estàndard',
+      'Editor bàsic',
+      'Suport per email',
     ],
     highlighted: false,
+    isFree: true,
   },
   {
-    key: 'pro',
+    key: 'paid',
     name: 'Pro',
-    price: '9€',
-    originalPrice: '19€',
-    description: 'Perfecte per a equips que treballen amb múltiples entrevistes.',
+    price: '10€',
+    description: 'Transcripcions il·limitades per a professionals.',
     features: [
-      '120 transcripcions al mes',
+      'Transcripcions il·limitades',
       'Models avançats amb diarització',
       'Exportacions il·limitades (PDF, DOCX, TXT)',
-      'Suport prioritari en menys de 2h',
+      'Editor col·laboratiu avançat',
+      'Suport prioritari',
     ],
     highlighted: true,
-  },
-  {
-    key: 'premium',
-    name: 'Premium',
-    price: '19€',
-    originalPrice: '29€',
-    description: 'Per a organitzacions que necessiten velocitat i control.',
-    features: [
-      '300 transcripcions al mes',
-      'Models personalitzats i glossaris propis',
-      'Integracions amb Slack, Notion i Drive',
-      'Customer Success dedicat',
-    ],
-    highlighted: false,
   },
 ]
 
@@ -103,11 +90,11 @@ export default function PaymentPage() {
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 justify-items-center max-w-4xl mx-auto">
           {plans.map((plan) => (
             <Card
               key={plan.name}
-              className={plan.highlighted ? 'border-primary shadow-xl shadow-primary/20' : ''}
+              className={`w-full max-w-sm ${plan.highlighted ? 'border-primary shadow-xl shadow-primary/20' : ''}`}
             >
               <CardHeader className="space-y-1">
                 <CardTitle className="flex items-center justify-between text-left text-2xl font-semibold">
@@ -120,8 +107,10 @@ export default function PaymentPage() {
                 </CardTitle>
                 <div className="flex items-baseline gap-2 text-left">
                   <span className="text-4xl font-bold">{plan.price}</span>
-                  <span className="text-sm text-muted-foreground line-through">{plan.originalPrice}</span>
-                  <span className="text-sm text-muted-foreground">/ mes</span>
+                  {plan.originalPrice && (
+                    <span className="text-sm text-muted-foreground line-through">{plan.originalPrice}</span>
+                  )}
+                  {!plan.isFree && <span className="text-sm text-muted-foreground">/ mes</span>}
                 </div>
                 <p className="text-left text-sm text-muted-foreground">{plan.description}</p>
               </CardHeader>
@@ -139,8 +128,9 @@ export default function PaymentPage() {
                   className="w-full rounded-xl"
                   disabled={loadingPlan !== null && loadingPlan !== plan.key}
                   onClick={() => handleSelectPlan(plan.key)}
+                  variant={plan.isFree ? "outline" : "default"}
                 >
-                  {loadingPlan === plan.key ? 'Redirigint...' : 'Començar'}
+                  {loadingPlan === plan.key ? 'Redirigint...' : (plan.isFree ? 'Començar gratis' : 'Començar')}
                 </Button>
               </CardContent>
             </Card>

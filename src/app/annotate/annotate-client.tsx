@@ -9,6 +9,10 @@ import { ToolsSidePanel } from "@/components/annotation/ToolsSidePanel";
 import { AudioUploadResult } from "@/components/audio-upload/AudioUpload";
 import type { Transcription, TranscriptionSegment, Speaker } from "@/types";
 
+import html2canvas from "html2canvas-pro";
+import jsPDF from "jspdf";
+
+
 interface Annotation {
   id: string;
   type: "circle" | "highlight";
@@ -205,6 +209,84 @@ export default function AnnotateClient() {
 
     return previewAnnotation;
   };
+
+  const exportToPDF = async () => {
+    const node = canvasRef.current;
+    if (!node) {
+      console.error('Canvas ref is null');
+      return;
+    }
+
+    try {
+      console.log('Starting PDF export...');
+      console.log('Node dimensions:', {
+        scrollWidth: node.scrollWidth,
+        scrollHeight: node.scrollHeight,
+        clientWidth: node.clientWidth,
+        clientHeight: node.clientHeight
+      });
+
+      // Make sure we render the full scrollable height (not just the viewport)
+      const canvas = await html2canvas(node, {
+        scale: 2,                    // Increased scale for better quality
+        backgroundColor: "#ffffff",
+        useCORS: true,
+        allowTaint: true,
+        width: node.scrollWidth,
+        height: node.scrollHeight,
+        scrollX: 0,
+        scrollY: 0,
+        foreignObjectRendering: false, // Disable to avoid issues
+        logging: true, // Enable logging for debugging
+      });
+
+      console.log('Canvas created:', {
+        width: canvas.width,
+        height: canvas.height
+      });
+
+      if (canvas.width === 0 || canvas.height === 0) {
+        throw new Error('Canvas has zero dimensions');
+      }
+
+      const imgData = canvas.toDataURL("image/png", 0.95); // Higher quality PNG
+      console.log('Image data length:', imgData.length);
+
+      if (imgData.length < 100) {
+        throw new Error('Image data is too small, likely empty');
+      }
+
+      // A4 portrait
+      const pdf = new jsPDF({ unit: "pt", format: "a4", orientation: "p" });
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+
+      // Add horizontal padding (40pt on each side = 80pt total)
+      const horizontalPadding = 40;
+      const availableWidth = pageW - (horizontalPadding * 2);
+      
+      // Fit width with padding; compute full image height in PDF units
+      const imgW = availableWidth;
+      const imgH = (canvas.height * imgW) / canvas.width;
+
+      console.log('PDF dimensions:', { pageW, pageH, imgW, imgH });
+
+      // If the content is taller than one page, we "slide" the big image upward
+      let yOffset = 0;
+      while (yOffset < imgH) {
+        // Draw the same tall image each page, shifted up by yOffset and with horizontal padding
+        pdf.addImage(imgData, "PNG", horizontalPadding, -yOffset, imgW, imgH, undefined, "SLOW");
+        yOffset += pageH;
+        if (yOffset < imgH) pdf.addPage();
+      }
+
+      pdf.save(`annotations-${selectedAudioId ?? "export"}.pdf`);
+      console.log('PDF saved successfully');
+    } catch (error) {
+       console.error('Error generating PDF:', error);
+       alert(`Error al generar el PDF: ${(error as Error).message || 'Unknown error'}`);
+     }
+   };
 
   if (!transcription) {
     return (
@@ -440,6 +522,7 @@ export default function AnnotateClient() {
           onSaveAnnotations={saveAnnotations}
           onExportAnnotations={exportAnnotations}
           onRemoveAnnotation={removeAnnotation}
+          exportToPDF={exportToPDF}
         />
       </div>
     </AppLayout>

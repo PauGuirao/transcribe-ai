@@ -115,7 +115,7 @@ export function EmptyState({
               <div className="text-center mb-6">
                 <h3 className="text-xl font-bold mb-2">Plan Pro</h3>
                 <div className="flex items-baseline justify-center gap-1">
-                  <span className="text-3xl font-bold">5€</span>
+                  <span className="text-3xl font-bold">10€</span>
                   <span className="text-muted-foreground">/mes</span>
                 </div>
                 <p className="text-sm text-muted-foreground mt-1">Cancela cuando quieras</p>
@@ -124,23 +124,23 @@ export function EmptyState({
               <div className="space-y-3 mb-6">
                 <div className="flex items-center gap-3">
                   <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
-                  <span className="text-sm">100 transcripciones al mes</span>
+                  <span className="text-sm">Transcripcions il·limitades</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
-                  <span className="text-sm">Transcripción en tiempo real</span>
+                  <span className="text-sm">Models avançats amb diarització</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
-                  <span className="text-sm">Exportación en múltiples formatos</span>
+                  <span className="text-sm">Exportacions il·limitades (PDF, DOCX, TXT)</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
-                  <span className="text-sm">Edición avanzada de transcripciones</span>
+                  <span className="text-sm">Editor col·laboratiu avançat</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
-                  <span className="text-sm">Soporte prioritario</span>
+                  <span className="text-sm">Suport prioritari</span>
                 </div>
               </div>
 
@@ -157,10 +157,10 @@ export function EmptyState({
 
           <div className="text-center">
             <p className="text-sm text-muted-foreground mb-2">
-              ¿Necesitas más transcripciones?
+              ¿Necessites més transcripcions?
             </p>
             <p className="text-xs text-muted-foreground">
-              También tenemos planes Premium desde 15€/mes con hasta 500 transcripciones
+              Comença amb el pla gratuït de 5 transcripcions o actualitza al Pro per transcripcions il·limitades
             </p>
           </div>
         </div>

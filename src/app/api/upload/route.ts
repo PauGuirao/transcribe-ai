@@ -12,6 +12,10 @@ const ALLOWED_TYPES = [
   "audio/ogg",
   "audio/webm",
   "audio/x-m4a",
+  "audio/flac",
+  "audio/aac",
+  "audio/x-ms-wma",
+  "audio/aiff",
 ];
 
 export async function POST(request: NextRequest) {
@@ -79,16 +83,163 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate unique filename
-    const fileExtension = file.name.split(".").pop() || "audio";
+    let fileExtension = file.name.split(".").pop() || "audio";
+    let processedFile = file;
+    let processedBytes = await file.arrayBuffer();
+    let finalMimeType = file.type;
+
+    // Check if it's an MP4 video file and extract audio
+    if (file.type === "video/mp4") {
+      let tempFilename = ""; // Declare tempFilename in outer scope
+      try {
+        console.log("Processing MP4 file for audio extraction...");
+        
+        // First upload the MP4 to a temporary location for FFmpeg API
+        tempFilename = `temp_${uuidv4()}.mp4`;
+        const { data: tempUpload, error: tempUploadError } = await supabase.storage
+          .from("audio-files")
+          .upload(`${user.id}/temp/${tempFilename}`, processedBytes, {
+            contentType: file.type,
+            upsert: false,
+          });
+
+        if (tempUploadError) {
+          throw new Error(`Failed to upload temp file: ${tempUploadError.message}`);
+        }
+
+        // Get public URL for the temp file
+        const { data: { publicUrl } } = supabase.storage
+          .from("audio-files")
+          .getPublicUrl(`${user.id}/temp/${tempFilename}`);
+
+        // Extract audio using FFmpeg API
+        console.log("FFmpeg API request URL:", "https://api.rendi.dev/v1/run-ffmpeg-command");
+        const ffmpegResponse = await fetch("https://api.rendi.dev/v1/run-ffmpeg-command", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-API-KEY": "eJxLTjI2Nk9KNbdG1MEsx1DWxME7UtUw2NNdNSrG0SDIwSTNLMjeIj6w0KKwyMjTJKgsL9XQzDg8wCXANSgcA5e8Q1A=="
+          },
+          body: JSON.stringify({
+            input_files: {
+              in_1: publicUrl
+            },
+            output_files: {
+              out_1: "extracted_audio.m4a"
+            },
+            ffmpeg_command: "-i {{in_1}} -vn -acodec copy {{out_1}}"
+          })
+        });
+
+        if (!ffmpegResponse.ok) {
+          throw new Error(`FFmpeg API error: ${ffmpegResponse.status}, ${await ffmpegResponse.text()}`);
+        }
+
+        const ffmpegResult = await ffmpegResponse.json();
+        console.log("FFmpeg API response:", ffmpegResult);
+        
+        if (!ffmpegResult.command_id) {
+          throw new Error("No command_id received from FFmpeg API");
+        }
+
+        console.log("FFmpeg command submitted, command_id:", ffmpegResult.command_id);
+
+        // Poll for completion
+        let attempts = 0;
+        const maxAttempts = 30; // 30 attempts with 2 second intervals = 1 minute max
+        let commandResult;
+
+        while (attempts < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+          
+          const statusResponse = await fetch(`https://api.rendi.dev/v1/commands/${ffmpegResult.command_id}`, {
+            method: "GET",
+            headers: {
+              "X-API-KEY": "eJxLTjI2Nk9KNbdG1MEsx1DWxME7UtUw2NNdNSrG0SDIwSTNLMjeIj6w0KKwyMjTJKgsL9XQzDg8wCXANSgcA5e8Q1A=="
+            }
+          });
+
+          if (!statusResponse.ok) {
+            throw new Error(`Status check error: ${statusResponse.status}, ${await statusResponse.text()}`);
+          }
+
+          commandResult = await statusResponse.json();
+          console.log(`Attempt ${attempts + 1}: Status = ${commandResult.status}`);
+
+          if (commandResult.status === "SUCCESS") {
+            break;
+          } else if (commandResult.status === "FAILED" || commandResult.status === "ERROR") {
+            throw new Error(`FFmpeg processing failed with status: ${commandResult.status}`);
+          }
+
+          attempts++;
+        }
+
+        if (attempts >= maxAttempts) {
+          throw new Error("FFmpeg processing timeout - exceeded maximum wait time");
+        }
+        
+        if (commandResult.output_files && commandResult.output_files.out_1 && commandResult.output_files.out_1.storage_url) {
+          // Download the extracted audio
+          const audioResponse = await fetch(commandResult.output_files.out_1.storage_url);
+          if (audioResponse.ok) {
+            processedBytes = await audioResponse.arrayBuffer();
+            fileExtension = "m4a";
+            finalMimeType = "audio/mp4";
+            console.log("Successfully extracted audio from MP4");
+          } else {
+            throw new Error(`Failed to download extracted audio: ${audioResponse.status}`);
+          }
+        } else {
+          throw new Error("No output file URL received from FFmpeg API");
+        }
+
+        // Clean up temp file
+        console.log(`Attempting to delete temp file: ${user.id}/temp/${tempFilename}`);
+        const { data: deleteData, error: deleteError } = await supabase.storage
+          .from("audio-files")
+          .remove([`${user.id}/temp/${tempFilename}`]);
+        
+        if (deleteError) {
+          console.error("Failed to delete temp file:", deleteError);
+        } else {
+          console.log("Temp file deleted successfully:", deleteData);
+        }
+
+      } catch (error) {
+        console.error("Failed to extract audio from MP4:", error);
+        
+        // Try to clean up temp file even if processing failed (only if tempFilename was set)
+        if (tempFilename) {
+          console.log(`Attempting to delete temp file after error: ${user.id}/temp/${tempFilename}`);
+          try {
+            const { data: deleteData, error: deleteError } = await supabase.storage
+              .from("audio-files")
+              .remove([`${user.id}/temp/${tempFilename}`]);
+            
+            if (deleteError) {
+              console.error("Failed to delete temp file after error:", deleteError);
+            } else {
+              console.log("Temp file deleted successfully after error:", deleteData);
+            }
+          } catch (cleanupError) {
+            console.error("Error during temp file cleanup:", cleanupError);
+          }
+        }
+        
+        // Fall back to storing the original MP4 file
+        console.log("Falling back to storing original MP4 file");
+      }
+    }
+
     const uniqueFilename = `${uuidv4()}.${fileExtension}`;
     const audioId = uniqueFilename.split(".")[0];
 
-    // Upload file to Supabase Storage
-    const bytes = await file.arrayBuffer();
+    // Upload processed file to Supabase Storage
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from("audio-files")
-      .upload(`${user.id}/${uniqueFilename}`, bytes, {
-        contentType: file.type,
+      .upload(`${user.id}/${uniqueFilename}`, processedBytes, {
+        contentType: finalMimeType,
         upsert: false,
       });
 
@@ -110,7 +261,7 @@ export async function POST(request: NextRequest) {
         original_filename: file.name,
         file_size: file.size,
         duration: null,
-        mime_type: file.type,
+        mime_type: finalMimeType,
         storage_path: uploadData.path,
         status: "uploaded",
       })

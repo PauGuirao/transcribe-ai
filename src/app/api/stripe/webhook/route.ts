@@ -56,12 +56,10 @@ export async function POST(request: NextRequest) {
       const plan = session.metadata?.plan ?? "pro";
 
       const tokensByPlan: Record<string, number> = {
-        basic: Number(process.env.STRIPE_PLAN_BASIC_TOKENS ?? 80),
-        pro: Number(process.env.STRIPE_PLAN_PRO_TOKENS ?? 250),
-        premium: Number(process.env.STRIPE_PLAN_PREMIUM_TOKENS ?? 600),
+        paid: Number(process.env.STRIPE_PLAN_PRO_TOKENS ?? 999999),
       };
 
-      const tokensAllowance = tokensByPlan[plan] ?? tokensByPlan.pro;
+      const tokensAllowance = tokensByPlan[plan] ?? tokensByPlan.paid;
 
       if (userId) {
         const { error } = await supabaseAdmin
