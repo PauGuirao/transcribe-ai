@@ -111,14 +111,6 @@ export function ToolsSidePanel({
             <Button
               variant="outline"
               size="sm"
-              onClick={onExportAnnotations}
-              className="w-full justify-start gap-2"
-            >
-              <Download className="h-4 w-4" /> Exportar
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
               onClick={exportToPDF}
               className="w-full justify-start gap-2"
             >
