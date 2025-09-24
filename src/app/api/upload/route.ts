@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
 
     // Generate unique filename
     let fileExtension = file.name.split(".").pop() || "audio";
-    let processedFile = file;
+    const processedFile = file;
     let processedBytes = await file.arrayBuffer();
     let finalMimeType = file.type;
 
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-API-KEY": "eJxLTjI2Nk9KNbdG1MEsx1DWxME7UtUw2NNdNSrG0SDIwSTNLMjeIj6w0KKwyMjTJKgsL9XQzDg8wCXANSgcA5e8Q1A=="
+            "X_API_KEY": process.env.X_API_KEY || "",
           },
           body: JSON.stringify({
             input_files: {
@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
           const statusResponse = await fetch(`https://api.rendi.dev/v1/commands/${ffmpegResult.command_id}`, {
             method: "GET",
             headers: {
-              "X-API-KEY": "eJxLTjI2Nk9KNbdG1MEsx1DWxME7UtUw2NNdNSrG0SDIwSTNLMjeIj6w0KKwyMjTJKgsL9XQzDg8wCXANSgcA5e8Q1A=="
+              "X_API_KEY": process.env.X_API_KEY || "",
             }
           });
 

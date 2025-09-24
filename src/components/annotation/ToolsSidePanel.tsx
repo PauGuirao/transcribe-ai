@@ -3,11 +3,11 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Circle, Highlighter, Save, Download, Trash2, FileText } from "lucide-react";
+import { Circle, Highlighter, Save, Download, Trash2, FileText, Pen, Type } from "lucide-react";
 
 interface Annotation {
   id: string;
-  type: "circle" | "highlight";
+  type: "circle" | "highlight" | "pen";
   x: number;
   y: number;
   width?: number;
@@ -17,6 +17,7 @@ interface Annotation {
   color: string;
   segmentId?: string;
   text?: string;
+  path?: string; // SVG path for pen drawings
 }
 const availableColors = [
   { id: "red", value: "#ef4444" },
@@ -25,8 +26,8 @@ const availableColors = [
   { id: "green", value: "#22c55e" },
 ];
 interface ToolsSidePanelProps {
-  selectedTool: "circle" | "highlight";
-  onToolSelect: (tool: "circle" | "highlight") => void;
+  selectedTool: "circle" | "highlight" | "pen";
+  onToolSelect: (tool: "circle" | "highlight" | "pen") => void;
   selectedColor: string; // Nou: per saber quin color està actiu
   onColorSelect: (color: string) => void; // Nou: per canviar de color
   annotations: Annotation[];
@@ -54,7 +55,7 @@ export function ToolsSidePanel({
         {/* Eines de Dibuix */}
         <div>
           <h3 className="text-sm font-medium text-gray-500 mb-2">Eines</h3>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-3 gap-2">
             <Button
               variant={selectedTool === "circle" ? "secondary" : "outline"}
               onClick={() => onToolSelect("circle")}
@@ -70,6 +71,14 @@ export function ToolsSidePanel({
             >
               <Highlighter className="h-4 w-4" />
               <span>Subratllat</span>
+            </Button>
+            <Button
+              variant={selectedTool === "pen" ? "secondary" : "outline"}
+              onClick={() => onToolSelect("pen")}
+              className="flex items-center justify-center gap-2"
+            >
+              <Pen className="h-4 w-4" />
+              <span>Llapis</span>
             </Button>
           </div>
         </div>
@@ -156,6 +165,11 @@ export function ToolsSidePanel({
                           className="h-4 w-4"
                           style={{ color: annotation.color }}
                         />
+                      ) : annotation.type === "pen" ? (
+                        <Pen
+                          className="h-4 w-4"
+                          style={{ color: annotation.color }}
+                        />
                       ) : (
                         <Highlighter
                           className="h-4 w-4"
@@ -165,7 +179,7 @@ export function ToolsSidePanel({
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium text-gray-900 truncate">
-                        {annotation.type === "circle" ? "Oval" : "Subratllat"} #
+                        {annotation.type === "circle" ? "Oval" : annotation.type === "pen" ? "Llapis" : "Subratllat"} #
                         {index + 1}
                         {annotation.text && (
                           <span className="ml-2 text-xs font-normal text-gray-600">

@@ -15,7 +15,7 @@ import jsPDF from "jspdf";
 
 interface Annotation {
   id: string;
-  type: "circle" | "highlight";
+  type: "circle" | "highlight" | "pen";
   x: number;
   y: number;
   width?: number;
@@ -25,6 +25,7 @@ interface Annotation {
   color: string;
   segmentId?: string;
   text?: string;
+  path?: string; // SVG path for pen drawings
 }
 export default function AnnotateClient() {
   const searchParams = useSearchParams();
@@ -35,9 +36,7 @@ export default function AnnotateClient() {
   const [speakers, setSpeakers] = useState<Speaker[]>([]);
   const [selectedColor, setSelectedColor] = useState<string>("#ef4444");
   const [annotations, setAnnotations] = useState<Annotation[]>([]);
-  const [selectedTool, setSelectedTool] = useState<"circle" | "highlight">(
-    "circle"
-  );
+  const [selectedTool, setSelectedTool] = useState<"circle" | "highlight" | "pen">("circle");
   const [isDrawing, setIsDrawing] = useState(false);
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
   const [currentPos, setCurrentPos] = useState({ x: 0, y: 0 });
@@ -46,6 +45,8 @@ export default function AnnotateClient() {
     null
   );
   const [annotationText, setAnnotationText] = useState("");
+  const [penPath, setPenPath] = useState<string>("");
+  const [isPenDrawing, setIsPenDrawing] = useState(false);
   const canvasRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -88,55 +89,83 @@ export default function AnnotateClient() {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    setIsDrawing(true);
-    setStartPos({ x, y });
-    setCurrentPos({ x, y });
+    if (selectedTool === "pen") {
+      setIsPenDrawing(true);
+      setPenPath(`M ${x} ${y}`);
+    } else {
+      setIsDrawing(true);
+      setStartPos({ x, y });
+      setCurrentPos({ x, y });
+    }
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDrawing || !canvasRef.current) return;
+    if (!canvasRef.current) return;
 
     const rect = canvasRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    setCurrentPos({ x, y });
+    if (selectedTool === "pen" && isPenDrawing) {
+      setPenPath(prev => `${prev} L ${x} ${y}`);
+    } else if (isDrawing) {
+      setCurrentPos({ x, y });
+    }
   };
 
   const handleMouseUp = (e: React.MouseEvent) => {
-    if (!isDrawing || !canvasRef.current) return;
+    if (!canvasRef.current) return;
 
-    const rect = canvasRef.current.getBoundingClientRect();
-    const endX = e.clientX - rect.left;
-    const endY = e.clientY - rect.top;
+    if (selectedTool === "pen" && isPenDrawing) {
+      const rect = canvasRef.current.getBoundingClientRect();
+      const endX = e.clientX - rect.left;
+      const endY = e.clientY - rect.top;
 
-    const newAnnotation: Annotation = {
-      id: Date.now().toString(),
-      type: selectedTool,
-      x: (startPos.x + endX) / 2, // El centre X
-      y: (startPos.y + endY) / 2, // El centre Y
-      color: selectedColor,
-    };
+      const newAnnotation: Annotation = {
+        id: Date.now().toString(),
+        type: "pen",
+        x: endX,
+        y: endY,
+        color: selectedColor,
+        path: penPath,
+      };
 
-    if (selectedTool === "circle") {
-      // Calcula el radi per a cada eix
-      newAnnotation.radiusX = Math.abs(endX - startPos.x) / 2;
-      newAnnotation.radiusY = Math.abs(endY - startPos.y) / 2;
-
-      // Mostra l'input de text per a les anotacions de cercle/oval
-      setPendingAnnotation(newAnnotation);
-      setShowTextInput(true);
-      setAnnotationText("");
-    } else {
-      // La lògica del rectangle no canvia, però ajustem les coordenades
-      newAnnotation.x = Math.min(startPos.x, endX);
-      newAnnotation.y = Math.min(startPos.y, endY);
-      newAnnotation.width = Math.abs(endX - startPos.x);
-      newAnnotation.height = Math.abs(endY - startPos.y);
       setAnnotations((prev) => [...prev, newAnnotation]);
-    }
+      setIsPenDrawing(false);
+      setPenPath("");
+    } else if (isDrawing) {
+      const rect = canvasRef.current.getBoundingClientRect();
+      const endX = e.clientX - rect.left;
+      const endY = e.clientY - rect.top;
 
-    setIsDrawing(false);
+      const newAnnotation: Annotation = {
+        id: Date.now().toString(),
+        type: selectedTool,
+        x: (startPos.x + endX) / 2, // El centre X
+        y: (startPos.y + endY) / 2, // El centre Y
+        color: selectedColor,
+      };
+
+      if (selectedTool === "circle") {
+        // Calcula el radi per a cada eix
+        newAnnotation.radiusX = Math.abs(endX - startPos.x) / 2;
+        newAnnotation.radiusY = Math.abs(endY - startPos.y) / 2;
+
+        // Mostra l'input de text per a les anotacions de cercle/oval
+        setPendingAnnotation(newAnnotation);
+        setShowTextInput(true);
+        setAnnotationText("");
+      } else {
+        // La lògica del rectangle no canvia, però ajustem les coordenades
+        newAnnotation.x = Math.min(startPos.x, endX);
+        newAnnotation.y = Math.min(startPos.y, endY);
+        newAnnotation.width = Math.abs(endX - startPos.x);
+        newAnnotation.height = Math.abs(endY - startPos.y);
+        setAnnotations((prev) => [...prev, newAnnotation]);
+      }
+
+      setIsDrawing(false);
+    }
   };
 
   const handleTextConfirm = () => {
@@ -413,6 +442,23 @@ export default function AnnotateClient() {
                           </>
                         )}
                       </>
+                    ) : annotation.type === "pen" ? (
+                      <svg
+                        className="absolute inset-0 pointer-events-none"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                        }}
+                      >
+                        <path
+                          d={annotation.path}
+                          stroke={annotation.color}
+                          strokeWidth="2"
+                          fill="none"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
                     ) : (
                       <div
                         className="absolute"
@@ -466,45 +512,48 @@ export default function AnnotateClient() {
                   );
                 })()}
 
-                {/* Pending Circle Annotation with Text Input */}
+                {/* Live pen drawing preview */}
+                {isPenDrawing && penPath && (
+                  <svg
+                    className="absolute inset-0 pointer-events-none opacity-70"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                    }}
+                  >
+                    <path
+                      d={penPath}
+                      stroke={selectedColor}
+                      strokeWidth="2"
+                      fill="none"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeDasharray="5,5"
+                    />
+                  </svg>
+                )}
+
+                {/* Pending Annotation with Text Input */}
                 {showTextInput && pendingAnnotation && (
                   <>
-                    {/* Show the circle */}
-                    <div
-                      className="absolute border-2 rounded-full opacity-70"
-                      style={{
-                        left:
-                          pendingAnnotation.x -
-                          (pendingAnnotation.radiusX || 0),
-                        top:
-                          pendingAnnotation.y -
-                          (pendingAnnotation.radiusY || 0),
-                        width: (pendingAnnotation.radiusX || 0) * 2,
-                        height: (pendingAnnotation.radiusY || 0) * 2,
-                        borderColor: pendingAnnotation.color,
-                        backgroundColor: `${pendingAnnotation.color}20`,
-                      }}
-                    />
-                    {/* Text input on top */}
-                    <Input
-                      value={annotationText}
-                      onChange={(e) => setAnnotationText(e.target.value)}
-                      placeholder="Text"
-                      className="absolute bg-white/90 backdrop-blur-sm border-0 rounded px-1 py-0.5 text-xs shadow-sm z-50 w-16 h-6 text-center pointer-events-auto focus:ring-0 focus:outline-none"
-                      style={{
-                        left: `${pendingAnnotation.x - 32}px`,
-                        top: `${pendingAnnotation.y - 12}px`,
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          handleTextConfirm();
-                        } else if (e.key === "Escape") {
-                          handleTextCancel();
-                        }
-                      }}
-                      onBlur={handleTextConfirm}
-                      autoFocus
-                    />
+                    {/* Show the circle only for circle annotations */}
+                    {pendingAnnotation.type === "circle" && (
+                      <div
+                        className="absolute border-2 rounded-full opacity-70"
+                        style={{
+                          left:
+                            pendingAnnotation.x -
+                            (pendingAnnotation.radiusX || 0),
+                          top:
+                            pendingAnnotation.y -
+                            (pendingAnnotation.radiusY || 0),
+                          width: (pendingAnnotation.radiusX || 0) * 2,
+                          height: (pendingAnnotation.radiusY || 0) * 2,
+                          borderColor: pendingAnnotation.color,
+                          backgroundColor: `${pendingAnnotation.color}20`,
+                        }}
+                      />
+                    )}
                   </>
                 )}
               </div>
