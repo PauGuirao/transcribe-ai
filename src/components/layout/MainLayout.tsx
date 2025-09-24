@@ -44,10 +44,24 @@ export function MainLayout({ selectedAudioId, onAudioSelect, onUploadComplete }:
     return count + segment.text.trim().split(/\s+/).filter(Boolean).length;
   }, 0);
 
-  const handleSegmentDoubleClick = (segment: TranscriptionSegment) => {
+  const handleSegmentClick = (segment: TranscriptionSegment) => {
+    console.log('Segment clicked:', segment);
     if (audioPlayerRef) {
+      console.log('Seeking to:', segment.start);
+      audioPlayerRef.seekTo(segment.start);
+    } else {
+      console.error('Audio player ref not available');
+    }
+  };
+
+  const handleSegmentDoubleClick = (segment: TranscriptionSegment) => {
+    console.log('Segment double-clicked:', segment);
+    if (audioPlayerRef) {
+      console.log('Seeking and playing from:', segment.start);
       audioPlayerRef.seekTo(segment.start);
       audioPlayerRef.play();
+    } else {
+      console.error('Audio player ref not available for double-click');
     }
   };
   
@@ -129,6 +143,7 @@ export function MainLayout({ selectedAudioId, onAudioSelect, onUploadComplete }:
             <EditableTranscriptionSegments
               segments={editedSegments}
               speakers={speakers}
+              onSegmentClick={handleSegmentClick}
               onSegmentDoubleClick={handleSegmentDoubleClick}
               onSegmentsChange={handleSegmentsChange}
             />

@@ -547,10 +547,10 @@ export default function Home() {
             >
               Contacte
             </Link>
-            <Link href="/" className="hover:text-foreground">
+            <Link href="/privacy" className="hover:text-foreground">
               Privadesa
             </Link>
-            <Link href="/" className="hover:text-foreground">
+            <Link href="/terms" className="hover:text-foreground">
               Termes
             </Link>
           </div>

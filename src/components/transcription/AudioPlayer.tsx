@@ -114,10 +114,21 @@ export function AudioPlayer({ audioId, className, onRef }: AudioPlayerProps) {
 
   const handleSeek = (value: number[]) => {
     const audio = audioRef.current;
-    if (audio && duration) {
-      const newTime = (value[0] / 100) * duration;
-      audio.currentTime = newTime;
-      setCurrentTime(newTime);
+    if (audio && duration && value && value.length > 0) {
+      const percentage = Math.max(0, Math.min(100, value[0]));
+      const newTime = (percentage / 100) * duration;
+      
+      // Ensure the new time is within valid bounds
+      const clampedTime = Math.max(0, Math.min(duration, newTime));
+      
+      console.log('Seeking to:', { percentage, newTime: clampedTime, duration });
+      
+      try {
+        audio.currentTime = clampedTime;
+        setCurrentTime(clampedTime);
+      } catch (error) {
+        console.error('Error seeking audio:', error);
+      }
     }
   };
 
@@ -305,6 +316,7 @@ export function AudioPlayer({ audioId, className, onRef }: AudioPlayerProps) {
           <Slider
             value={[progressPercentage]}
             onValueChange={handleSeek}
+            onValueCommit={handleSeek}
             max={100}
             step={0.1}
             disabled={isLoading || !duration}
