@@ -4,7 +4,7 @@ import React from 'react';
 import Navbar from './Navbar';
 import AppSidebar from './AppSidebar';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
-import { AudioUploadResult } from '@/components/audio-upload/AudioUpload';
+import { AudioUploadResult } from '@/types';
 
 interface AppLayoutProps {
   children: React.ReactNode;

@@ -6,7 +6,7 @@ import AppLayout from "@/components/layout/AppLayout";
 
 import { Input } from "@/components/ui/input";
 import { ToolsSidePanel } from "@/components/annotation/ToolsSidePanel";
-import { AudioUploadResult } from "@/components/audio-upload/AudioUpload";
+import { AudioUploadResult } from "@/types";
 import type { Transcription, TranscriptionSegment, Speaker } from "@/types";
 
 import html2canvas from "html2canvas-pro";

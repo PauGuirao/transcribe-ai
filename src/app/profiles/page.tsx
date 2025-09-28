@@ -40,7 +40,7 @@ interface TranscriptionSummary {
   updatedAt: string
 }
 
-export default function ProfilesPage() {
+const ProfilesPage = React.memo(function ProfilesPage() {
   const [profiles, setProfiles] = useState<AlumneProfile[]>([])
   const [listError, setListError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -68,13 +68,13 @@ export default function ProfilesPage() {
       const res = await fetch('/api/alumne')
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        throw new Error(data?.error || 'No se pudieron cargar los perfiles')
+        throw new Error(data?.error || 'No s\'han pogut carregar els perfils')
       }
       const data = await res.json()
       setProfiles(data.profiles || [])
       setListError(null)
     } catch (err) {
-      setListError(err instanceof Error ? err.message : 'No se pudieron cargar los perfiles')
+      setListError(err instanceof Error ? err.message : 'No s\'han pogut carregar els perfils')
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -95,11 +95,11 @@ export default function ProfilesPage() {
 
   const validateName = (value: string) => {
     if (!value.trim()) {
-      setNameError('El nombre es obligatorio')
+      setNameError('El nom és obligatori')
       return false
     }
     if (value.trim().length < 2) {
-      setNameError('El nombre debe tener al menos 2 caracteres')
+      setNameError('El nom ha de tenir almenys 2 caràcters')
       return false
     }
     setNameError(null)
@@ -110,7 +110,7 @@ export default function ProfilesPage() {
     if (value && value.trim()) {
       const numericAge = Number(value)
       if (Number.isNaN(numericAge) || numericAge < 0 || numericAge > 25) {
-        setAgeError('La edad debe estar entre 0 y 25 años')
+        setAgeError('L\'edat ha d\'estar entre 0 i 25 anys')
         return false
       }
     }
@@ -134,19 +134,31 @@ export default function ProfilesPage() {
     validateAge(value)
   }
 
-  const fetchTranscriptions = async (alumneId: string) => {
+  const fetchTranscriptions = async (alumneId: string, forceRefresh = false) => {
     setTranscriptionsLoading(true)
     setTranscriptionsError(null)
     try {
-      const res = await fetch(`/api/transcription?alumneId=${alumneId}`)
+      // Add cache-busting parameter when forcing refresh
+      const url = forceRefresh 
+        ? `/api/transcription?alumneId=${alumneId}&_t=${Date.now()}`
+        : `/api/transcription?alumneId=${alumneId}`
+      
+      const res = await fetch(url, {
+        // Disable browser cache for fresh data
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        }
+      })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        throw new Error(data?.error || 'No se pudieron cargar las transcripciones')
+        throw new Error(data?.error || 'No s\'han pogut carregar les transcripcions')
       }
       const data = await res.json()
       setTranscriptions(data.transcriptions || [])
     } catch (err) {
-      setTranscriptionsError(err instanceof Error ? err.message : 'No se pudieron cargar las transcripciones')
+      setTranscriptionsError(err instanceof Error ? err.message : 'No s\'han pogut carregar les transcripcions')
       setTranscriptions([])
     } finally {
       setTranscriptionsLoading(false)
@@ -159,9 +171,9 @@ export default function ProfilesPage() {
       setSelectedStudentId(null)
       setTranscriptions([])
     } else {
-      // If clicking a different student, expand and fetch transcriptions
+      // If clicking a different student, expand and fetch transcriptions with force refresh
       setSelectedStudentId(studentId)
-      fetchTranscriptions(studentId)
+      fetchTranscriptions(studentId, true) // Always force refresh for immediate updates
     }
   }
 
@@ -188,14 +200,14 @@ export default function ProfilesPage() {
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        throw new Error(data?.error || 'No se pudo crear el perfil')
+        throw new Error(data?.error || 'No s\'ha pogut crear el perfil')
       }
 
       resetForm()
       setSheetOpen(false)
       await fetchProfiles()
     } catch (err) {
-      setCreateError(err instanceof Error ? err.message : 'No se pudo crear el perfil')
+      setCreateError(err instanceof Error ? err.message : 'No s\'ha pogut crear el perfil')
     } finally {
       setCreating(false)
     }
@@ -207,7 +219,7 @@ export default function ProfilesPage() {
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-12">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold tracking-tight">Alumnat</h1>
+              <h1 className="text-2xl font-bold tracking-tight">Alumnat</h1>
               <p className="text-muted-foreground text-lg">
                 Gestiona els teus alumnes per vincular-los ràpidament a transcripcions i anotacions.
               </p>
@@ -224,9 +236,9 @@ export default function ProfilesPage() {
                   <SheetHeader className="space-y-4 pt-8 px-5">
                     <div className="flex items-center gap-3">
                       <div>
-                         <SheetTitle className="text-xl">Nuevo perfil de alumno</SheetTitle>
+                         <SheetTitle className="text-xl">Nou perfil d'alumne</SheetTitle>
                          <SheetDescription className="text-sm text-muted-foreground">
-                           Crea un perfil para organizar y vincular transcripciones de forma más eficiente
+                           Crea un perfil per organitzar i vincular transcripcions de forma més eficient
                          </SheetDescription>
                        </div>
                     </div>
@@ -237,11 +249,11 @@ export default function ProfilesPage() {
                       <div className="space-y-3">
                         <Label htmlFor="alumne-name" className="flex items-center gap-2 text-sm font-medium">
                           <User className="h-4 w-4 text-muted-foreground" />
-                          Nombre completo
+                          Nom complet
                         </Label>
                         <Input
                            id="alumne-name"
-                           placeholder="Ej: María García López"
+                           placeholder="Ex: Maria García López"
                            value={name}
                            onChange={handleNameChange}
                            className={`h-11 ${nameError ? 'border-destructive focus-visible:ring-destructive' : ''}`}
@@ -254,7 +266,7 @@ export default function ProfilesPage() {
                            </div>
                          ) : (
                             <p className="text-xs text-muted-foreground">
-                              Nombre completo del alumno (mínimo 2 caracteres)
+                              Nom complet de l'alumne (mínim 2 caràcters)
                             </p>
                           )}
                       </div>
@@ -262,14 +274,14 @@ export default function ProfilesPage() {
                       <div className="space-y-3">
                         <Label htmlFor="alumne-age" className="flex items-center gap-2 text-sm font-medium">
                           <Calendar className="h-4 w-4 text-muted-foreground" />
-                          Edad (opcional)
+                          Edat (opcional)
                         </Label>
                         <Input
                            id="alumne-age"
                            type="number"
                            min={0}
                            max={25}
-                           placeholder="Ej: 8"
+                           placeholder="Ex: 8"
                            value={age}
                            onChange={handleAgeChange}
                            className={`h-11 ${ageError ? 'border-destructive focus-visible:ring-destructive' : ''}`}
@@ -281,7 +293,7 @@ export default function ProfilesPage() {
                            </div>
                          ) : (
                             <p className="text-xs text-muted-foreground">
-                              Opcional: ayuda a organizar por grupos de edad (0-25 años)
+                              Opcional: ajuda a organitzar per grups d'edat (0-25 anys)
                             </p>
                           )}
                       </div>
@@ -291,7 +303,7 @@ export default function ProfilesPage() {
                       <div className="flex items-start gap-3 rounded-lg border border-destructive/20 bg-destructive/5 p-4">
                         <AlertCircle className="h-5 w-5 text-destructive mt-0.5 flex-shrink-0" />
                         <div>
-                          <p className="text-sm font-medium text-destructive">Error al crear el perfil</p>
+                          <p className="text-sm font-medium text-destructive">Error en crear el perfil</p>
                           <p className="text-sm text-destructive/80">{createError}</p>
                         </div>
                       </div>
@@ -307,7 +319,7 @@ export default function ProfilesPage() {
                         {creating ? (
                            <>
                              <Loader2 className="h-4 w-4 animate-spin" />
-                             Creando perfil...
+                             Creant perfil...
                            </>
                          ) : (
                            <>
@@ -323,7 +335,7 @@ export default function ProfilesPage() {
                         className="h-11"
                         size="lg"
                       >
-                        Cancelar
+                        Cancel·lar
                       </Button>
                     </div>
                   </form>
@@ -347,8 +359,8 @@ export default function ProfilesPage() {
               <div className="rounded-2xl border border-dashed border-muted-foreground/40 bg-muted/30 py-20 text-center text-muted-foreground">
                 <div className="mx-auto max-w-sm space-y-3">
                   <Users className="mx-auto h-12 w-12 text-muted-foreground/60" />
-                  <h3 className="text-lg font-medium">No hay alumnos registrados</h3>
-                  <p className="text-sm">Crea tu primer perfil de alumno para comenzar a organizar transcripciones.</p>
+                  <h3 className="text-lg font-medium">No hi ha alumnes registrats</h3>
+                  <p className="text-sm">Crea el teu primer perfil d'alumne per començar a organitzar transcripcions.</p>
                 </div>
               </div>
             ) : (
@@ -356,11 +368,11 @@ export default function ProfilesPage() {
                 <table className="min-w-full divide-y divide-border">
                     <thead className="bg-muted/30">
                       <tr>
-                        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Nombre</th>
-                        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Edad</th>
-                        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Creado</th>
-                        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Actualizado</th>
-                        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Transcripciones</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Nom</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Edat</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Creat</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Actualitzat</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Transcripcions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border/40 text-sm">
@@ -388,7 +400,7 @@ export default function ProfilesPage() {
                             <td className="px-6 py-4">
                               <div className="flex items-center gap-2 text-muted-foreground">
                                 <FileText className="h-4 w-4" />
-                                <span className="text-sm">Ver transcripciones</span>
+                                <span className="text-sm">Veure transcripcions</span>
                               </div>
                             </td>
                           </tr>
@@ -401,7 +413,7 @@ export default function ProfilesPage() {
                                   {transcriptionsLoading ? (
                                     <div className="flex items-center justify-center py-8">
                                       <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-                                      <span className="ml-2 text-sm text-muted-foreground">Cargando transcripciones...</span>
+                                      <span className="ml-2 text-sm text-muted-foreground">Carregant transcripcions...</span>
                                     </div>
                                   ) : transcriptionsError ? (
                                     <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
@@ -411,11 +423,27 @@ export default function ProfilesPage() {
                                     <div className="rounded-lg border border-dashed border-muted-foreground/40 bg-muted/30 py-8 text-center text-muted-foreground">
                                       <div className="space-y-2">
                                         <FileText className="mx-auto h-8 w-8 text-muted-foreground/60" />
-                                        <p className="text-sm">No hay transcripciones para este alumno.</p>
+                                        <p className="text-sm">No hi ha transcripcions per aquest alumne.</p>
                                       </div>
                                     </div>
                                   ) : (
                                     <div className="space-y-3">
+                                      <div className="flex items-center justify-between">
+                                        <h4 className="text-sm font-medium text-foreground">Transcripcions assignades</h4>
+                                        <Button
+                                          variant="outline"
+                                          size="sm"
+                                          onClick={(e) => {
+                                            e.stopPropagation()
+                                            fetchTranscriptions(profile.id, true)
+                                          }}
+                                          disabled={transcriptionsLoading}
+                                          className="h-8 gap-2"
+                                        >
+                                          <RefreshCw className={`h-3 w-3 ${transcriptionsLoading ? 'animate-spin' : ''}`} />
+                                          Actualitzar
+                                        </Button>
+                                      </div>
                                       {transcriptions.map((transcription) => (
                                         <Link
                                           key={transcription.id}
@@ -427,7 +455,7 @@ export default function ProfilesPage() {
                                               <FileText className="h-5 w-5 text-primary" />
                                               <div>
                                                 <h4 className="font-medium text-foreground">
-                                                  {transcription.name || `Transcripción ${transcription.id.slice(0, 8)}`}
+                                                  {transcription.name || `Transcripció ${transcription.id.slice(0, 8)}`}
                                                 </h4>
                                                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                                   <Clock className="h-3 w-3" />
@@ -456,4 +484,6 @@ export default function ProfilesPage() {
       </div>
     </AppLayout>
   )
-}
+});
+
+export default ProfilesPage;

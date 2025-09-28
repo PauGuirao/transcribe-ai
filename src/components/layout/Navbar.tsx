@@ -12,6 +12,8 @@ import {
   LogOut,
   ChevronDown,
   Sparkles,
+  Users,
+  HelpCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,7 +30,7 @@ import { supabase } from "@/lib/supabase";
 
 export default function Navbar() {
   const router = useRouter();
-  const { user, signOut, isSubscribed, checkingSubscription } = useAuth();
+  const { user, signOut, isSubscribed, checkingSubscription, organization, currentUserRole } = useAuth();
 
   const handleSignOut = async () => {
     try {
@@ -54,7 +56,7 @@ export default function Navbar() {
         <h1 className="text-xl font-semibold text-gray-900">transcriu</h1>
       </div>
       <div className="flex items-center gap-3">
-        {user && isSubscribed === false && (
+        {user && isSubscribed === false && currentUserRole === 'owner' && (
           <Button
             asChild
             size="sm"
@@ -66,6 +68,19 @@ export default function Navbar() {
             </Link>
           </Button>
         )}
+        
+        {/* Organization display */}
+        {organization && (
+          <Link href="/team">
+            <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-md border-2 border-border shadow-md hover:bg-gray-50 transition-colors cursor-pointer">
+              <Users className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-medium text-foreground truncate max-w-32">
+                {organization.name}
+              </span>
+            </div>
+          </Link>
+        )}
+        
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -95,9 +110,21 @@ export default function Navbar() {
             </div>
             <DropdownMenuSeparator className="my-0" />
             <div className="py-2">
+              <DropdownMenuItem className="px-4" asChild>
+                <Link href="/team">
+                  <Users className="h-4 w-4 text-black" />
+                  Equip
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="px-4" asChild>
+                <Link href="/help">
+                  <HelpCircle className="h-4 w-4 text-black" />
+                  Ajuda
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuItem className="px-4">
-                <BadgeCheck className="h-4 w-4 text-orange-500" />
-                Gestionar suscripción
+                <BadgeCheck className="h-4 w-4 text-black" />
+                Gestionar suscripció
               </DropdownMenuItem>
             </div>
             <DropdownMenuSeparator className="my-0" />
@@ -110,7 +137,7 @@ export default function Navbar() {
               variant="destructive"
             >
               <LogOut className="h-4 w-4" />
-              Cerrar sesión
+              Tancar Sessió
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

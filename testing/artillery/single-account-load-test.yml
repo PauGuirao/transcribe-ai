@@ -1,0 +1,118 @@
+config:
+  target: 'http://localhost:3000'
+  phases:
+    # Warm-up phase
+    - duration: 60
+      arrivalRate: 5
+      name: "Warm-up - 5 users"
+  
+  # Default headers for all requests
+  defaults:
+    headers:
+      'User-Agent': 'Artillery Load Test'
+  
+  # Variables for single account testing
+  variables:
+    sessionToken: "{{ $env.SESSION_TOKEN }}"
+    userId: "{{ $env.USER_ID }}"
+
+scenarios:
+  # Main scenario: Single account load testing
+  - name: "Single Account Load Test"
+    weight: 100
+    flow:
+      # Set authentication headers
+      - function: "setSingleAccountAuth"
+      
+      # Visit dashboard to verify auth
+      - get:
+          url: "/dashboard"
+          headers:
+            Cookie: "session={{ sessionToken }}"
+            Authorization: "Bearer {{ sessionToken }}"
+          expect:
+            - statusCode: 200
+      
+      # Simulate different user behaviors
+      - function: "randomUserBehavior"
+      
+      # Upload audio file (if behavior is upload)
+      - post:
+          url: "/api/upload"
+          ifTrue: "{{ uploadFile }}"
+          headers:
+            Cookie: "session={{ sessionToken }}"
+            Authorization: "Bearer {{ sessionToken }}"
+          formData:
+            file: "@test-files/test.m4a"
+          capture:
+            - json: "$.audioId"
+              as: "audioId"
+      
+      # Wait for processing
+      - think: "{{ $randomInt(2, 5) }}"
+      
+      # Check transcription status (if uploaded)
+      - get:
+          url: "/api/transcriptions/{{ audioId }}/status"
+          ifTrue: "{{ uploadFile }}"
+          headers:
+            Cookie: "session={{ sessionToken }}"
+            Authorization: "Bearer {{ sessionToken }}"
+          capture:
+            - json: "$.status"
+              as: "transcriptionStatus"
+      
+      # Browse library
+      - get:
+          url: "/library"
+          ifTrue: "{{ browseLibrary }}"
+          headers:
+            Cookie: "session={{ sessionToken }}"
+            Authorization: "Bearer {{ sessionToken }}"
+      
+      # Visit profiles
+      - get:
+          url: "/profiles"
+          ifTrue: "{{ visitProfiles }}"
+          headers:
+            Cookie: "session={{ sessionToken }}"
+            Authorization: "Bearer {{ sessionToken }}"
+      
+      # Random think time between actions
+      - think: "{{ $randomInt(1, 3) }}"
+
+# Custom functions for single account testing
+functions:
+  setSingleAccountAuth: |
+    function(context, events, done) {
+      // Set session token from environment variable
+      context.vars.sessionToken = process.env.SESSION_TOKEN || 'your_session_token_here';
+      context.vars.userId = process.env.USER_ID || 'your_user_id_here';
+      return done();
+    }
+  
+  randomUserBehavior: |
+    function(context, events, done) {
+      // Randomly assign user behaviors to simulate different usage patterns
+      const behaviors = Math.random();
+      
+      if (behaviors < 0.4) {
+        // 40% chance: Upload and transcribe
+        context.vars.uploadFile = true;
+        context.vars.browseLibrary = false;
+        context.vars.visitProfiles = false;
+      } else if (behaviors < 0.7) {
+        // 30% chance: Browse library
+        context.vars.uploadFile = false;
+        context.vars.browseLibrary = true;
+        context.vars.visitProfiles = false;
+      } else {
+        // 30% chance: Visit profiles
+        context.vars.uploadFile = false;
+        context.vars.browseLibrary = false;
+        context.vars.visitProfiles = true;
+      }
+      
+      return done();
+    }

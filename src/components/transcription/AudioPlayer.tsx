@@ -14,18 +14,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-interface AudioPlayerProps {
-  audioId: string;
-  className?: string;
-  onRef?: (ref: AudioPlayerRef) => void;
-}
-
-export interface AudioPlayerRef {
-  seekTo: (time: number) => void;
-  play: () => void;
-  pause: () => void;
-}
+import { AudioPlayerProps, AudioPlayerRef } from '@/types';
 
 export function AudioPlayer({ audioId, className, onRef }: AudioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null);

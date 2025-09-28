@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { supabase } from "@/lib/supabase"; // 👈 Import your Supabase client
+import { createAudioStatusSubscription, realtimeManager } from "@/lib/supabase-realtime";
 import { Audio, Transcription, TranscriptionSegment, Speaker } from "@/types";
 
 /**
@@ -72,47 +73,25 @@ export function useTranscriptionData(audioId?: string) {
   useEffect(() => {
     if (!audioId) return;
 
-    console.log(`[REALTIME] Setting up subscription for audioId: ${audioId}`);
+    console.log(`[REALTIME] Setting up optimized subscription for audioId: ${audioId}`);
 
-    const channel = supabase.channel(`audios:${audioId}`);
-
-    channel
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "audios",
-          filter: `id=eq.${audioId}`,
-        },
-        (payload) => {
-          // This log fires when a message is received
-          console.log("[REALTIME] Received payload:", payload);
-          const newStatus = payload.new.status;
-          if (newStatus === "completed" || newStatus === "error") {
-            console.log(
-              `[REALTIME] Status changed to '${newStatus}'. Fetching data...`
-            );
-            fetchData();
-          }
-        }
-      )
-      .subscribe((status, err) => {
-        // This callback tracks the subscription's connection status
-        if (status === "SUBSCRIBED") {
-          console.log(
-            `[REALTIME] Successfully subscribed to channel: audios:${audioId}`
-          );
-        }
-        if (status === "CLOSED") {
-          console.log("[REALTIME] Channel closed.");
-        }
-      });
+    // Use the optimized realtime subscription
+    const channel = createAudioStatusSubscription(
+      supabase,
+      audioId,
+      (payload) => {
+        console.log("[REALTIME] Received optimized payload:", payload);
+        fetchData();
+      },
+      (error) => {
+        console.error("[REALTIME] Subscription error:", error);
+      }
+    );
 
     // Cleanup function
     return () => {
-      console.log(`[REALTIME] Unsubscribing from channel: audios:${audioId}`);
-      supabase.removeChannel(channel);
+      console.log(`[REALTIME] Cleaning up optimized subscription for audioId: ${audioId}`);
+      realtimeManager.unsubscribe(`audios:${audioId}`);
     };
   }, [audioId, fetchData]);
 

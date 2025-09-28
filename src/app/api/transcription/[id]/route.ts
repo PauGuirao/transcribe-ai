@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
+import { apiCache } from "@/lib/cache";
 import type { TranscriptionSegment, Speaker } from "@/types";
 
 interface TranscriptionData {
@@ -114,6 +115,14 @@ export async function PATCH(
           { success: false, error: "No se pudo actualizar el alumno asignado" },
           { status: 500, headers: NO_CACHE_HEADERS }
         );
+      }
+
+      // Invalidate cache for the assigned student's transcriptions
+      if (alumneId) {
+        const cacheKey = apiCache.generateKey("transcriptions", { alumneId });
+        console.log("Invalidating cache for key:", cacheKey);
+        apiCache.delete(cacheKey);
+        console.log("Cache invalidated successfully");
       }
 
       return NextResponse.json(

@@ -1,5 +1,11 @@
 import { createBrowserClient } from "@supabase/ssr";
-import type { TranscriptionSegment, Speaker } from "@/types";
+import type { 
+  TranscriptionSegment, 
+  Speaker, 
+  User, 
+  Audio, 
+  Transcription 
+} from "@/types";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -91,36 +97,6 @@ export const storage = {
     return data.publicUrl;
   },
 };
-
-// Types for our database tables
-export interface User {
-  id: string;
-  email: string;
-  name?: string;
-  image?: string;
-  created_at: string;
-}
-
-export interface Audio {
-  id: string;
-  filename: string;
-  original_name: string;
-  custom_name?: string;
-  file_path: string;
-  upload_date: string;
-  status: "PENDING" | "PROCESSING" | "COMPLETED" | "ERROR";
-  user_id: string;
-  created_at: string;
-}
-
-export interface Transcription {
-  id: string;
-  audio_id: string;
-  original_text: string;
-  edited_text: string;
-  created_at: string;
-  updated_at: string;
-}
 
 // Database operations
 export const db = {
@@ -232,7 +208,7 @@ export const db = {
 
   async updateTranscription(
     audioId: string,
-    updates: Partial<Pick<Transcription, "original_text" | "edited_text">>
+    updates: Partial<Pick<Transcription, "originalText" | "editedText">>
   ) {
     const { data, error } = await supabase
       .from("transcriptions")

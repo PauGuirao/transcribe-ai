@@ -1,28 +1,32 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, LogIn } from "lucide-react";
 
-export default function SignIn() {
+const SignInPage = React.memo(function SignInPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, signInWithGoogle } = useAuth();
+  const returnUrl = searchParams.get("returnUrl");
 
   useEffect(() => {
     if (user) {
-      router.push("/dashboard");
+      // If there's a returnUrl, redirect there, otherwise go to dashboard
+      const redirectTo = returnUrl || "/dashboard";
+      router.push(redirectTo);
     }
-  }, [user, router]);
+  }, [user, router, returnUrl]);
 
   const handleSignIn = async () => {
     setLoading(true);
     try {
-      await signInWithGoogle();
+      await signInWithGoogle(returnUrl || undefined);
     } catch (error) {
       console.error("Sign in error:", error);
     } finally {
@@ -104,4 +108,6 @@ export default function SignIn() {
       </div>
     </div>
   );
-}
+});
+
+export default SignInPage;

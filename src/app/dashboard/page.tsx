@@ -5,7 +5,7 @@ import Link from 'next/link';
 import AppLayout from '@/components/layout/AppLayout';
 import { Mic, PencilLine, Library, ArrowRight } from 'lucide-react';
 
-export default function DashboardPage() {
+const DashboardPage = React.memo(function DashboardPage() {
   const tools = [
     { title: 'Transcripció', desc: 'Converteix el teu àudio a text amb IA', href: '/transcribe', Icon: Mic },
     { title: 'Anotació', desc: 'Edita, marca i organitza la transcripció', href: '/annotate', Icon: PencilLine },
@@ -48,4 +48,6 @@ export default function DashboardPage() {
       </div>
     </AppLayout>
   );
-}
+});
+
+export default DashboardPage;

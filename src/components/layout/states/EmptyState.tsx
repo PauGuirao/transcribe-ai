@@ -2,10 +2,8 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  AudioUpload,
-  AudioUploadResult,
-} from "@/components/audio-upload/AudioUpload";
+import { AudioUpload } from "@/components/audio-upload/AudioUpload";
+import { AudioUploadResult } from "@/types";
 import { Button } from "@/components/ui/button";
 import { FileText, Loader2, AlertCircle, ArrowRight, CreditCard, Check, Zap } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";

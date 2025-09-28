@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { AudioUpload, AudioUploadResult } from '@/components/audio-upload/AudioUpload';
+import { AudioUpload } from '@/components/audio-upload/AudioUpload';
+import { AudioUploadResult } from '@/types';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

@@ -3,6 +3,8 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import Replicate from "replicate";
 import { transcribeAudioWithTimestamps } from "@/lib/openai";
+import { transcriptionQueue } from '@/lib/queue';
+import { performanceMonitor, withPerformanceTracking } from '@/lib/performance';
 const replicateToken = process.env.REPLICATE_API_TOKEN;
 
 if (!replicateToken) {
@@ -15,6 +17,10 @@ const replicateWhisperVersion =
   "openai/whisper:8099696689d249cf8b122d833c36ac3f75505c666a395ca40ef26f68e7d3d16e";
 
 export async function POST(request: NextRequest) {
+  const startTime = Date.now();
+  let success = true;
+  let userId: string | undefined;
+
   try {
     // Create Supabase client
     const cookieStore = await cookies();
@@ -48,19 +54,86 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    userId = user.id;
+
     const {
       audioId,
       filename,
       originalName,
       filePath,
       provider = "openai",
+      queueId,
     } = await request.json();
 
-    if (!audioId || !filename || !filePath) {
+    if (!audioId) {
       return NextResponse.json(
         {
           success: false,
-          error: "Audio ID, filename, and filePath are required",
+          error: "Audio ID is required",
+        },
+        { status: 400 }
+      );
+    }
+
+    console.log(`🔄 Processing transcription for audioId: ${audioId}`);
+    // If this is a queued request, process immediately
+    if (queueId) {
+      console.log(`🔄 Processing queued transcription for audioId: ${audioId}`);
+      return await processTranscription(audioId, filename, originalName, filePath, provider, user.id, supabase);
+    }
+
+    // For new requests, add to queue
+    const queueItemId = `transcribe_${audioId}_${Date.now()}`;
+    console.log(`🔄 Adding transcription to queue with ID: ${queueItemId}`);
+    
+    transcriptionQueue.add({
+      id: queueItemId,
+      audioId,
+      userId: user.id,
+      filename,
+      originalName,
+      filePath,
+      provider,
+      priority: 1,
+      maxRetries: 3,
+    });
+    console.log(`🔄 Transcription added to queue with ID: ${queueItemId}`);
+
+    return NextResponse.json({ 
+      message: 'Transcription queued successfully',
+      queueId: queueItemId,
+      position: transcriptionQueue.getPosition(queueItemId),
+      status: transcriptionQueue.getQueueStatus()
+    });
+
+  } catch (error) {
+    success = false;
+    console.error("Transcribe API error:", error);
+    return NextResponse.json(
+      { success: false, error: "Internal server error" },
+      { status: 500 }
+    );
+  } finally {
+    performanceMonitor.logRequest('/api/transcribe', startTime, success, userId);
+  }
+}
+
+export async function processTranscription(
+  audioId: string,
+  filename: string,
+  originalName: string,
+  filePath: string,
+  provider: string,
+  userId: string,
+  supabase: any
+) {
+  try {
+
+    if (!filename || !filePath) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Filename and filePath are required",
         },
         { status: 400 }
       );
@@ -71,7 +144,7 @@ export async function POST(request: NextRequest) {
     const { data: remainingTokens, error: tokenError } = await supabase.rpc(
       "decrement_tokens",
       {
-        user_id: user.id,
+        user_id: userId,
         amount: TOKEN_COST,
       }
     );
@@ -94,7 +167,7 @@ export async function POST(request: NextRequest) {
         .from("audios")
         .update({ status: "processing" })
         .eq("id", audioId)
-        .eq("user_id", user.id);
+        .eq("user_id", userId);
 
       const { data: audioData, error: downloadError } = await supabase.storage
         .from("audio-files")
@@ -109,7 +182,8 @@ export async function POST(request: NextRequest) {
       const audioFile = new File([audioBuffer], originalName || filename, {
         type: getContentType(originalName || filename),
       });
-
+      
+      console.log(`🔄 Processing audio file: ${originalName || filename}`);
       if (provider === "replicate") {
         const buffer = Buffer.from(audioBuffer);
         const contentType = getContentType(originalName || filename);
@@ -152,7 +226,7 @@ export async function POST(request: NextRequest) {
           {
             id: audioId,
             audio_id: audioId,
-            user_id: user.id,
+            user_id: userId,
             status: "processing",
             prediction_id: prediction.id,
           },
@@ -178,7 +252,7 @@ export async function POST(request: NextRequest) {
           .insert({
             id: audioId,
             audio_id: audioId,
-            user_id: user.id,
+            user_id: userId,
             status: "completed",
             provider,
           })
@@ -199,7 +273,7 @@ export async function POST(request: NextRequest) {
       const { data: jsonUpload, error: jsonUploadError } =
         await supabase.storage
           .from("transcriptions")
-          .upload(`${user.id}/${audioId}.json`, transcriptionJson, {
+          .upload(`${userId}/${audioId}.json`, transcriptionJson, {
             contentType: "application/json",
             upsert: true,
           });
@@ -214,7 +288,7 @@ export async function POST(request: NextRequest) {
 
       const { data: txtUpload, error: txtUploadError } = await supabase.storage
         .from("transcriptions")
-        .upload(`${user.id}/${audioId}.txt`, transcriptionResult.text, {
+        .upload(`${userId}/${audioId}.txt`, transcriptionResult.text, {
           contentType: "text/plain",
           upsert: true,
         });
@@ -229,7 +303,7 @@ export async function POST(request: NextRequest) {
         .from("audios")
         .update({ status: "completed" })
         .eq("id", audioId)
-        .eq("user_id", user.id);
+        .eq("user_id", userId);
 
       return NextResponse.json({
         success: true,
@@ -249,7 +323,7 @@ export async function POST(request: NextRequest) {
           .from("audios")
           .update({ status: "error" })
           .eq("id", audioId)
-          .eq("user_id", user.id);
+          .eq("user_id", userId);
 
         // Save error to database
         const errorMessage =
@@ -260,7 +334,7 @@ export async function POST(request: NextRequest) {
           {
             id: audioId,
             audio_id: audioId,
-            user_id: user.id,
+            user_id: userId,
             original_text: "",
             edited_text: "",
             segments: [],
@@ -275,7 +349,7 @@ export async function POST(request: NextRequest) {
         await supabase.storage
           .from("transcriptions")
           .upload(
-            `${user.id}/${audioId}.error`,
+            `${userId}/${audioId}.error`,
             JSON.stringify({ error: errorMessage }),
             {
               contentType: "application/json",
@@ -299,7 +373,7 @@ export async function POST(request: NextRequest) {
       );
     }
   } catch (error) {
-    console.error("Transcribe API error:", error);
+    console.error("Process transcription error:", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },
       { status: 500 }

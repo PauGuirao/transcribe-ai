@@ -1,8 +1,9 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
+import { getCachedUserProfile, getCachedOrganization, getCachedSubscriptionStatus } from "@/lib/cache";
 
 // Define the shape of the context's value
 interface AuthContextType {
@@ -12,10 +13,14 @@ interface AuthContextType {
   isSubscribed: boolean | null;
   planType: string | null;
   tokens: number | null;
+  organization: any | null;
+  organizationMembers: any[] | null;
+  currentUserRole: string | null;
   checkingSubscription: boolean;
-  signInWithGoogle: () => Promise<void>;
+  signInWithGoogle: (returnUrl?: string) => Promise<void>;
   signOut: () => Promise<void>;
   refreshTokens: () => Promise<void>;
+  refreshOrganizationData: () => Promise<void>;
 }
 
 // Create the context
@@ -31,7 +36,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isSubscribed, setIsSubscribed] = useState<boolean | null>(null);
   const [planType, setPlanType] = useState<string | null>(null);
   const [tokens, setTokens] = useState<number | null>(null);
+  const [organization, setOrganization] = useState<any | null>(null);
+  const [organizationMembers, setOrganizationMembers] = useState<any[] | null>(null);
+  const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
   const [checkingSubscription, setCheckingSubscription] = useState(true);
+
+  // Request deduplication
+  const pendingMembersRequest = useRef<Promise<any> | null>(null);
+  const lastMembersFetch = useRef<number>(0);
+  const CACHE_TTL = 30000; // 30 seconds cache
 
   useEffect(() => {
     // This effect handles user authentication state changes
@@ -54,106 +67,234 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Optimized function to fetch organization members with deduplication
+  const fetchOrganizationMembers = useCallback(async (organizationId: string) => {
+    // Check cache TTL
+    const now = Date.now();
+    if (now - lastMembersFetch.current < CACHE_TTL && organizationMembers) {
+      return { members: organizationMembers, currentUserRole };
+    }
+
+    // Return existing promise if one is pending
+    if (pendingMembersRequest.current) {
+      return pendingMembersRequest.current;
+    }
+
+    // Create new request
+    pendingMembersRequest.current = (async () => {
+      try {
+        const membersResponse = await fetch("/api/organization/members");
+        if (membersResponse.ok) {
+          const membersData = await membersResponse.json();
+          setOrganizationMembers(membersData.members);
+          setCurrentUserRole(membersData.currentUserRole);
+          lastMembersFetch.current = now;
+          return membersData;
+        }
+        throw new Error('Failed to fetch members');
+      } catch (error) {
+        console.error("Error fetching organization members:", error);
+        throw error;
+      } finally {
+        pendingMembersRequest.current = null;
+      }
+    })();
+
+    return pendingMembersRequest.current;
+  }, [organizationMembers, currentUserRole]);
+
+  // Function to fetch subscription status
+  const fetchSubscriptionStatus = useCallback(async (userId: string) => {
+    setCheckingSubscription(true);
+    
+    try {
+      // Use enhanced caching for subscription status
+      const subscriptionData = await getCachedSubscriptionStatus(userId, supabase);
+      
+      if (!subscriptionData) {
+        setIsSubscribed(false);
+        setPlanType(null);
+        setTokens(null);
+        setOrganization(null);
+        setOrganizationMembers(null);
+        setCurrentUserRole(null);
+        return;
+      }
+
+      // Set tokens from profile
+      setTokens(subscriptionData.tokens || null);
+
+      // Handle organization data
+      if (subscriptionData.organization && subscriptionData.current_organization_id) {
+        setOrganization(subscriptionData.organization);
+        setIsSubscribed(subscriptionData.organization.subscription_status === 'active');
+        setPlanType(subscriptionData.organization.plan_type || null);
+        
+        // Fetch organization members only once with deduplication
+        try {
+          await fetchOrganizationMembers(subscriptionData.organization.id);
+        } catch (error) {
+          console.error("Error fetching organization members:", error);
+        }
+      } else {
+        // No organization, set defaults
+        setIsSubscribed(false);
+        setPlanType(null);
+        setOrganization(null);
+        setOrganizationMembers(null);
+        setCurrentUserRole(null);
+      }
+    } catch (err) {
+      console.error("Unexpected subscription fetch error:", err);
+      setIsSubscribed(false);
+      setPlanType(null);
+      setTokens(null);
+      setOrganization(null);
+      setOrganizationMembers(null);
+      setCurrentUserRole(null);
+    } finally {
+      setCheckingSubscription(false);
+    }
+  }, [fetchOrganizationMembers]);
+
   useEffect(() => {
     // This effect fetches the subscription status whenever the user object changes
-    const fetchSubscriptionStatus = async () => {
+    const handleUserChange = async () => {
       // If there's no user, reset subscription state
       if (!user) {
         setIsSubscribed(null);
-
+        setPlanType(null);
+        setTokens(null);
+        setOrganization(null);
+        setOrganizationMembers(null);
+        setCurrentUserRole(null);
         setCheckingSubscription(false);
         return;
       }
 
-      setCheckingSubscription(true);
-      try {
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("is_subscribed, plan_type, tokens")
-          .eq("id", user.id)
-          .single();
-
-        console.log(user.id);
-        console.log("Subscription data:", data, "Error:", error);
-
-        if (error) {
-          console.error("Failed to load subscription status:", error);
-          setIsSubscribed(false); // Default to false on error for security
-          setPlanType(null);
-          setTokens(null);
-        } else {
-          setIsSubscribed(Boolean(data?.is_subscribed));
-          setPlanType(data?.plan_type || null);
-          setTokens(data?.tokens || null);
-        }
-      } catch (err) {
-        console.error("Unexpected subscription fetch error:", err);
-        setIsSubscribed(false);
-      } finally {
-        setCheckingSubscription(false);
-      }
+      await fetchSubscriptionStatus(user.id);
     };
 
-    fetchSubscriptionStatus();
-  }, [user]); // The dependency array ensures this runs only when `user` changes
+    handleUserChange();
+  }, [user, fetchSubscriptionStatus]); // The dependency array ensures this runs only when `user` changes
 
   // Function to initiate Google sign-in
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = useCallback(async (returnUrl?: string) => {
+    // If returnUrl is an invitation URL, extract token and store in cookie
+    if (returnUrl && returnUrl.includes('/invite/')) {
+      const tokenMatch = returnUrl.match(/\/invite\/([^/?]+)/);
+      if (tokenMatch) {
+        const token = tokenMatch[1];
+        // Set invitation token in cookie for server-side processing
+        document.cookie = `invite_token=${token}; path=/; max-age=3600; SameSite=Lax`;
+      }
+    }
+    
+    const redirectTo = `${window.location.origin}/auth/callback`;
+    
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo,
       },
     });
     if (error) {
       console.error("Error signing in:", error.message);
     }
-  };
+  }, []);
 
   // Function to sign the user out
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
       console.error("Error signing out:", error.message);
     }
-  };
+  }, []);
 
   // Function to refresh tokens manually
-  const refreshTokens = async () => {
+  const refreshTokens = useCallback(async () => {
     if (!user) return;
     
     try {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("is_subscribed, plan_type, tokens")
-        .eq("id", user.id)
-        .single();
+      // Use enhanced caching for user profile and organization data
+      const userProfile = await getCachedUserProfile(user.id, supabase);
+      
+      if (!userProfile) {
+        console.error("Failed to refresh profile");
+        return;
+      }
 
-      if (error) {
-        console.error("Failed to refresh tokens:", error);
+      // Set tokens from profile
+      setTokens(userProfile.tokens || null);
+
+      // Get organization data if user has one
+      if (userProfile.current_organization_id) {
+        const orgData = await getCachedOrganization(userProfile.current_organization_id, supabase);
+        
+        if (orgData) {
+          setOrganization(orgData);
+          setIsSubscribed(orgData.subscription_status === 'active');
+          setPlanType(orgData.plan_type || null);
+        } else {
+          // No organization, set defaults
+          setIsSubscribed(false);
+          setPlanType(null);
+          setOrganization(null);
+        }
       } else {
-        setIsSubscribed(Boolean(data?.is_subscribed));
-        setPlanType(data?.plan_type || null);
-        setTokens(data?.tokens || null);
+        // No organization, set defaults
+        setIsSubscribed(false);
+        setPlanType(null);
+        setOrganization(null);
       }
     } catch (err) {
       console.error("Unexpected token refresh error:", err);
     }
-  };
+  }, [user]);
 
-  // The value provided to consuming components
-  const value = {
+  // Function to refresh organization data including members (now uses deduplication)
+  const refreshOrganizationData = useCallback(async () => {
+    if (!user || !organization?.id) return;
+    
+    try {
+      await fetchOrganizationMembers(organization.id);
+    } catch (error) {
+      console.error("Error refreshing organization data:", error);
+    }
+  }, [user, organization?.id, fetchOrganizationMembers]);
+
+  // Memoize the context value to prevent unnecessary re-renders
+  const value = useMemo(() => ({
     user,
     session,
     loading,
     isSubscribed,
     planType,
     tokens,
+    organization,
+    organizationMembers,
+    currentUserRole,
     checkingSubscription,
     signInWithGoogle,
     signOut,
     refreshTokens,
-  };
+    refreshOrganizationData,
+  }), [
+    user,
+    session,
+    loading,
+    isSubscribed,
+    planType,
+    tokens,
+    organization,
+    organizationMembers,
+    currentUserRole,
+    checkingSubscription,
+    signInWithGoogle,
+    signOut,
+    refreshTokens,
+    refreshOrganizationData,
+  ]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

@@ -65,7 +65,7 @@ export function TranscriptionHeader({
   };
 
   return (
-    <div className="p-2 md:p-5 bg-gray-50 md:pb-1">
+    <div className="p-2 md:p-5 bg-white md:pb-3 border-b border-gray-200 shadow-sm">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
         <div className="flex items-center justify-between w-full mr-80">
           <div className="flex items-center space-x-2">
@@ -107,7 +107,7 @@ export function TranscriptionHeader({
               <Save className="h-4 w-4" />
             )}
             <span className="ml-2">
-              {isSaving ? "Guardando..." : "Guardar"}
+              {isSaving ? "Guardant..." : "Guardar"}
             </span>
           </Button>
         </div>

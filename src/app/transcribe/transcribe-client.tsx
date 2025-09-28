@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import AppLayout from "@/components/layout/AppLayout";
 import { MainLayout } from "@/components/layout/MainLayout";
-import { AudioUploadResult } from "@/components/audio-upload/AudioUpload";
+import { AudioUploadResult } from "@/types";
 
 export default function TranscribeClient() {
   const searchParams = useSearchParams();

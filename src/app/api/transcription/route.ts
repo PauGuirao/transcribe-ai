@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { apiCache, CACHE_HEADERS, createCachedResponse } from "@/lib/cache";
+import { BatchQueryBuilder, createOptimizedSupabaseClient, QueryPerformanceTracker } from "@/lib/database-optimized";
 
 interface RawTranscription {
   id: string;
@@ -25,108 +27,83 @@ interface FormattedTranscription {
 
 export const runtime = "nodejs";
 
-const NO_CACHE_HEADERS = {
-  "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0, s-maxage=0",
-  Pragma: "no-cache",
-  Expires: "0",
-};
-
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const alumneId = searchParams.get("alumneId");
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "20");
 
     if (!alumneId) {
       return NextResponse.json(
         { success: false, error: "alumneId parameter is required" },
-        { status: 400, headers: NO_CACHE_HEADERS }
+        { status: 400, headers: CACHE_HEADERS.NO_CACHE }
       );
     }
 
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll();
-          },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set({ name, value, ...options })
-            );
-          },
-        },
-      }
-    );
+    // Create optimized supabase client
+    const supabase = await createOptimizedSupabaseClient();
+    const queryTracker = QueryPerformanceTracker.getInstance();
 
     const {
       data: { user },
       error: userError,
     } = await supabase.auth.getUser();
+    
     if (userError || !user) {
       return NextResponse.json(
         { success: false, error: "Authentication required" },
-        { status: 401, headers: NO_CACHE_HEADERS }
+        { status: 401, headers: CACHE_HEADERS.NO_CACHE }
       );
     }
 
-    // Get transcriptions for the specified alumne
-    const { data: transcriptions, error: transcriptionsError } = (await supabase
-      .from("transcriptions")
-      .select(
-        `
-        id,
-        audio_id,
-        created_at,
-        updated_at,
-        alumne_id,
-        json_path,
-        audios:audio_id (
-          user_id,
-          custom_name
-        )
-      `
+    // Use optimized batch query to prevent N+1 queries
+    const batchQuery = new BatchQueryBuilder(supabase);
+    
+    const result = await queryTracker.trackQuery(
+      'getTranscriptionsWithAudioData',
+      () => batchQuery.getTranscriptionsWithAudioData(
+        alumneId, 
+        user.id, 
+        { 
+          limit, 
+          offset: (page - 1) * limit,
+          orderBy: 'created_at',
+          orderDirection: 'desc'
+        }
       )
-      .eq("alumne_id", alumneId)
-      .eq("audios.user_id", user.id)
-      .order("created_at", { ascending: false })) as {
-      data: RawTranscription[] | null;
-      error: Error | null;
-    };
-
-    if (transcriptionsError) {
-      console.error("Error fetching transcriptions:", transcriptionsError);
-      return NextResponse.json(
-        { success: false, error: "Failed to fetch transcriptions" },
-        { status: 500, headers: NO_CACHE_HEADERS }
-      );
-    }
+    );
 
     // Map the results to a cleaner format
-    const formattedTranscriptions: FormattedTranscription[] = (
-      transcriptions || []
-    ).map((t: RawTranscription) => ({
+    const formattedTranscriptions: FormattedTranscription[] = result.data.map((t: any) => ({
       id: t.id,
       audioId: t.audio_id,
-      name: t.audios.custom_name,
+      name: t.audios?.custom_name || t.audios?.filename || "Untitled",
       createdAt: t.created_at,
       updatedAt: t.updated_at,
     }));
 
-    return NextResponse.json(
-      {
-        success: true,
-        transcriptions: formattedTranscriptions,
+    const responseData = {
+      success: true,
+      transcriptions: formattedTranscriptions,
+      pagination: {
+        page,
+        limit,
+        total: result.count,
+        hasMore: result.hasMore,
+        nextPage: result.hasMore ? page + 1 : null,
       },
-      { headers: NO_CACHE_HEADERS }
-    );
+    };
+
+    return NextResponse.json(responseData, {
+      status: 200,
+      headers: CACHE_HEADERS.SHORT,
+    });
   } catch (error) {
-    console.error("Error processing request:", error);
+    console.error("Error in transcription route:", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },
-      { status: 500, headers: NO_CACHE_HEADERS }
+      { status: 500, headers: CACHE_HEADERS.NO_CACHE }
     );
   }
 }

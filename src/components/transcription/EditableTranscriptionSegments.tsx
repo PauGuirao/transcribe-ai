@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Play, Edit3, Save, X, Check, Trash2, User, Plus, Merge } from 'lucide-react';
+import { Play, Edit3, Save, Trash2, User, Plus, Merge } from 'lucide-react';
 import type { TranscriptionSegment, Speaker } from '@/types';
 import { cn } from '@/lib/utils';
 
@@ -46,9 +46,17 @@ export function EditableTranscriptionSegments({
     }
   }, [editingSegmentId, cursorPosition]);
 
-  // Keyboard event listener for L and N keys when hovering
+  // Keyboard event listener for L and N keys when hovering, and ESC when editing
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
+      // ESC key to cancel editing
+      if (e.key === 'Escape' && editingSegmentId !== null) {
+        e.preventDefault();
+        cancelEditing();
+        return;
+      }
+      
+      // L and N keys for speaker assignment when hovering
       if (hoveredSegmentId !== null && editingSegmentId === null) {
         if (e.key.toLowerCase() === 'l') {
           e.preventDefault();
@@ -133,11 +141,11 @@ export function EditableTranscriptionSegments({
        setEditText(nextSegment.text.trim());
        setCursorPosition(nextSegment.text.trim().length); // Start at the end of the next segment
        
-       // Scroll to center the next segment
+       // Scroll to show the next segment without hiding the header
        setTimeout(() => {
          const nextSegmentElement = document.querySelector(`[data-segment-id="${nextSegment.id}"]`);
          if (nextSegmentElement) {
-           nextSegmentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+           nextSegmentElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
          }
        }, 100);
      } else {
@@ -297,7 +305,7 @@ export function EditableTranscriptionSegments({
 
   return (
     <div className={cn("h-full flex flex-col bg-gray-50", className)}>
-      <div className="flex-1 space-y-2 p-4 overflow-y-auto mr-80">
+      <div className="h-full overflow-y-auto space-y-2 p-4 mr-80">
         {editedSegments.map((segment, index) => (
           <div 
             key={segment.id} 
@@ -332,14 +340,14 @@ export function EditableTranscriptionSegments({
               <Button
                 variant="ghost"
                 size="sm"
-                className="absolute -top-3 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 h-6 w-6 p-0 bg-white border border-gray-300 hover:bg-orange-50 hover:border-orange-400 shadow-sm z-10"
+                className="absolute -top-4 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 h-8 w-8 p-0 bg-white border border-gray-300 hover:bg-orange-50 hover:border-orange-400 shadow-sm z-10"
                 onClick={(e) => {
                   e.stopPropagation();
                   combineWithPreviousSegment(segment.id);
                 }}
                 title="Combine with previous segment"
               >
-                <Merge className="h-3 w-3 text-gray-600" />
+                <Merge className="h-4 w-4 text-gray-600" />
               </Button>
             )}
             {/* Add Empty Segment Button - Only show on hover and not on last segment */}
@@ -347,14 +355,14 @@ export function EditableTranscriptionSegments({
               <Button
                 variant="ghost"
                 size="sm"
-                className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 h-6 w-6 p-0 bg-white border border-gray-300 hover:bg-blue-50 hover:border-blue-400 shadow-sm z-10"
+                className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 h-8 w-8 p-0 bg-white border border-gray-300 hover:bg-blue-50 hover:border-blue-400 shadow-sm z-10"
                 onClick={(e) => {
                   e.stopPropagation();
                   insertEmptySegment(segment.id);
                 }}
                 title="Add empty segment after this one"
               >
-                <Plus className="h-3 w-3 text-gray-600" />
+                <Plus className="h-4 w-4 text-gray-600" />
               </Button>
             )}
             <div className="flex items-center justify-between mb-3">
@@ -400,27 +408,6 @@ export function EditableTranscriptionSegments({
                     ))}
                   </SelectContent>
                 </Select>
-                
-                {editingSegmentId === segment.id && (
-                  <>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={saveEdit}
-                      className="h-6 w-6 p-0 text-green-600 hover:text-green-700"
-                    >
-                      <Check className="h-3 w-3" />
-                    </Button>
-                    <Button
-                       variant="ghost"
-                       size="sm"
-                       onClick={cancelEditing}
-                       className="h-6 w-6 p-0 text-red-600 hover:text-red-700"
-                     >
-                       <X className="h-3 w-3" />
-                     </Button>
-                  </>
-                )}
               </div>
               <Button
                 variant="ghost"

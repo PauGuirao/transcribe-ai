@@ -25,10 +25,11 @@ import {
   GraduationCap,
   Loader2,
   AlertCircle,
+  MoreHorizontal,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import AppLayout from "@/components/layout/AppLayout";
-import { AudioUploadResult } from "@/components/audio-upload/AudioUpload";
+import { AudioUploadResult } from "@/types";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,6 +45,15 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 
 interface AudioFile {
   id: string;
@@ -73,7 +83,7 @@ const STATUS_MAP = {
   uploaded: { label: "Pujat", classes: "bg-blue-100 text-gray-800" }, // keep gray like your default
 } as const;
 
-export default function LibraryPage() {
+const LibraryPage = React.memo(function LibraryPage() {
   const [files, setFiles] = useState<AudioFile[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -105,6 +115,7 @@ export default function LibraryPage() {
       const data = await response.json();
 
       if (data.success) {
+        console.log("Fetched files:", data.audioFiles || []);
         setFiles(data.audioFiles || []);
       } else {
         throw new Error(data.error || "Failed to fetch files");
@@ -319,8 +330,14 @@ export default function LibraryPage() {
   };
 
   const formatDateKey = (dateString: string) => {
+    if (!dateString) return "Data desconeguda";
+    
     const date = new Date(dateString);
-    return date.toLocaleDateString("es-ES", {
+    if (isNaN(date.getTime())) {
+      return "Data desconeguda";
+    }
+    
+    return date.toLocaleDateString("ca-ES", {
       weekday: "long",
       month: "long",
       day: "numeric",
@@ -344,6 +361,161 @@ export default function LibraryPage() {
     });
 
     return sortedEntries;
+  };
+
+  const getStatusBadge = (status: string) => {
+    const rawStatus = String(status ?? "").toLowerCase() as keyof typeof STATUS_MAP;
+    const meta = STATUS_MAP[rawStatus] ?? {
+      label: status ?? "—",
+      classes: "bg-gray-100 text-gray-800",
+    };
+    return (
+      <Badge variant="secondary" className={meta.classes}>
+        {meta.label}
+      </Badge>
+    );
+  };
+
+  const renderFileTable = (files: AudioFile[]) => {
+    return (
+      <div className="rounded-lg border">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-muted/50">
+              <TableHead>Nom</TableHead>
+              <TableHead>Estat</TableHead>
+              <TableHead>Alumne</TableHead>
+              <TableHead>Data</TableHead>
+              <TableHead className="w-[50px]">Accions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {files.map((file) => (
+              <TableRow 
+                key={file.id}
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => router.push(`/transcribe?audioId=${file.id}`)}
+              >
+                <TableCell>
+                  <div className="flex items-center gap-3">
+                    <FileText className="h-4 w-4 text-muted-foreground" />
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium text-foreground truncate">
+                        {file.customName || file.originalName}
+                      </div>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  {getStatusBadge(file.status)}
+                </TableCell>
+                <TableCell>
+                  <div className="text-sm">
+                    {(() => {
+                      const alumneId = file.alumneId || file.transcription?.alumneId;
+                      if (alumneId) {
+                        const alumne = alumnes.find(a => a.id === alumneId);
+                        return alumne ? alumne.name : "Sense assignar";
+                      }
+                      return "Sense assignar";
+                    })()}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="text-sm text-muted-foreground">
+                    {new Date(file.uploadDate).toLocaleDateString("ca-ES", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 w-8 p-0"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      {file.status === "uploaded" ? (
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleTranscribe(file.id);
+                          }}
+                        >
+                          <FileText className="h-4 w-4 mr-2" />
+                          Transcriure
+                        </DropdownMenuItem>
+                      ) : (
+                        <>
+                          {file.status === "completed" && (
+                            <>
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDownloadPDF(file.transcription!.id);
+                                }}
+                              >
+                                <Download className="h-4 w-4 mr-2" />
+                                Descargar PDF
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDownloadDOCX(file.transcription!.id);
+                                }}
+                              >
+                                <Download className="h-4 w-4 mr-2" />
+                                Descargar Word
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  router.push(`/annotate?audioId=${file.id}`);
+                                }}
+                              >
+                                <PenTool className="h-4 w-4 mr-2" />
+                                Anotar
+                              </DropdownMenuItem>
+                            </>
+                          )}
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEdit(file);
+                            }}
+                          >
+                            <Edit className="h-4 w-4 mr-2" />
+                            Editar
+                          </DropdownMenuItem>
+                        </>
+                      )}
+                      <DropdownMenuItem
+                        className="text-destructive"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(file.id);
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Eliminar
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    );
   };
 
   const renderFileCard = (file: AudioFile) => {
@@ -584,19 +756,15 @@ export default function LibraryPage() {
         ) : (
           <div>
             {filterType === "default" ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {files.map((file) => renderFileCard(file))}
-              </div>
+              renderFileTable(files)
             ) : (
               <div className="space-y-6">
                 {groupFilesByDay(files).map(([dateKey, dayFiles]) => (
                   <div key={dateKey} className="space-y-3">
-                    <h3 className="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-2">
+                    <h3 className="text-md font-semibold text-gray-800 border-b border-gray-200 pb-2">
                       {dateKey}
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                      {dayFiles.map((file) => renderFileCard(file))}
-                    </div>
+                    {renderFileTable(dayFiles)}
                   </div>
                 ))}
               </div>
@@ -777,4 +945,6 @@ export default function LibraryPage() {
       </Sheet>
     </AppLayout>
   );
-}
+});
+
+export default LibraryPage;

@@ -7,23 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { UploadProgress } from "@/types";
-
-export interface AudioUploadResult {
-  audioId: string;
-  filename: string;
-  filePath: string;
-  originalName: string;
-  autoTranscribe: boolean;
-}
-
-interface AudioUploadProps {
-  onUploadComplete: (result: AudioUploadResult) => void;
-  onUploadError: (error: string) => void;
-  autoTranscribe?: boolean;
-  variant?: "default" | "minimal";
-  showUploadedFiles?: boolean;
-}
+import { UploadProgress, AudioUploadResult, AudioUploadProps } from "@/types";
 
 const ACCEPTED_AUDIO_TYPES = {
   "audio/mpeg": [".mp3"],

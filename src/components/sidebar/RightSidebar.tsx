@@ -60,13 +60,13 @@ export function RightSidebar({
         const res = await fetch('/api/alumne')
         if (!res.ok) {
           const data = await res.json().catch(() => ({}))
-          throw new Error(data?.error || 'No se pudieron cargar los alumnos')
+          throw new Error(data?.error || 'No s\'han pogut carregar els alumnes')
         }
         const data = await res.json()
         setAlumnes(data.profiles || [])
         setAlumnesError(null)
       } catch (error) {
-        setAlumnesError(error instanceof Error ? error.message : 'No se pudieron cargar los alumnos')
+        setAlumnesError(error instanceof Error ? error.message : 'No s\'han pogut carregar els alumnes')
       } finally {
         setAlumnesLoading(false)
       }
@@ -91,10 +91,10 @@ export function RightSidebar({
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        throw new Error(data?.error || 'No se pudo asignar el alumno')
+        throw new Error(data?.error || 'No s\'ha pogut assignar l\'alumne')
       }
     } catch (error) {
-      setAlumnesError(error instanceof Error ? error.message : 'No se pudo asignar el alumno')
+      setAlumnesError(error instanceof Error ? error.message : 'No s\'ha pogut assignar l\'alumne')
     } finally {
       setAssigningAlumne(false)
     }
@@ -108,10 +108,7 @@ export function RightSidebar({
     <div className="fixed top-[73px] right-0 bottom-0 w-80 bg-background border-l flex flex-col z-40">
       {/* Header */}
       <div className="p-4 border-b">
-        <h2 className="text-lg font-semibold mb-2">Opciones</h2>
-        <p className="text-sm text-muted-foreground">
-          Exportar y configurar transcripción
-        </p>
+        <h2 className="text-lg font-semibold">Opcions</h2>
       </div>
 
       <div className="flex-1 overflow-y-auto p-5 space-y-6">
@@ -165,7 +162,7 @@ export function RightSidebar({
             ))}
             {speakers.length === 0 && (
               <p className="text-sm text-muted-foreground text-center py-4">
-                No hay speakers configurados
+                No hi ha speakers configurats
               </p>
             )}
           </div>
@@ -188,10 +185,10 @@ export function RightSidebar({
             disabled={alumnesLoading || assigningAlumne}
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder={alumnesLoading ? 'Cargando alumnos...' : 'Selecciona un alumno'} />
+              <SelectValue placeholder={alumnesLoading ? 'Carregant alumnes...' : 'Selecciona un alumne'} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="none">Sense asignar</SelectItem>
+              <SelectItem value="none">Sense assignar</SelectItem>
               {alumnes.map((alumne) => (
                 <SelectItem key={alumne.id} value={alumne.id}>
                   {alumne.name}{' '}

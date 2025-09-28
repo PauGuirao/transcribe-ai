@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import { useTranscriptionData } from '@/hooks/useTranscriptionData';
 import { RightSidebar } from '@/components/sidebar/RightSidebar';
-import { AudioPlayer, AudioPlayerRef } from '@/components/transcription/AudioPlayer';
+import { AudioPlayer } from '@/components/transcription/AudioPlayer';
 import { EditableTranscriptionSegments } from '@/components/transcription/EditableTranscriptionSegments';
 import { EmptyState } from './states/EmptyState';
 import { LoadingState } from './states/LoadingState';
@@ -12,8 +12,7 @@ import { ErrorState } from './states/ErrorState';
 import { ProcessingState } from './states/ProcessingState';
 import { TranscriptionErrorState } from './states/TranscriptionErrorState';
 import { TranscriptionHeader } from './TranscriptionHeader';
-import { AudioUploadResult } from '@/components/audio-upload/AudioUpload';
-import { TranscriptionSegment } from '@/types';
+import { AudioUploadResult, TranscriptionSegment, AudioPlayerRef } from '@/types';
 
 interface MainLayoutProps {
   selectedAudioId?: string;
@@ -131,7 +130,7 @@ export function MainLayout({ selectedAudioId, onAudioSelect, onUploadComplete }:
 
     if (transcription) {
       return (
-        <>
+        <div className="flex-1 flex flex-col bg-gray-50 h-full">
           <TranscriptionHeader
             audio={audio}
             onSaveTitle={saveTitle}
@@ -139,7 +138,7 @@ export function MainLayout({ selectedAudioId, onAudioSelect, onUploadComplete }:
             hasUnsavedChanges={hasUnsavedChanges}
             isSaving={saving}
           />
-          <div className="flex-1 overflow-auto bg-gray-50">
+          <div className="flex-1 overflow-hidden pb-40">
             <EditableTranscriptionSegments
               segments={editedSegments}
               speakers={speakers}
@@ -148,7 +147,7 @@ export function MainLayout({ selectedAudioId, onAudioSelect, onUploadComplete }:
               onSegmentsChange={handleSegmentsChange}
             />
           </div>
-        </>
+        </div>
       );
     }
     
@@ -157,8 +156,8 @@ export function MainLayout({ selectedAudioId, onAudioSelect, onUploadComplete }:
   };
   
   return (
-    <div className="flex h-full bg-background">
-      <div className="flex-1 flex flex-col min-w-0 pb-20">
+    <div className="flex h-screen bg-background overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0">
         {renderContent()}
       </div>
       
