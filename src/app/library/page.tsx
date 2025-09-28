@@ -129,6 +129,7 @@ const LibraryPage = React.memo(function LibraryPage() {
 
   useEffect(() => {
     fetchFiles();
+    loadAlumnes();
   }, []);
 
   const handleDownload = async (
@@ -217,7 +218,6 @@ const LibraryPage = React.memo(function LibraryPage() {
     // Set the currently assigned alumne
     const assignedAlumneId = file.alumneId || file.transcription?.alumneId;
     setSelectedAlumne(assignedAlumneId || 'none');
-    
     loadAlumnes();
   };
 
@@ -225,14 +225,17 @@ const LibraryPage = React.memo(function LibraryPage() {
     try {
       setAlumnesLoading(true);
       setAlumnesError(null);
+      console.log('Loading alumnes...');
       const res = await fetch('/api/alumne');
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new Error(data?.error || 'No se pudieron cargar los alumnos');
       }
       const data = await res.json();
+      console.log('Loaded alumnes:', data.profiles);
       setAlumnes(data.profiles || []);
     } catch (error) {
+      console.error('Error loading alumnes:', error);
       setAlumnesError(error instanceof Error ? error.message : 'No se pudieron cargar los alumnos');
     } finally {
       setAlumnesLoading(false);
@@ -413,11 +416,25 @@ const LibraryPage = React.memo(function LibraryPage() {
                   <div className="text-sm">
                     {(() => {
                       const alumneId = file.alumneId || file.transcription?.alumneId;
-                      if (alumneId) {
-                        const alumne = alumnes.find(a => a.id === alumneId);
-                        return alumne ? alumne.name : "Sense assignar";
+                      console.log('File:', file.id, 'AlumneId:', alumneId, 'Available alumnes:', alumnes.length);
+                      
+                      if (!alumneId) {
+                        return "Sense assignar";
                       }
-                      return "Sense assignar";
+                      
+                      // If we're still loading alumnes, show loading state
+                      if (alumnesLoading) {
+                        return "Carregant...";
+                      }
+                      
+                      // If alumnes are loaded but empty, and we have an alumneId, there might be an issue
+                      if (alumnes.length === 0 && alumneId) {
+                        return "Error carregant alumne";
+                      }
+                      
+                      const alumne = alumnes.find(a => a.id === alumneId);
+                      console.log('Found alumne:', alumne);
+                      return alumne ? alumne.name : "Alumne no trobat";
                     })()}
                   </div>
                 </TableCell>

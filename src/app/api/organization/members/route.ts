@@ -34,6 +34,7 @@ export async function GET(request: NextRequest) {
       'getOrganizationMembersWithProfiles',
       () => batchQuery.getOrganizationMembersWithProfiles(userOrgData.organization.id)
     );
+    console.log('membersData', membersData);
 
     const responseData = {
       organization: userOrgData.organization,

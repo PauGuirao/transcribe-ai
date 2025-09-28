@@ -415,18 +415,18 @@ function InviteModalComponent({ isOpen, onClose }: InviteModalProps) {
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <Mail className="w-4 h-4" />
-              <h3 className="font-medium">Enviar invitación por correo</h3>
+              <h3 className="font-medium">Enviar invitació per correu</h3>
             </div>
             
             <div className="space-y-3">
               <div className="space-y-2">
-                <Label htmlFor="invite-email">Correo electrónico</Label>
+                <Label htmlFor="invite-email">Correu electrònic</Label>
                 <Input
                   id="invite-email"
                   type="email"
                   value={state.emailInvite.email}
                   onChange={(e) => dispatch({ type: 'SET_EMAIL', payload: e.target.value })}
-                  placeholder="usuario@ejemplo.com"
+                  placeholder="usuari@exemple.com"
                   disabled={state.emailInvite.isLoading}
                 />
               </div>
@@ -439,12 +439,12 @@ function InviteModalComponent({ isOpen, onClose }: InviteModalProps) {
                 {state.emailInvite.isLoading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                    Enviando...
+                    Enviant...
                   </>
                 ) : (
                   <>
                     <Mail className="w-4 h-4 mr-2" />
-                    Enviar invitación
+                    Enviar invitació
                   </>
                 )}
               </Button>
@@ -452,7 +452,7 @@ function InviteModalComponent({ isOpen, onClose }: InviteModalProps) {
               {state.emailInvite.success && (
                 <div className="text-sm text-green-600 dark:text-green-400 flex items-center gap-2">
                   <Check className="w-4 h-4" />
-                  Invitación enviada correctamente
+                  Invitació enviada correctament
                 </div>
               )}
 
@@ -463,120 +463,12 @@ function InviteModalComponent({ isOpen, onClose }: InviteModalProps) {
               )}
 
               <p className="text-xs text-gray-500">
-                Se enviará un correo con un enlace de invitación seguro y personalizado válido por 7 días
+                S'enviarà un correu amb un enllaç d'invitació segur i personalitzat vàlid per 7 dies
               </p>
             </div>
           </div>
 
-          {/* Link Invitation Section */}
-          <div className="space-y-4 border-t pt-6">
-            <div className="flex items-center gap-2">
-              <Link className="w-4 h-4" />
-              <h3 className="font-medium">Compartir enlace de invitación</h3>
-            </div>
-            
-            <div className="space-y-3">
-              <div className="flex gap-2">
-                <Input
-                  id="invite-link"
-                  type="text"
-                  value={state.inviteUrl}
-                  readOnly
-                  className="flex-1 font-mono text-sm"
-                  placeholder={state.isLoading ? "Generando enlace..." : ""}
-                />
-                <Button
-                  onClick={copyToClipboard}
-                  disabled={!state.inviteUrl || state.isLoading}
-                  className="px-4 shrink-0"
-                >
-                  {state.isLoading ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : state.isCopied ? (
-                    <>
-                      <Check className="w-4 h-4 mr-2" />
-                      Copiado
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-4 h-4 mr-2" />
-                      Copiar
-                    </>
-                  )}
-                </Button>
-              </div>
-              {state.error && (
-                <div className="text-sm text-red-600 dark:text-red-400 mt-2">
-                  {state.error}
-                </div>
-              )}
-              <p className="text-xs text-gray-500 mt-2">
-                Este enlace permite a cualquier persona unirse a tu organización como miembro
-              </p>
-            </div>
 
-            {/* Social Share Buttons */}
-            <div className="space-y-2">
-              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Compartir vía:
-              </h4>
-              <div className="flex gap-2 justify-center">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={shareViaWhatsApp}
-                  disabled={!state.inviteUrl || state.isLoading}
-                  className="p-2 h-8 w-8"
-                  title="WhatsApp"
-                >
-                  <MessageCircle className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={shareViaEmail}
-                  disabled={!state.inviteUrl || state.isLoading}
-                  className="p-2 h-8 w-8"
-                  title="Email"
-                >
-                  <Mail className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={shareViaTwitter}
-                  disabled={!state.inviteUrl || state.isLoading}
-                  className="p-2 h-8 w-8"
-                  title="Twitter"
-                >
-                  <Twitter className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={shareViaFacebook}
-                  disabled={!state.inviteUrl || state.isLoading}
-                  className="p-2 h-8 w-8"
-                  title="Facebook"
-                >
-                  <Facebook className="w-4 h-4" />
-                </Button>
-                {/* Native Share Button for Mobile */}
-                {isNativeShareAvailable && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={shareViaNative}
-                    disabled={!state.inviteUrl || state.isLoading}
-                    className="p-2 h-8 w-8"
-                    title="Compartir"
-                  >
-                    <Share2 className="w-4 h-4" />
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
         </CardContent>
       </Card>
     </div>

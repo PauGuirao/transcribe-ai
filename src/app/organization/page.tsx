@@ -111,7 +111,7 @@ const OrganizationPage = React.memo(function OrganizationPage() {
         </div>
         <div className="space-y-3">
           <p className="text-sm text-primary-foreground/80">
-            Un pas més per optimitzar les teves sessions clíniques.
+            Un pas més per optimitzar les teves sessions logopèdiques.
           </p>
         </div>
       </div>

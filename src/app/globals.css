@@ -3,9 +3,14 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Prevent page-level scrolling */
+/* Allow scrolling by default */
 html, body {
   height: 100%;
+  overflow: auto;
+}
+
+/* Class to disable scrolling on specific pages */
+.no-scroll {
   overflow: hidden;
 }
 

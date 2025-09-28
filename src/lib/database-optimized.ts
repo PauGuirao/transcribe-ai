@@ -111,7 +111,7 @@ export class BatchQueryBuilder {
     organizationId: string,
     options: QueryOptions = {}
   ): Promise<any[]> {
-    const { limit = 100, orderBy = 'created_at', orderDirection = 'desc' } = options;
+    const { limit = 100 } = options;
 
     // Single query with proper join to get all member data
     const { data, error } = await this.supabase
@@ -122,6 +122,7 @@ export class BatchQueryBuilder {
         organization_id,
         role,
         created_at,
+        joined_at,
         profiles!inner (
           id,
           full_name,
@@ -129,14 +130,41 @@ export class BatchQueryBuilder {
         )
       `)
       .eq('organization_id', organizationId)
-      .order(orderBy, { ascending: orderDirection === 'asc' })
       .limit(limit);
 
     if (error) {
       throw new Error(`Failed to fetch organization members: ${error.message}`);
     }
 
-    return data || [];
+    // Sort members by role priority (admin/owner first), then by join date
+    const sortedData = (data || []).sort((a: any, b: any) => {
+      // Define role priority (lower number = higher priority)
+      const rolePriority = {
+        'owner': 1,
+        'admin': 2,
+        'member': 3
+      };
+      
+      const aPriority = rolePriority[a.role as keyof typeof rolePriority] || 999;
+      const bPriority = rolePriority[b.role as keyof typeof rolePriority] || 999;
+      
+      // First sort by role priority
+      if (aPriority !== bPriority) {
+        return aPriority - bPriority;
+      }
+      
+      // If same role, sort by join date (earliest first for admins/owners, latest first for members)
+      const aDate = new Date(a.created_at).getTime();
+      const bDate = new Date(b.created_at).getTime();
+      
+      if (a.role === 'owner' || a.role === 'admin') {
+        return aDate - bDate; // Earliest first for admin roles
+      } else {
+        return bDate - aDate; // Latest first for regular members
+      }
+    });
+
+    return sortedData;
   }
 
   // Batch audio files query with transcription counts

@@ -380,9 +380,9 @@ const TeamPage = React.memo(function TeamPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Roles</TableHead>
-                      <TableHead>Join Date</TableHead>
+                      <TableHead>Nom</TableHead>
+                      <TableHead>Rols</TableHead>
+                      <TableHead>Data de unió</TableHead>
                       {data.currentUserRole && (data.currentUserRole === 'admin' || data.currentUserRole === 'owner') && (
                         <TableHead className="w-[50px]"></TableHead>
                       )}
@@ -401,7 +401,7 @@ const TeamPage = React.memo(function TeamPage() {
                                     .toUpperCase()}
                                 </AvatarFallback>
                               </Avatar>
-                              {index === 0 && (
+                              {(member.role === 'admin' || member.role === 'owner') && (
                                 <div className="absolute -top-1 -right-1 p-1 bg-primary rounded-full shadow-sm">
                                   <Crown className="h-3 w-3 text-primary-foreground" />
                                 </div>

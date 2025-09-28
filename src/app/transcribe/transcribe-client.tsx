@@ -17,6 +17,16 @@ export default function TranscribeClient() {
     }
   }, [searchParams]);
 
+  // Add no-scroll class to body when component mounts
+  useEffect(() => {
+    document.body.classList.add("no-scroll");
+    
+    // Cleanup: remove the class when component unmounts
+    return () => {
+      document.body.classList.remove("no-scroll");
+    };
+  }, []);
+
   const handleAudioSelect = (audioId: string) => {
     setSelectedAudioId(audioId);
   };

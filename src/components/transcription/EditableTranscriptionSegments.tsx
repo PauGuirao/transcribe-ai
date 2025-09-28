@@ -94,6 +94,11 @@ export function EditableTranscriptionSegments({
   };
 
   const startEditing = (segment: TranscriptionSegment, clickPosition?: number) => {
+    // Save current edit before starting a new one
+    if (editingSegmentId !== null && editingSegmentId !== segment.id) {
+      saveEdit();
+    }
+    
     setEditingSegmentId(segment.id);
     setEditText(segment.text.trim());
     setCursorPosition(clickPosition ?? segment.text.trim().length);
@@ -429,6 +434,10 @@ export function EditableTranscriptionSegments({
                     ref={textareaRef}
                     value={editText}
                     onChange={(e) => setEditText(e.target.value)}
+                    onBlur={() => {
+                      // Save changes when focus is lost
+                      saveEdit();
+                    }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();

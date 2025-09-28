@@ -220,7 +220,7 @@ const ProfilesPage = React.memo(function ProfilesPage() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-2">
               <h1 className="text-2xl font-bold tracking-tight">Alumnat</h1>
-              <p className="text-muted-foreground text-lg">
+              <p className="text-muted-foreground text-md">
                 Gestiona els teus alumnes per vincular-los ràpidament a transcripcions i anotacions.
               </p>
             </div>
@@ -447,7 +447,7 @@ const ProfilesPage = React.memo(function ProfilesPage() {
                                       {transcriptions.map((transcription) => (
                                         <Link
                                           key={transcription.id}
-                                          href={`/transcription/${transcription.id}`}
+                                          href={`/transcribe?audioId=${transcription.audioId}`}
                                           className="block rounded-lg border border-border/60 bg-card/50 p-4 transition-all duration-200 hover:bg-card/80 hover:shadow-sm"
                                         >
                                           <div className="flex items-center justify-between">

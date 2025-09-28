@@ -54,7 +54,8 @@ export async function GET(request: NextRequest) {
               confidence,
               status,
               created_at,
-              updated_at
+              updated_at,
+              alumne_id
             )
           `,
           filters: {
@@ -82,7 +83,8 @@ export async function GET(request: NextRequest) {
               confidence,
               status,
               created_at,
-              updated_at
+              updated_at,
+              alumne_id
             )
           `,
           filters: {
