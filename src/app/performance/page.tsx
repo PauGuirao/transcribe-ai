@@ -69,8 +69,10 @@ export default function PerformancePage() {
       ]);
 
       if (perfResponse.ok) {
-        const perfData = await perfResponse.json();
-        setPerformanceData(perfData);
+        const perfResponse_data = await perfResponse.json();
+        if (perfResponse_data.success && perfResponse_data.data) {
+          setPerformanceData(perfResponse_data.data);
+        }
       }
 
       if (queueResponse.ok) {
@@ -218,7 +220,7 @@ export default function PerformancePage() {
       )}
 
       {/* Query Performance */}
-      {performanceData && (
+      {performanceData?.performanceMonitor && (
         <Card>
           <CardHeader>
             <CardTitle>Query Performance</CardTitle>
@@ -227,23 +229,23 @@ export default function PerformancePage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div>
                 <div className="text-sm text-muted-foreground">Total Queries</div>
-                <div className="text-2xl font-bold">{performanceData.performanceMonitor.totalQueries}</div>
+                <div className="text-2xl font-bold">{performanceData.performanceMonitor.totalQueries || 0}</div>
               </div>
               <div>
                 <div className="text-sm text-muted-foreground">Avg Time</div>
-                <div className="text-2xl font-bold">{performanceData.performanceMonitor.averageExecutionTime}ms</div>
+                <div className="text-2xl font-bold">{performanceData.performanceMonitor.averageExecutionTime || 0}ms</div>
               </div>
               <div>
                 <div className="text-sm text-muted-foreground">Slow Queries</div>
-                <div className="text-2xl font-bold">{performanceData.performanceMonitor.slowQueries}</div>
+                <div className="text-2xl font-bold">{performanceData.performanceMonitor.slowQueries || 0}</div>
               </div>
               <div>
                 <div className="text-sm text-muted-foreground">Error Rate</div>
-                <div className="text-2xl font-bold">{(performanceData.performanceMonitor.errorRate * 100).toFixed(1)}%</div>
+                <div className="text-2xl font-bold">{((performanceData.performanceMonitor.errorRate || 0) * 100).toFixed(1)}%</div>
               </div>
             </div>
 
-            {performanceData.performanceMonitor.topSlowQueries.length > 0 && (
+            {performanceData.performanceMonitor.topSlowQueries && performanceData.performanceMonitor.topSlowQueries.length > 0 && (
               <div>
                 <h3 className="text-lg font-semibold mb-3">Slowest Queries</h3>
                 <div className="space-y-2">
