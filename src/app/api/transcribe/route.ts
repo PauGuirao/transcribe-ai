@@ -141,33 +141,32 @@ export async function processTranscription(
 
     const TOKEN_COST = 1;
 
-    const { data: remainingTokens, error: tokenError } = await supabase.rpc(
-      "decrement_tokens",
+    // Use atomic transaction to start transcription
+    const { data: transcriptionResult, error: transcriptionError } = await supabase.rpc(
+      "start_transcription",
       {
-        user_id: userId,
-        amount: TOKEN_COST,
+        p_user_id: userId,
+        p_audio_id: audioId,
+        p_token_cost: TOKEN_COST,
       }
     );
 
-    if (tokenError || typeof remainingTokens !== "number") {
-      console.error("Token deduction error:", tokenError);
+    if (transcriptionError || !transcriptionResult?.success) {
+      console.error("Transcription start error:", transcriptionError || transcriptionResult?.error);
       return NextResponse.json(
         {
           success: false,
-          error:
-            tokenError?.message ||
+          error: transcriptionResult?.error || transcriptionError?.message || 
             "No cuentas con tokens suficientes para transcribir más audios.",
         },
         { status: 402 }
       );
     }
 
+    const remainingTokens = transcriptionResult.remaining_tokens;
+
     try {
-      await supabase
-        .from("audios")
-        .update({ status: "processing" })
-        .eq("id", audioId)
-        .eq("user_id", userId);
+      // Audio status is already updated to 'processing' by the start_transcription function
 
       const { data: audioData, error: downloadError } = await supabase.storage
         .from("audio-files")

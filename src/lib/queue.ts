@@ -101,13 +101,12 @@ class TranscriptionQueue extends EventEmitter {
         console.log(`🔄 Retrying item ${item.id} (attempt ${item.retries}/${item.maxRetries})`);
         this.emit('itemRetried', item);
       } else {
-        console.log(`💀 Item ${item.id} failed after ${item.maxRetries} retries`);
+        console.error(`💀 Max retries exceeded for item ${item.id}`);
         this.emit('itemFailed', item, error);
       }
     } finally {
       this.processing.delete(item.id);
-      console.log(`🏁 Finished processing ${item.id}, scheduling next item`);
-      // Process next item
+      // Process next item after a small delay to prevent overwhelming
       setTimeout(() => this.processNext(), 100);
     }
   }
