@@ -28,7 +28,7 @@ export function AuthHeader() {
   if (!user) {
     return (
       <Button
-        onClick={signInWithGoogle}
+        onClick={() => signInWithGoogle()}
         variant="outline"
         size="sm"
         className="flex items-center space-x-2"
