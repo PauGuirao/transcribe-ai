@@ -48,32 +48,140 @@ export interface OrganizationData {
 export async function waitForProfileCreation(
   supabase: any,
   userId: string,
-  maxRetries: number = 5
+  maxRetries: number = 8
 ): Promise<ProfileData | null> {
   let existingProfile = null;
   let retryCount = 0;
   
+  // Exponential backoff delays: 100ms, 200ms, 400ms, 800ms, 1600ms, 3200ms, 6400ms, 12800ms
+  const getDelay = (attempt: number) => Math.min(100 * Math.pow(2, attempt), 5000);
+  
+  console.log(`🔍 Starting profile creation wait for user ${userId}`);
+  
   while (!existingProfile && retryCount < maxRetries) {
-    const { data } = await supabase
-      .from("profiles")
-      .select("id, welcome_sent, current_organization_id")
-      .eq("id", userId)
-      .single();
-    
-    existingProfile = data;
-    
-    if (!existingProfile) {
-      console.log(`Profile not found for user ${userId}, waiting... (attempt ${retryCount + 1})`);
-      await new Promise(resolve => setTimeout(resolve, 500));
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, welcome_sent, current_organization_id, email, full_name")
+        .eq("id", userId)
+        .single();
+      
+      if (error) {
+        console.log(`⚠️ Profile query error for user ${userId} (attempt ${retryCount + 1}): ${error.message}`);
+      }
+      
+      existingProfile = data;
+      
+      if (!existingProfile) {
+        const delay = getDelay(retryCount);
+        console.log(`⏳ Profile not found for user ${userId}, waiting ${delay}ms... (attempt ${retryCount + 1}/${maxRetries})`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        retryCount++;
+      } else {
+        console.log(`✅ Profile found for user ${userId} after ${retryCount + 1} attempts`);
+      }
+    } catch (error) {
+      console.error(`💥 Unexpected error checking profile for user ${userId}:`, error);
+      const delay = getDelay(retryCount);
+      await new Promise(resolve => setTimeout(resolve, delay));
       retryCount++;
     }
   }
   
   if (!existingProfile) {
-    console.error(`Profile creation failed for user ${userId} after ${maxRetries} attempts`);
+    console.error(`❌ Profile creation failed for user ${userId} after ${maxRetries} attempts`);
   }
   
   return existingProfile;
+}
+
+// Fallback profile creation function
+export async function createProfileFallback(
+  supabase: any,
+  user: AuthUser
+): Promise<ProfileData | null> {
+  console.log(`🛠️ Attempting fallback profile creation for user ${user.id}`);
+  
+  try {
+    const userName = user.user_metadata?.full_name || 
+                    user.email?.split('@')[0] || 
+                    'User';
+    
+    // Create profile
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .insert({
+        id: user.id,
+        email: user.email,
+        tokens: 2,
+        plan_type: 'Gratis',
+        full_name: userName,
+        welcome_sent: false
+      })
+      .select("id, welcome_sent, current_organization_id")
+      .single();
+    
+    if (profileError) {
+      console.error(`❌ Fallback profile creation failed:`, profileError);
+      return null;
+    }
+    
+    console.log(`✅ Fallback profile created successfully for user ${user.id}`);
+    
+    // Create organization
+    const { data: organization, error: orgError } = await supabase
+      .from("organizations")
+      .insert({
+        name: 'test',
+        owner_id: user.id,
+        plan_type: 'individual',
+        max_members: 1,
+        subscription_status: 'inactive',
+        settings: {}
+      })
+      .select("id")
+      .single();
+    
+    if (orgError) {
+      console.error(`⚠️ Fallback organization creation failed:`, orgError);
+      // Profile exists, continue without organization
+      return profile;
+    }
+    
+    // Create organization member record
+    const { error: memberError } = await supabase
+      .from("organization_members")
+      .insert({
+        organization_id: organization.id,
+        user_id: user.id,
+        role: 'owner',
+        joined_at: new Date().toISOString()
+      });
+    
+    if (memberError) {
+      console.error(`⚠️ Fallback organization member creation failed:`, memberError);
+    }
+    
+    // Update profile with organization
+    const { data: updatedProfile, error: updateError } = await supabase
+      .from("profiles")
+      .update({ current_organization_id: organization.id })
+      .eq("id", user.id)
+      .select("id, welcome_sent, current_organization_id")
+      .single();
+    
+    if (updateError) {
+      console.error(`⚠️ Fallback profile organization update failed:`, updateError);
+      return profile; // Return original profile
+    }
+    
+    console.log(`✅ Fallback profile setup completed for user ${user.id}`);
+    return updatedProfile || profile;
+    
+  } catch (error) {
+    console.error(`💥 Fallback profile creation failed for user ${user.id}:`, error);
+    return null;
+  }
 }
 
 export async function sendWelcomeEmailIfNeeded(

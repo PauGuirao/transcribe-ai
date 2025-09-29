@@ -7,9 +7,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, LogIn } from "lucide-react";
+import { WelcomePopup } from "@/components/WelcomePopup";
 
 const SignInContent = React.memo(function SignInContent() {
   const [loading, setLoading] = useState(false);
+  const [showWelcomePopup, setShowWelcomePopup] = useState(false);
+  const [welcomeData, setWelcomeData] = useState<{ organizationName: string; userName: string }>({ organizationName: "", userName: "" });
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, signInWithGoogle } = useAuth();
@@ -17,6 +20,57 @@ const SignInContent = React.memo(function SignInContent() {
 
   useEffect(() => {
     if (user) {
+      // Check if there's an invitation token cookie first
+      const inviteTokenMatch = document.cookie.match(/invite_token=([^;]+)/);
+      const inviteToken = inviteTokenMatch ? inviteTokenMatch[1] : null;
+      
+      if (inviteToken) {
+        // If there's an invitation token, process it directly here to avoid infinite loop
+        console.log(`Found invitation token during signin: ${inviteToken}`);
+        
+        // Process the invitation by calling the API directly
+        const processInvitation = async () => {
+          try {
+            const response = await fetch("/api/organization/invite/join", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ token: inviteToken }),
+            });
+
+            // Clear the invite token cookie after processing (success or failure)
+            document.cookie = `invite_token=; path=/; max-age=0; SameSite=Lax`;
+
+            if (response.ok) {
+              console.log("Invitation processed successfully from signin page");
+              const data = await response.json();
+              
+              // Set welcome popup data
+              setWelcomeData({
+                organizationName: data.organization?.name || "the organization",
+                userName: user?.user_metadata?.full_name || user?.email || ""
+              });
+              
+              // Show welcome popup instead of immediate redirect
+              setShowWelcomePopup(true);
+            } else {
+              console.error("Failed to process invitation from signin page");
+              // On error, redirect to dashboard as fallback
+              router.push("/dashboard");
+            }
+          } catch (error) {
+            console.error("Error processing invitation from signin page:", error);
+            // Clear cookie and redirect to dashboard on error
+            document.cookie = `invite_token=; path=/; max-age=0; SameSite=Lax`;
+            router.push("/dashboard");
+          }
+        };
+
+        processInvitation();
+        return;
+      }
+      
       // If there's a returnUrl, redirect there, otherwise go to dashboard
       const redirectTo = returnUrl || "/dashboard";
       router.push(redirectTo);
@@ -105,6 +159,17 @@ const SignInContent = React.memo(function SignInContent() {
             </p>
           </CardContent>
         </Card>
+        
+        {/* Welcome Popup */}
+        <WelcomePopup
+          isOpen={showWelcomePopup}
+          onClose={() => {
+            setShowWelcomePopup(false);
+            router.push("/team");
+          }}
+          organizationName={welcomeData.organizationName}
+          userName={welcomeData.userName}
+        />
       </div>
     </div>
   );

@@ -24,9 +24,12 @@ export async function processInvitation(
 ): Promise<NextResponse> {
   console.log(`Found invite token: ${inviteToken}`);
   
+  let inviteData: any = null;
+  
   try {
     // Find the invitation by token
-    const { data: inviteData, isSecure } = await findInvitationByToken(supabase, inviteToken);
+    const { data, isSecure } = await findInvitationByToken(supabase, inviteToken);
+    inviteData = data;
     
     if (!inviteData) {
       console.log(`No invitation found for token: ${inviteToken}`);
@@ -86,8 +89,12 @@ export async function processInvitation(
   // Clear the invitation token cookie
   cookieStore.set('invite_token', '', { maxAge: 0 });
   
-  // Always redirect to team page for invitation flows
-  return NextResponse.redirect(`${origin}/team`);
+  // Redirect to team page with welcome popup parameters for invitation flows
+  if (inviteData?.organization_id) {
+    return NextResponse.redirect(`${origin}/team?welcome=true&org=${encodeURIComponent(inviteData.organization_id)}`);
+  } else {
+    return NextResponse.redirect(`${origin}/team`);
+  }
 }
 
 export function hasInvitationToken(cookieStore: any): string | null {

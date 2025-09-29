@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Users, CheckCircle, XCircle, Building2, UserPlus, ArrowRight, Shield } from "lucide-react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { WelcomePopup } from "@/components/WelcomePopup";
 
 interface OrganizationInfo {
   id: string;
@@ -28,17 +29,48 @@ const InvitePage = React.memo(function InvitePage() {
   const [isJoining, setIsJoining] = useState(false);
   const [joinResult, setJoinResult] = useState<{ success: boolean; message: string } | null>(null);
   const [user, setUser] = useState<any>(null);
+  const [showWelcomePopup, setShowWelcomePopup] = useState(false);
   
   const supabase = createClientComponentClient();
 
   const checkUser = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    setUser(user);
+    try {
+      // First try to get the session (more reliable for client-side)
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error('Session error:', sessionError);
+        setUser(null);
+        return;
+      }
+
+      if (session?.user) {
+        console.log('User found via session:', session.user);
+        setUser(session.user);
+        return;
+      }
+
+      // Fallback to getUser if no session
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError) {
+        console.error('User error:', userError);
+        setUser(null);
+        return;
+      }
+
+      console.log('User check response:', user);
+      setUser(user);
+    } catch (error) {
+      console.error('Error checking user:', error);
+      setUser(null);
+    }
   }, [supabase]);
 
   const validateInvite = useCallback(async () => {
     try {
       const response = await fetch(`/api/organization/invite/validate?token=${token}`);
+      console.log('Invite validation response:', response);
       const data = await response.json();
       setValidation(data);
     } catch (error) {
@@ -47,25 +79,45 @@ const InvitePage = React.memo(function InvitePage() {
   }, [token]);
 
   useEffect(() => {
-    // Combine both validation and user check in a single effect to prevent multiple calls
+    // Add auth state listener to handle real-time auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.id);
+        
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          setUser(session?.user || null);
+        } else if (event === 'SIGNED_OUT') {
+          setUser(null);
+        }
+      }
+    );
+
+    // Initial checks
     const initializePage = async () => {
       await validateInvite();
       await checkUser();
     };
     
     initializePage();
-  }, [validateInvite, checkUser]);
+
+    // Cleanup subscription on unmount
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [validateInvite, checkUser, supabase.auth]);
 
   const handleJoinOrganization = useCallback(async () => {
     if (!user) {
-      // Store the invite token in a cookie and redirect to signin
-      // The auth callback will handle the actual joining process
+      console.log('User not found, redirecting to signin');
       document.cookie = `invite_token=${token}; path=/; max-age=3600; SameSite=Lax`;
       router.push(`/auth/signin`);
       return;
     }
 
     // If user is already authenticated, call the join API directly
+    // Set the invite token cookie for consistency with the auth callback flow
+    document.cookie = `invite_token=${token}; path=/; max-age=3600; SameSite=Lax`;
+    
     setIsJoining(true);
     try {
       const response = await fetch("/api/organization/invite/join", {
@@ -80,14 +132,20 @@ const InvitePage = React.memo(function InvitePage() {
       
       if (response.ok) {
         setJoinResult({ success: true, message: "T'has unit correctament a l'organització!" });
-        // Redirect to team page after a short delay
-        setTimeout(() => {
-          router.push("/team");
-        }, 2000);
+        
+        // Clear the invite token cookie after successful processing
+        document.cookie = `invite_token=; path=/; max-age=0; SameSite=Lax`;
+        
+        // Show welcome popup
+        setShowWelcomePopup(true);
       } else {
+        // Clear the invite token cookie on error as well
+        document.cookie = `invite_token=; path=/; max-age=0; SameSite=Lax`;
         setJoinResult({ success: false, message: data.error || "No s'ha pogut unir a l'organització" });
       }
     } catch (error) {
+      // Clear the invite token cookie on error
+      document.cookie = `invite_token=; path=/; max-age=0; SameSite=Lax`;
       setJoinResult({ success: false, message: "S'ha produït un error en unir-se" });
     } finally {
       setIsJoining(false);
@@ -287,6 +345,17 @@ const InvitePage = React.memo(function InvitePage() {
           </div>
         </CardContent>
       </Card>
+      
+      {/* Welcome Popup */}
+      <WelcomePopup
+        isOpen={showWelcomePopup}
+        onClose={() => {
+          setShowWelcomePopup(false);
+          router.push("/team");
+        }}
+        organizationName={validation?.organization?.name || ""}
+        userName={user?.user_metadata?.full_name || user?.email || ""}
+      />
     </div>
   );
 });

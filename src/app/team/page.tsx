@@ -33,6 +33,7 @@ import {
 import AppLayout from "@/components/layout/AppLayout";
 import { InviteModal } from "@/components/team/InviteModal";
 import UpgradeModal from "@/components/UpgradeModal";
+import { WelcomePopup } from "@/components/WelcomePopup";
 
 interface OrganizationMember {
   id: string;
@@ -74,6 +75,7 @@ const TeamPage = React.memo(function TeamPage() {
   const [memberToRemove, setMemberToRemove] = useState<OrganizationMember | null>(null);
   const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
+  const [showWelcomePopup, setShowWelcomePopup] = useState(false);
 
   const handleInviteClick = () => {
     // Check if user has individual plan
@@ -138,6 +140,20 @@ const TeamPage = React.memo(function TeamPage() {
     setIsRemoveDialogOpen(false);
     setMemberToRemove(null);
   };
+
+  useEffect(() => {
+    // Check for welcome popup trigger from auth callback
+    const urlParams = new URLSearchParams(window.location.search);
+    const showWelcome = urlParams.get('welcome');
+    const orgName = urlParams.get('org');
+    
+    if (showWelcome === 'true' && orgName && organization) {
+      setShowWelcomePopup(true);
+      // Clean up URL parameters
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+    }
+  }, [organization]);
 
   useEffect(() => {
     // While AuthContext is loading, show loading state
@@ -509,6 +525,14 @@ const TeamPage = React.memo(function TeamPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      
+      {/* Welcome Popup */}
+      <WelcomePopup
+        isOpen={showWelcomePopup}
+        onClose={() => setShowWelcomePopup(false)}
+        organizationName={organization?.name || ""}
+        userName={user?.user_metadata?.full_name || user?.email || ""}
+      />
     </AppLayout>
   );
 });
