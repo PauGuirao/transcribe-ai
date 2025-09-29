@@ -95,15 +95,20 @@ export async function POST(request: NextRequest) {
 
       const jobId = jobResult.job_id;
 
-      // Forward to Cloudflare Worker ingest
+      // Forward to Cloudflare Worker
       try {
+        // Use direct endpoint for Workers AI, queue endpoint for Replicate
+        const endpoint = provider === "workers-ai" ? "/transcribe-direct" : "/ingest";
+        const baseUrl = CF_INGEST_URL.replace(/\/ingest$/, "");
+        const targetUrl = `${baseUrl}${endpoint}`;
+
         const headers: Record<string, string> = {
           "Content-Type": "application/json",
         };
         if (CF_INGEST_API_KEY) {
           headers["Authorization"] = `Bearer ${CF_INGEST_API_KEY}`;
         }
-        const res = await fetch(`${CF_INGEST_URL}/ingest`, {
+        const res = await fetch(targetUrl, {
           method: "POST",
           headers,
           body: JSON.stringify({
@@ -118,23 +123,27 @@ export async function POST(request: NextRequest) {
         });
         if (!res.ok) {
           const text = await res.text();
-          console.error("Cloudflare ingest failed:", res.status, text);
+          console.error("Cloudflare processing failed:", res.status, text);
           return NextResponse.json(
-            { success: false, error: "Failed to enqueue job" },
+            { success: false, error: "Failed to process transcription" },
             { status: 502 }
           );
         }
       } catch (err) {
-        console.error("Cloudflare ingest error:", err);
+        console.error("Cloudflare processing error:", err);
         return NextResponse.json(
-          { success: false, error: "Failed to enqueue job" },
+          { success: false, error: "Failed to process transcription" },
           { status: 502 }
         );
       }
 
+      const message = provider === "workers-ai" 
+        ? "Transcription processed successfully" 
+        : "Transcription queued successfully";
+
       return NextResponse.json({
         success: true,
-        message: "Job enqueued",
+        message,
         jobId,
         status: "pending",
       });

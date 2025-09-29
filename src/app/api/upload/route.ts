@@ -299,7 +299,7 @@ export async function POST(request: NextRequest) {
           filename: uniqueFilename,
           originalName: file.name,
           filePath: uploadData.path,
-          provider: "replicate",
+          provider: "workers-ai",
         }),
       })
         .then((response) => {

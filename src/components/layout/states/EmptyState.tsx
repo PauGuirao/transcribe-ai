@@ -56,7 +56,7 @@ export function EmptyState({
           filename: pendingUpload.filename, // Added this line
           originalName: pendingUpload.originalName, // Added this line
           filePath: pendingUpload.filePath,
-          provider: "replicate",
+          provider: "workers-ai",
         }),
       });
 
