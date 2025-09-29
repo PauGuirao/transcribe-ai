@@ -127,7 +127,7 @@ export function MainLayout({ selectedAudioId, onAudioSelect, onUploadComplete }:
     if (error) return <ErrorState message={error} onRetry={fetchData} />;
     
     // Handle all non-completed statuses as processing/loading states
-    if (audio?.status === 'processing' || audio?.status === 'pending') {
+    if (audio?.status === 'processing' || audio?.status === 'pending' || audio?.status === 'uploaded') {
       return <ProcessingState />;
     }
     

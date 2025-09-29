@@ -5,9 +5,11 @@ import { useSearchParams } from "next/navigation";
 import AppLayout from "@/components/layout/AppLayout";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { AudioUploadResult } from "@/types";
+import { useRouter } from "next/navigation";
 
 export default function TranscribeClient() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [selectedAudioId, setSelectedAudioId] = useState<string | undefined>();
 
   useEffect(() => {
@@ -17,21 +19,23 @@ export default function TranscribeClient() {
     }
   }, [searchParams]);
 
-  // Add no-scroll class to body when component mounts
+  // Keep URL in sync when selectedAudioId changes and URL is missing or different
   useEffect(() => {
-    document.body.classList.add("no-scroll");
-    
-    // Cleanup: remove the class when component unmounts
-    return () => {
-      document.body.classList.remove("no-scroll");
-    };
-  }, []);
+    if (selectedAudioId) {
+      const current = searchParams.get("audioId");
+      if (current !== selectedAudioId) {
+        router.replace(`/transcribe?audioId=${selectedAudioId}`);
+      }
+    }
+  }, [selectedAudioId]);
 
   const handleAudioSelect = (audioId: string) => {
+    router.push(`/transcribe?audioId=${audioId}`);
     setSelectedAudioId(audioId);
   };
 
   const handleUploadComplete = (result: AudioUploadResult) => {
+    router.push(`/transcribe?audioId=${result.audioId}`);
     setSelectedAudioId(result.audioId);
   };
 

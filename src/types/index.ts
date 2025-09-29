@@ -5,7 +5,7 @@ export interface Audio {
   customName?: string;
   filePath: string;
   uploadDate: Date;
-  status: "pending" | "processing" | "completed" | "error";
+  status: "pending" | "uploaded" | "processing" | "completed" | "error";
   transcription?: Transcription;
 }
 
