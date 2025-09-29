@@ -151,6 +151,12 @@ export function MainLayout({ selectedAudioId, onAudioSelect, onUploadComplete }:
       );
     }
     
+    // If audio is completed but no transcription yet, show loading state
+    // This handles the case where the Worker just finished but the transcription file isn't available yet
+    if (audio?.status === 'completed' && !transcription) {
+      return <LoadingState />;
+    }
+    
     // Fallback for when there's an audio but no transcription or other state
     return <div className="flex-1 flex items-center justify-center">No transcription available.</div>
   };

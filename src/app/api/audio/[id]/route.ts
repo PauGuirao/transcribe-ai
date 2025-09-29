@@ -120,12 +120,16 @@ export async function GET(
             `No transcription JSON found for audio ${audioFile.id}:`,
             storageError
           );
+          // If audio is completed but transcription file is not available yet,
+          // return null transcription so the frontend can show loading state
         }
       } catch (error) {
         console.error(
           `Error fetching transcription JSON for audio ${audioFile.id}:`,
           error
         );
+        // If there's an error fetching transcription but audio is completed,
+        // return null transcription so the frontend can handle it appropriately
       }
     }
 
