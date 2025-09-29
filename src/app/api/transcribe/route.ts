@@ -1,20 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import Replicate from "replicate";
-import { transcribeAudioWithTimestamps } from "@/lib/openai";
-import { transcriptionQueue } from '@/lib/queue';
-import { performanceMonitor, withPerformanceTracking } from '@/lib/performance';
-const replicateToken = process.env.REPLICATE_API_TOKEN;
+// Removed inline Replicate/OpenAI processing and local in-memory queue (migrated to Cloudflare Workers)
+import { performanceMonitor } from '@/lib/performance';
+import { createHash } from "crypto";
 
-if (!replicateToken) {
-  throw new Error("Missing REPLICATE_API_TOKEN environment variable");
-}
-
-const replicate = new Replicate({ auth: replicateToken });
-const replicateWhisperVersion =
-  process.env.REPLICATE_WHISPER_VERSION ??
-  "openai/whisper:8099696689d249cf8b122d833c36ac3f75505c666a395ca40ef26f68e7d3d16e";
+const CF_INGEST_URL = process.env.CLOUDFLARE_INGEST_URL;
+const CF_INGEST_API_KEY = process.env.CLOUDFLARE_INGEST_API_KEY;
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
@@ -62,7 +54,6 @@ export async function POST(request: NextRequest) {
       originalName,
       filePath,
       provider = "openai",
-      queueId,
     } = await request.json();
 
     if (!audioId) {
@@ -76,35 +67,84 @@ export async function POST(request: NextRequest) {
     }
 
     console.log(`🔄 Processing transcription for audioId: ${audioId}`);
-    // If this is a queued request, process immediately
-    if (queueId) {
-      console.log(`🔄 Processing queued transcription for audioId: ${audioId}`);
-      return await processTranscription(audioId, filename, originalName, filePath, provider, user.id, supabase);
+    // Legacy inline processing path removed (migrated to Cloudflare Workers)
+
+    // New ingestion path: if Cloudflare Worker ingest URL is configured, create durable job and forward to Worker
+    if (CF_INGEST_URL) {
+      const idempotencyKey = createHash("sha256")
+        .update(`${userId}:${audioId}:${filePath || ''}:${originalName || filename || ''}`)
+        .digest("hex");
+
+      const { data: jobResult, error: jobErr } = await supabase.rpc(
+        "upsert_transcription_job",
+        {
+          p_user_id: userId,
+          p_audio_id: audioId,
+          p_idempotency_key: idempotencyKey,
+          p_provider: provider,
+        }
+      );
+
+      if (jobErr || !jobResult?.success) {
+        console.error("Job upsert error:", jobErr || jobResult?.error);
+        return NextResponse.json(
+          { success: false, error: "Failed to create transcription job" },
+          { status: 500 }
+        );
+      }
+
+      const jobId = jobResult.job_id;
+
+      // Forward to Cloudflare Worker ingest
+      try {
+        const headers: Record<string, string> = {
+          "Content-Type": "application/json",
+        };
+        if (CF_INGEST_API_KEY) {
+          headers["Authorization"] = `Bearer ${CF_INGEST_API_KEY}`;
+        }
+        const res = await fetch(`${CF_INGEST_URL}/ingest`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            jobId,
+            userId,
+            audioId,
+            filename,
+            originalName,
+            filePath,
+            provider,
+          }),
+        });
+        if (!res.ok) {
+          const text = await res.text();
+          console.error("Cloudflare ingest failed:", res.status, text);
+          return NextResponse.json(
+            { success: false, error: "Failed to enqueue job" },
+            { status: 502 }
+          );
+        }
+      } catch (err) {
+        console.error("Cloudflare ingest error:", err);
+        return NextResponse.json(
+          { success: false, error: "Failed to enqueue job" },
+          { status: 502 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: "Job enqueued",
+        jobId,
+        status: "pending",
+      });
     }
 
-    // For new requests, add to queue
-    const queueItemId = `transcribe_${audioId}_${Date.now()}`;
-    console.log(`🔄 Adding transcription to queue with ID: ${queueItemId}`);
-    
-    transcriptionQueue.add({
-      id: queueItemId,
-      audioId,
-      userId: user.id,
-      filename,
-      originalName,
-      filePath,
-      provider,
-      priority: 1,
-      maxRetries: 3,
-    });
-    console.log(`🔄 Transcription added to queue with ID: ${queueItemId}`);
-
-    return NextResponse.json({ 
-      message: 'Transcription queued successfully',
-      queueId: queueItemId,
-      position: transcriptionQueue.getPosition(queueItemId),
-      status: transcriptionQueue.getQueueStatus()
-    });
+    // Legacy fallback removed: Cloudflare ingest must be configured; otherwise return error
+    return NextResponse.json(
+      { success: false, error: 'Cloudflare ingest not configured' },
+      { status: 500 }
+    );
 
   } catch (error) {
     success = false;
@@ -115,286 +155,5 @@ export async function POST(request: NextRequest) {
     );
   } finally {
     performanceMonitor.logRequest('/api/transcribe', startTime, success, userId);
-  }
-}
-
-export async function processTranscription(
-  audioId: string,
-  filename: string,
-  originalName: string,
-  filePath: string,
-  provider: string,
-  userId: string,
-  supabase: any
-) {
-  try {
-
-    if (!filename || !filePath) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Filename and filePath are required",
-        },
-        { status: 400 }
-      );
-    }
-
-    const TOKEN_COST = 1;
-
-    // Use atomic transaction to start transcription
-    const { data: transcriptionResult, error: transcriptionError } = await supabase.rpc(
-      "start_transcription",
-      {
-        p_user_id: userId,
-        p_audio_id: audioId,
-        p_token_cost: TOKEN_COST,
-      }
-    );
-
-    if (transcriptionError || !transcriptionResult?.success) {
-      console.error("Transcription start error:", transcriptionError || transcriptionResult?.error);
-      return NextResponse.json(
-        {
-          success: false,
-          error: transcriptionResult?.error || transcriptionError?.message || 
-            "No cuentas con tokens suficientes para transcribir más audios.",
-        },
-        { status: 402 }
-      );
-    }
-
-    const remainingTokens = transcriptionResult.remaining_tokens;
-
-    try {
-      // Audio status is already updated to 'processing' by the start_transcription function
-
-      const { data: audioData, error: downloadError } = await supabase.storage
-        .from("audio-files")
-        .download(filePath);
-
-      if (downloadError || !audioData) {
-        console.error("Download error:", downloadError);
-        throw new Error("Failed to download audio file from storage");
-      }
-
-      const audioBuffer = await audioData.arrayBuffer();
-      const audioFile = new File([audioBuffer], originalName || filename, {
-        type: getContentType(originalName || filename),
-      });
-      
-      console.log(`🔄 Processing audio file: ${originalName || filename}`);
-      if (provider === "replicate") {
-        const buffer = Buffer.from(audioBuffer);
-        const contentType = getContentType(originalName || filename);
-        const audioDataUrl = `data:${contentType};base64,${buffer.toString(
-          "base64"
-        )}`;
-        // Use the correct production URL for webhooks
-        const origin = 'https://www.transcriu.com';
-
-        const webhookUrl = `${origin}/api/replicate/webhook`;
-        console.log("=== REPLICATE WEBHOOK CONFIG ===");
-        console.log(JSON.stringify({
-          timestamp: new Date().toISOString(),
-          origin,
-          webhookUrl,
-          vercelUrl: process.env.VERCEL_URL,
-          audioId
-        }, null, 2));
-
-        const prediction = await replicate.predictions.create({
-          version: replicateWhisperVersion,
-          input: {
-            audio: audioDataUrl,
-            language: "auto",
-            translate: false,
-            temperature: 0,
-            transcription: "plain text",
-            suppress_tokens: "-1",
-            logprob_threshold: -1,
-            no_speech_threshold: 0.6,
-            condition_on_previous_text: true,
-            compression_ratio_threshold: 2.4,
-            temperature_increment_on_fallback: 0.2,
-          },
-          webhook: webhookUrl,
-          webhook_events_filter: ["completed"],
-        });
-
-        await supabase.from("transcriptions").upsert(
-          {
-            id: audioId,
-            audio_id: audioId,
-            user_id: userId,
-            status: "processing",
-            prediction_id: prediction.id,
-          },
-          { onConflict: "id" }
-        );
-
-        return NextResponse.json({
-          success: true,
-          audioId,
-          predictionId: prediction.id,
-          status: "processing",
-          remainingTokens,
-        });
-      }
-
-      const transcriptionResult = await transcribeAudioWithTimestamps(
-        audioFile
-      );
-
-      const { data: transcriptionRecord, error: transcriptionError } =
-        await supabase
-          .from("transcriptions")
-          .insert({
-            id: audioId,
-            audio_id: audioId,
-            user_id: userId,
-            status: "completed",
-            provider,
-          })
-          .select()
-          .single();
-
-      if (transcriptionError) {
-        console.error(
-          "Database transcription insert error:",
-          transcriptionError
-        );
-        throw new Error("Failed to save transcription to database");
-      }
-
-      const transcriptionJson = JSON.stringify(transcriptionResult, null, 2);
-      console.log("Saving transcription JSON to storage...");
-
-      const { data: jsonUpload, error: jsonUploadError } =
-        await supabase.storage
-          .from("transcriptions")
-          .upload(`${userId}/${audioId}.json`, transcriptionJson, {
-            contentType: "application/json",
-            upsert: true,
-          });
-
-      if (jsonUploadError) {
-        console.error("Failed to save JSON to storage:", jsonUploadError);
-      } else {
-        console.log("JSON saved successfully:", jsonUpload);
-      }
-
-      console.log("Saving transcription TXT to storage...");
-
-      const { data: txtUpload, error: txtUploadError } = await supabase.storage
-        .from("transcriptions")
-        .upload(`${userId}/${audioId}.txt`, transcriptionResult.text, {
-          contentType: "text/plain",
-          upsert: true,
-        });
-
-      if (txtUploadError) {
-        console.error("Failed to save TXT to storage:", txtUploadError);
-      } else {
-        console.log("TXT saved successfully:", txtUpload);
-      }
-
-      await supabase
-        .from("audios")
-        .update({ status: "completed" })
-        .eq("id", audioId)
-        .eq("user_id", userId);
-
-      return NextResponse.json({
-        success: true,
-        transcriptionId: audioId,
-        originalText: transcriptionResult.text,
-        editedText: transcriptionResult.text,
-        segments: transcriptionResult.segments,
-        audioId: audioId,
-        remainingTokens,
-      });
-    } catch (transcriptionError) {
-      console.error("Transcription error:", transcriptionError);
-
-      try {
-        // Update audio status to 'error'
-        await supabase
-          .from("audios")
-          .update({ status: "error" })
-          .eq("id", audioId)
-          .eq("user_id", userId);
-
-        // Save error to database
-        const errorMessage =
-          transcriptionError instanceof Error
-            ? transcriptionError.message
-            : "Unknown error";
-        await supabase.from("transcriptions").upsert(
-          {
-            id: audioId,
-            audio_id: audioId,
-            user_id: userId,
-            original_text: "",
-            edited_text: "",
-            segments: [],
-            provider: provider,
-            status: "error",
-            error_message: errorMessage,
-          },
-          { onConflict: "id" }
-        );
-
-        // Save error to Supabase Storage
-        await supabase.storage
-          .from("transcriptions")
-          .upload(
-            `${userId}/${audioId}.error`,
-            JSON.stringify({ error: errorMessage }),
-            {
-              contentType: "application/json",
-              upsert: true,
-            }
-          );
-      } catch (errorSaveError) {
-        console.error("Failed to save error to Supabase:", errorSaveError);
-      }
-
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Failed to transcribe audio",
-          details:
-            transcriptionError instanceof Error
-              ? transcriptionError.message
-              : "Unknown error",
-        },
-        { status: 500 }
-      );
-    }
-  } catch (error) {
-    console.error("Process transcription error:", error);
-    return NextResponse.json(
-      { success: false, error: "Internal server error" },
-      { status: 500 }
-    );
-  }
-}
-
-function getContentType(filename: string): string {
-  const extension = filename.split(".").pop()?.toLowerCase();
-
-  switch (extension) {
-    case "mp3":
-      return "audio/mpeg";
-    case "wav":
-      return "audio/wav";
-    case "m4a":
-      return "audio/mp4";
-    case "ogg":
-      return "audio/ogg";
-    case "webm":
-      return "audio/webm";
-    default:
-      return "audio/mpeg";
   }
 }
