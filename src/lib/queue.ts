@@ -1,7 +1,5 @@
 // Queue system for managing transcription requests
 import { EventEmitter } from 'events';
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
-import { cookies } from "next/headers";
 
 interface QueueItem {
   id: string;
@@ -114,45 +112,11 @@ class TranscriptionQueue extends EventEmitter {
   private async processItem(item: QueueItem): Promise<void> {
     console.log(`🌐 Processing item directly without HTTP call for ${item.id}`);
     
-    try {
-      // Create Supabase client with proper authentication
-      const cookieStore = await cookies();
-      const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-          cookies: {
-            get(name: string) {
-              return cookieStore.get(name)?.value;
-            },
-            set(name: string, value: string, options: CookieOptions) {
-              cookieStore.set({ name, value, ...options });
-            },
-            remove(name: string, options: CookieOptions) {
-              cookieStore.set({ name, value: "", ...options });
-            },
-          },
-        }
-      );
-
-      // Import and call processTranscription directly
-      const { processTranscription } = await import('@/app/api/transcribe/route');
-      
-      await processTranscription(
-        item.audioId,
-        item.filename || '',
-        item.originalName || '',
-        item.filePath || '',
-        item.provider || 'replicate',
-        item.userId,
-        supabase
-      );
-      
-      console.log(`✅ Successfully processed item ${item.id} directly`);
-    } catch (error) {
-      console.error(`❌ Error in direct processing for ${item.id}:`, error);
-      throw error;
-    }
+    // Legacy local processing has been deprecated in favor of Cloudflare Workers + Queues.
+    // This method is intentionally a no-op to preserve compatibility and avoid build errors
+    // after removing processTranscription from the Next.js route.
+    console.warn('Local TranscriptionQueue.processItem is deprecated and no longer performs work. Use Cloudflare /ingest path.');
+    return;
   }
 
   getQueueStatus() {
