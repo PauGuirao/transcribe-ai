@@ -27,11 +27,11 @@ export function EditableTranscriptionSegments({
   onSegmentsChange,
   className 
 }: EditableTranscriptionSegmentsProps) {
-  const [editingSegmentId, setEditingSegmentId] = useState<number | null>(null);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editedSegments, setEditedSegments] = useState<TranscriptionSegment[]>(segments);
   const [editText, setEditText] = useState('');
   const [cursorPosition, setCursorPosition] = useState<number>(0);
-  const [hoveredSegmentId, setHoveredSegmentId] = useState<number | null>(null);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -39,181 +39,171 @@ export function EditableTranscriptionSegments({
   }, [segments]);
 
   useEffect(() => {
-    if (editingSegmentId !== null && textareaRef.current) {
+    if (editingIndex !== null && textareaRef.current) {
       const textarea = textareaRef.current;
       textarea.focus();
       textarea.setSelectionRange(cursorPosition, cursorPosition);
     }
-  }, [editingSegmentId, cursorPosition]);
+  }, [editingIndex, cursorPosition]);
 
   // Keyboard event listener for L and N keys when hovering, and ESC when editing
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       // ESC key to cancel editing
-      if (e.key === 'Escape' && editingSegmentId !== null) {
+      if (e.key === 'Escape' && editingIndex !== null) {
         e.preventDefault();
         cancelEditing();
         return;
       }
       
       // L and N keys for speaker assignment when hovering
-      if (hoveredSegmentId !== null && editingSegmentId === null) {
+      if (hoveredIndex !== null && editingIndex === null) {
         if (e.key.toLowerCase() === 'l') {
           e.preventDefault();
-          updateSegmentSpeaker(hoveredSegmentId, 'Logopeda');
+          updateSegmentSpeaker(hoveredIndex, 'Logopeda');
         } else if (e.key.toLowerCase() === 'n') {
           e.preventDefault();
-          updateSegmentSpeaker(hoveredSegmentId, 'Alumne');
+          updateSegmentSpeaker(hoveredIndex, 'Alumne');
         }
       }
     };
 
     document.addEventListener('keydown', handleKeyPress);
     return () => document.removeEventListener('keydown', handleKeyPress);
-  }, [hoveredSegmentId, editingSegmentId]);
+  }, [hoveredIndex, editingIndex]);
 
-  const updateSegmentSpeaker = (segmentId: number, speakerName: string) => {
+  const updateSegmentSpeaker = (index: number, speakerName: string) => {
     // Find the speaker by name to get their ID
     const speaker = speakers.find(s => s.name === speakerName);
     const speakerId = speaker?.id;
-    
-    const updatedSegments = editedSegments.map(segment => {
-      if (segment.id === segmentId) {
-        return { ...segment, speakerId: speakerId };
-      }
-      return segment;
-    });
+
+    const updatedSegments = [...editedSegments];
+    const current = updatedSegments[index];
+    if (!current) return;
+    updatedSegments[index] = { ...current, speakerId: speakerId };
+
     setEditedSegments(updatedSegments);
     onSegmentsChange?.(updatedSegments);
   };
-
-
 
   const handleSegmentClick = (segment: TranscriptionSegment) => {
     onSegmentClick?.(segment);
   };
 
-  const startEditing = (segment: TranscriptionSegment, clickPosition?: number) => {
+  const startEditing = (index: number, clickPosition?: number) => {
     // Save current edit before starting a new one
-    if (editingSegmentId !== null && editingSegmentId !== segment.id) {
+    if (editingIndex !== null && editingIndex !== index) {
       saveEdit();
     }
-    
-    setEditingSegmentId(segment.id);
-    setEditText(segment.text.trim());
-    setCursorPosition(clickPosition ?? segment.text.trim().length);
+
+    setEditingIndex(index);
+    const seg = editedSegments[index];
+    const text = seg?.text?.trim() ?? '';
+    setEditText(text);
+    setCursorPosition(clickPosition ?? text.length);
   };
 
   const cancelEditing = () => {
-    setEditingSegmentId(null);
+    setEditingIndex(null);
     setEditText('');
   };
 
   const saveEdit = () => {
-    if (editingSegmentId === null) return;
+    if (editingIndex === null) return;
 
-    const updatedSegments = editedSegments.map(segment => 
-      segment.id === editingSegmentId 
-        ? { ...segment, text: editText }
-        : segment
-    );
-    
+    const updatedSegments = [...editedSegments];
+    const current = updatedSegments[editingIndex];
+    if (!current) return;
+    updatedSegments[editingIndex] = { ...current, text: editText };
+
     setEditedSegments(updatedSegments);
     onSegmentsChange?.(updatedSegments);
-    setEditingSegmentId(null);
+    setEditingIndex(null);
     setEditText('');
   };
 
   const saveEditAndMoveToNext = () => {
-    if (editingSegmentId === null) return;
+    if (editingIndex === null) return;
 
-    const updatedSegments = editedSegments.map(segment => 
-      segment.id === editingSegmentId 
-        ? { ...segment, text: editText }
-        : segment
-    );
-    
+    const updatedSegments = [...editedSegments];
+    const current = updatedSegments[editingIndex];
+    if (!current) return;
+    updatedSegments[editingIndex] = { ...current, text: editText };
+
     setEditedSegments(updatedSegments);
     onSegmentsChange?.(updatedSegments);
-    
-    // Find the next segment to edit
-    const currentIndex = editedSegments.findIndex(segment => segment.id === editingSegmentId);
-    const nextSegment = editedSegments[currentIndex + 1];
-    
+
+    const nextIndex = editingIndex + 1;
+    const nextSegment = editedSegments[nextIndex];
+
     if (nextSegment) {
-       // Start editing the next segment
-       setEditingSegmentId(nextSegment.id);
-       setEditText(nextSegment.text.trim());
-       setCursorPosition(nextSegment.text.trim().length); // Start at the end of the next segment
-       
-       // Scroll to show the next segment without hiding the header
-       setTimeout(() => {
-         const nextSegmentElement = document.querySelector(`[data-segment-id="${nextSegment.id}"]`);
-         if (nextSegmentElement) {
-           nextSegmentElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-         }
-       }, 100);
-     } else {
-      // No next segment, just finish editing
-      setEditingSegmentId(null);
+      setEditingIndex(nextIndex);
+      const nextText = nextSegment.text.trim();
+      setEditText(nextText);
+      setCursorPosition(nextText.length);
+
+      setTimeout(() => {
+        const nextSegmentElement = document.querySelector(`[data-segment-index="${nextIndex}"]`);
+        if (nextSegmentElement) {
+          nextSegmentElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }, 100);
+    } else {
+      setEditingIndex(null);
       setEditText('');
     }
   };
 
   const saveEditAndMoveToPrevious = () => {
-    if (editingSegmentId === null) return;
+    if (editingIndex === null) return;
 
-    const updatedSegments = editedSegments.map(segment => 
-      segment.id === editingSegmentId 
-        ? { ...segment, text: editText }
-        : segment
-    );
-    
+    const updatedSegments = [...editedSegments];
+    const current = updatedSegments[editingIndex];
+    if (!current) return;
+    updatedSegments[editingIndex] = { ...current, text: editText };
+
     setEditedSegments(updatedSegments);
     onSegmentsChange?.(updatedSegments);
-    
-    // Find the previous segment to edit
-    const currentIndex = editedSegments.findIndex(segment => segment.id === editingSegmentId);
-    const previousSegment = editedSegments[currentIndex - 1];
-    
+
+    const previousIndex = editingIndex - 1;
+    const previousSegment = editedSegments[previousIndex];
+
     if (previousSegment) {
-       // Start editing the previous segment
-       setEditingSegmentId(previousSegment.id);
-       setEditText(previousSegment.text.trim());
-       setCursorPosition(previousSegment.text.trim().length); // Start at the end of the previous segment
-       
-       // Scroll to center the previous segment
-       setTimeout(() => {
-         const previousSegmentElement = document.querySelector(`[data-segment-id="${previousSegment.id}"]`);
-         if (previousSegmentElement) {
-           previousSegmentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-         }
-       }, 100);
-     } else {
-      // No previous segment, just finish editing
-      setEditingSegmentId(null);
+      setEditingIndex(previousIndex);
+      const prevText = previousSegment.text.trim();
+      setEditText(prevText);
+      setCursorPosition(prevText.length);
+
+      setTimeout(() => {
+        const previousSegmentElement = document.querySelector(`[data-segment-index="${previousIndex}"]`);
+        if (previousSegmentElement) {
+          previousSegmentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    } else {
+      setEditingIndex(null);
       setEditText('');
     }
   };
 
-  const deleteSegment = (segmentId: number) => {
-    const updatedSegments = editedSegments.filter(segment => segment.id !== segmentId);
+  const deleteSegment = (index: number) => {
+    const updatedSegments = [...editedSegments];
+    updatedSegments.splice(index, 1);
     setEditedSegments(updatedSegments);
     onSegmentsChange?.(updatedSegments);
     // Cancel editing if we're deleting the segment being edited
-    if (editingSegmentId === segmentId) {
-      setEditingSegmentId(null);
+    if (editingIndex === index) {
+      setEditingIndex(null);
       setEditText('');
     }
   };
 
-  const handleSpeakerChange = (segmentId: number, speakerId: string) => {
-    const updatedSegments = editedSegments.map(segment => 
-      segment.id === segmentId 
-        ? { ...segment, speakerId: speakerId === 'none' ? undefined : speakerId }
-        : segment
-    );
-    
+  const handleSpeakerChange = (index: number, speakerId: string) => {
+    const updatedSegments = [...editedSegments];
+    const current = updatedSegments[index];
+    if (!current) return;
+    updatedSegments[index] = { ...current, speakerId: speakerId === 'none' ? undefined : speakerId };
+
     setEditedSegments(updatedSegments);
     onSegmentsChange?.(updatedSegments);
   };
@@ -223,17 +213,15 @@ export function EditableTranscriptionSegments({
     return speakers.find(speaker => speaker.id === speakerId) || null;
   };
 
-  const insertEmptySegment = (afterSegmentId: number) => {
-    const segmentIndex = editedSegments.findIndex(seg => seg.id === afterSegmentId);
-    if (segmentIndex === -1) return;
+  const insertEmptySegment = (afterIndex: number) => {
+    const currentSegment = editedSegments[afterIndex];
+    const nextSegment = editedSegments[afterIndex + 1];
+    if (!currentSegment) return;
 
-    const currentSegment = editedSegments[segmentIndex];
-    const nextSegment = editedSegments[segmentIndex + 1];
-    
     // Calculate time for the new segment (halfway between current and next, or 5 seconds after current)
     const newStart = currentSegment.end;
     const newEnd = nextSegment ? (currentSegment.end + nextSegment.start) / 2 : currentSegment.end + 5;
-    
+
     const newSegment: TranscriptionSegment = {
       id: Math.max(...editedSegments.map(s => s.id)) + 1,
       seek: Math.floor(newStart * 100),
@@ -249,50 +237,55 @@ export function EditableTranscriptionSegments({
     };
 
     const updatedSegments = [
-      ...editedSegments.slice(0, segmentIndex + 1),
+      ...editedSegments.slice(0, afterIndex + 1),
       newSegment,
-      ...editedSegments.slice(segmentIndex + 1)
+      ...editedSegments.slice(afterIndex + 1)
     ];
-    
+
     setEditedSegments(updatedSegments);
     onSegmentsChange?.(updatedSegments);
-    
+
     // Start editing the new segment immediately
-    setEditingSegmentId(newSegment.id);
+    setEditingIndex(afterIndex + 1);
     setEditText('');
   };
 
-  const combineWithPreviousSegment = (segmentId: number) => {
-    const segmentIndex = editedSegments.findIndex(seg => seg.id === segmentId);
-    if (segmentIndex <= 0) return; // Can't combine if it's the first segment
+  const combineWithPreviousSegment = (index: number) => {
+    if (index <= 0) return; // Can't combine if it's the first segment
 
-    const currentSegment = editedSegments[segmentIndex];
-    const previousSegment = editedSegments[segmentIndex - 1];
-    
+    const currentSegment = editedSegments[index];
+    const previousSegment = editedSegments[index - 1];
+    if (!currentSegment || !previousSegment) return;
+
     // Combine the text: previous text + space + current text
     const combinedText = previousSegment.text.trim() + ' ' + currentSegment.text.trim();
-    
+
     // Update the previous segment with combined text and extended end time
     const updatedPreviousSegment = {
       ...previousSegment,
       text: combinedText,
       end: currentSegment.end
     };
-    
-    // Remove the current segment and update the previous one
+
     const updatedSegments = [
-      ...editedSegments.slice(0, segmentIndex - 1),
+      ...editedSegments.slice(0, index - 1),
       updatedPreviousSegment,
-      ...editedSegments.slice(segmentIndex + 1)
+      ...editedSegments.slice(index + 1)
     ];
-    
+
     setEditedSegments(updatedSegments);
     onSegmentsChange?.(updatedSegments);
-    
-    // Cancel editing if we're combining the segment being edited
-    if (editingSegmentId === segmentId) {
-      setEditingSegmentId(null);
-      setEditText('');
+
+    // Adjust editing index if needed
+    if (editingIndex !== null) {
+      if (editingIndex === index) {
+        // moved into previous
+        setEditingIndex(index - 1);
+        setEditText(updatedPreviousSegment.text.trim());
+        setCursorPosition(updatedPreviousSegment.text.trim().length);
+      } else if (editingIndex > index) {
+        setEditingIndex(editingIndex - 1);
+      }
     }
   };
 
@@ -313,16 +306,17 @@ export function EditableTranscriptionSegments({
       <div className="h-full overflow-y-auto space-y-2 p-4 mr-80">
         {editedSegments.map((segment, index) => (
           <div 
-            key={segment.id} 
+            key={`${segment.id}-${index}`}
             data-segment-id={segment.id}
+            data-segment-index={index}
             className={cn(
               "relative group p-3 border rounded-xl bg-white transition-all duration-300 ease-in-out hover:shadow-md hover:border-blue-200 cursor-pointer",
-              editingSegmentId === segment.id 
+              editingIndex === index 
                 ? "ring-2 ring-blue-400 bg-gradient-to-r from-blue-50 to-indigo-50 shadow-lg border-blue-300" 
                 : "border-gray-200 hover:bg-gray-50"
             )}
-            onMouseEnter={() => setHoveredSegmentId(segment.id)}
-            onMouseLeave={() => setHoveredSegmentId(null)}
+            onMouseEnter={() => setHoveredIndex(index)}
+            onMouseLeave={() => setHoveredIndex(null)}
             onClick={(e) => {
               // Only trigger selection if not clicking on interactive elements
               const target = e.target as HTMLElement;
@@ -348,7 +342,7 @@ export function EditableTranscriptionSegments({
                 className="absolute -top-4 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 h-8 w-8 p-0 bg-white border border-gray-300 hover:bg-orange-50 hover:border-orange-400 shadow-sm z-10"
                 onClick={(e) => {
                   e.stopPropagation();
-                  combineWithPreviousSegment(segment.id);
+                  combineWithPreviousSegment(index);
                 }}
                 title="Combine with previous segment"
               >
@@ -363,7 +357,7 @@ export function EditableTranscriptionSegments({
                 className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 h-8 w-8 p-0 bg-white border border-gray-300 hover:bg-blue-50 hover:border-blue-400 shadow-sm z-10"
                 onClick={(e) => {
                   e.stopPropagation();
-                  insertEmptySegment(segment.id);
+                  insertEmptySegment(index);
                 }}
                 title="Add empty segment after this one"
               >
@@ -379,7 +373,7 @@ export function EditableTranscriptionSegments({
                 {/* Speaker Selection */}
                 <Select
                   value={segment.speakerId || 'none'}
-                  onValueChange={(value) => handleSpeakerChange(segment.id, value)}
+                  onValueChange={(value) => handleSpeakerChange(index, value)}
                 >
                   <SelectTrigger className="h-7 text-xs w-auto min-w-[120px]">
                     <SelectValue 
@@ -419,7 +413,7 @@ export function EditableTranscriptionSegments({
                 size="sm"
                 onClick={(e) => {
                   e.stopPropagation();
-                  deleteSegment(segment.id);
+                  deleteSegment(index);
                 }}
                 className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
                 title="Eliminar segmento"
@@ -428,7 +422,7 @@ export function EditableTranscriptionSegments({
               </Button>
             </div>
             <div className="relative">
-              {editingSegmentId === segment.id ? (
+              {editingIndex === index ? (
                 <div className="animate-in fade-in-0 duration-200">
                   <Textarea
                     ref={textareaRef}
@@ -475,7 +469,7 @@ export function EditableTranscriptionSegments({
                       }
                       
                       document.body.removeChild(span);
-                      startEditing(segment, clickPosition);
+                      startEditing(index, clickPosition);
                     }}
                   >
                     {segment.text.trim()}
