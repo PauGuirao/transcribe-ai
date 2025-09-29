@@ -248,6 +248,19 @@ export async function POST(request: NextRequest) {
         .eq("id", audioId)
         .eq("user_id", userId);
 
+      // Mark transcription job as completed (find job by prediction_id)
+      const { data: jobData } = await supabaseAdmin
+        .from("transcription_jobs")
+        .select("id")
+        .eq("prediction_id", predictionId)
+        .single();
+      
+      if (jobData?.id) {
+        await supabaseAdmin.rpc("mark_job_completed", {
+          p_job_id: jobData.id
+        });
+      }
+
       // Delete the previous file (if any)
       if (previousPath && previousPath !== newPath) {
         await supabaseAdmin.storage
@@ -285,6 +298,20 @@ export async function POST(request: NextRequest) {
         })
         .eq("id", transcriptionId)
         .eq("user_id", userId);
+
+      // Mark transcription job as failed (find job by prediction_id)
+      const { data: jobData } = await supabaseAdmin
+        .from("transcription_jobs")
+        .select("id")
+        .eq("prediction_id", predictionId)
+        .single();
+      
+      if (jobData?.id) {
+        await supabaseAdmin.rpc("mark_job_failed", {
+          p_job_id: jobData.id,
+          p_error: errorMessage
+        });
+      }
 
       return NextResponse.json(
         { received: true },
