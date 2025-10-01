@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
+import { mailerooService } from "@/lib/maileroo";
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET as string;
@@ -59,10 +60,71 @@ export async function POST(request: NextRequest) {
       const session = event.data.object as Stripe.Checkout.Session;
       const userId = session.metadata?.userId;
       const plan = session.metadata?.plan ?? "pro";
+      const invitationEmail = session.metadata?.invitationEmail;
+      const organizationName = session.metadata?.organizationName;
 
       console.log("👤 User ID from metadata:", userId);
       console.log("📋 Plan from metadata:", plan);
+      console.log("📧 Invitation email from metadata:", invitationEmail);
+      console.log("🏢 Organization name from metadata:", organizationName);
 
+      // Handle group plan invitations (bank transfer payments)
+      if (plan === "group" && invitationEmail && organizationName) {
+        console.log("🎯 Processing group plan invitation");
+        
+        try {
+          // Create group invitation record
+          const { data: invitationData, error: invitationError } = await supabaseAdmin
+            .rpc('create_group_invitation', {
+              p_email: invitationEmail,
+              p_organization_name: organizationName,
+              p_stripe_payment_intent_id: session.payment_intent as string,
+              p_stripe_customer_id: session.customer as string,
+              p_amount_paid: session.amount_total || 0,
+              p_currency: session.currency || 'eur',
+              p_organization_settings: session.metadata?.organizationSettings ? 
+                JSON.parse(session.metadata.organizationSettings) : {}
+            });
+
+          if (invitationError) {
+            console.error("❌ Failed to create group invitation:", invitationError);
+            return NextResponse.json(
+              { error: "Failed to create group invitation" },
+              { status: 500 }
+            );
+          }
+
+          console.log("✅ Group invitation created successfully:", invitationData);
+          
+          // Send group invitation email with join button
+          const joinUrl = `${process.env.NEXT_PUBLIC_APP_URL}/group-invite/${invitationData[0].token}`;
+          console.log("🔗 Generated join URL:", joinUrl);
+
+          
+          /*
+          await mailerooService.sendGroupInvitationEmail(
+            invitationEmail,
+            joinUrl,
+            organizationName,
+            session.amount_total || 0,
+            session.currency || 'eur'
+          );
+          */
+
+          console.log("✅ Group invitation email sent successfully to:", invitationEmail);
+          
+          console.log("🎉 Group invitation webhook processing completed successfully");
+          return NextResponse.json({ received: true }, { status: 200 });
+        } catch (error) {
+          console.error("❌ Group invitation processing error:", error);
+          return NextResponse.json(
+            { error: "Group invitation processing failed" },
+            { status: 500 }
+          );
+        }
+      }
+
+      // Handle regular user subscriptions (existing logic)
       if (!userId) {
         console.error("❌ No userId found in session metadata");
         return NextResponse.json(
@@ -109,7 +171,7 @@ export async function POST(request: NextRequest) {
       const { error: orgError } = await supabaseAdmin
         .from("organizations")
         .update({
-          plan_type: plan === "paid" ? "group" : "individual",
+          plan_type: plan === "paid" ? "group" : "pro",
           max_members: plan === "paid" ? 10 : 1,
           stripe_customer_id: session.customer,
           stripe_subscription_id: session.subscription,

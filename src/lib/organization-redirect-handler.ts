@@ -12,10 +12,18 @@ export async function determineRedirectAfterAuth(
   origin: string
 ): Promise<RedirectDecision> {
   // Get user's organization information
-  const { organizationId, organizationName } = await getUserOrganizationInfo(supabase, userId);
+  const { organizationId, organizationName, planType } = await getUserOrganizationInfo(supabase, userId);
   
   if (organizationId && organizationName) {
-    // Check if organization has default name that needs to be changed
+    // For free and pro plans, always redirect to dashboard
+    if (planType === 'free' || planType === 'pro') {
+      return {
+        url: `${origin}/dashboard`,
+        reason: "free_or_pro_plan_user"
+      };
+    }
+    
+    // For organization plans, check if organization has default name that needs to be changed
     if (organizationName === "test") {
       return {
         url: `${origin}/organization`,
@@ -28,9 +36,10 @@ export async function determineRedirectAfterAuth(
       };
     }
   } else {
+    // No organization - redirect to dashboard for individual users
     return {
-      url: `${origin}/organization`,
-      reason: "no_organization"
+      url: `${origin}/dashboard`,
+      reason: "no_organization_individual_user"
     };
   }
 }

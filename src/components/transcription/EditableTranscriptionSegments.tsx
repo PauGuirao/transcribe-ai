@@ -228,11 +228,6 @@ export function EditableTranscriptionSegments({
       start: newStart,
       end: newEnd,
       text: '',
-      tokens: [],
-      temperature: 0.0,
-      avg_logprob: 0.0,
-      compression_ratio: 0.0,
-      no_speech_prob: 0.0,
       speakerId: currentSegment.speakerId
     };
 
@@ -244,7 +239,7 @@ export function EditableTranscriptionSegments({
 
     setEditedSegments(updatedSegments);
     onSegmentsChange?.(updatedSegments);
-
+    
     // Start editing the new segment immediately
     setEditingIndex(afterIndex + 1);
     setEditText('');

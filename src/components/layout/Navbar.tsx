@@ -81,8 +81,8 @@ export default function Navbar() {
           </Button>
         )}
         
-        {/* Organization display */}
-        {organization && (
+        {/* Organization display - only show for group plan */}
+        {organization && organization.plan_type === 'group' && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <div className="flex items-center gap-2 px-4 py-1 bg-white rounded-md border-2 border-border shadow-md hover:bg-gray-50 transition-colors cursor-pointer">

@@ -384,14 +384,15 @@ export async function cleanupAutoCreatedOrganization(
 export async function getUserOrganizationInfo(
   supabase: any,
   userId: string
-): Promise<{ organizationId: string | null; organizationName: string | null }> {
+): Promise<{ organizationId: string | null; organizationName: string | null; planType: string | null }> {
   const { data: userOrg } = await supabase
     .from("profiles")
     .select(`
       current_organization_id,
       organizations!current_organization_id (
         id,
-        name
+        name,
+        plan_type
       )
     `)
     .eq("id", userId)
@@ -404,11 +405,12 @@ export async function getUserOrganizationInfo(
     
     return {
       organizationId: userOrg.current_organization_id,
-      organizationName: orgData?.name || null
+      organizationName: orgData?.name || null,
+      planType: orgData?.plan_type || null
     };
   }
 
-  return { organizationId: null, organizationName: null };
+  return { organizationId: null, organizationName: null, planType: null };
 }
 
 // Logging helpers

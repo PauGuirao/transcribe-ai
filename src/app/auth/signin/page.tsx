@@ -20,7 +20,50 @@ const SignInContent = React.memo(function SignInContent() {
 
   useEffect(() => {
     if (user) {
-      // Check if there's an invitation token cookie first
+      // Check for group invitation first (higher priority)
+      const groupInviteParam = searchParams.get("group_invite");
+      const groupInviteTokenMatch = document.cookie.match(/group_invite_token=([^;]+)/);
+      const groupInviteToken = groupInviteTokenMatch ? groupInviteTokenMatch[1] : null;
+      
+      if (groupInviteParam === "true" && groupInviteToken) {
+        console.log(`Found group invitation token during signin: ${groupInviteToken}`);
+        
+        // Process the group invitation by calling the API directly
+        const processGroupInvitation = async () => {
+          try {
+            const response = await fetch("/api/group-invite/join", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ token: groupInviteToken }),
+            });
+
+            // Clear the group invite token cookie after processing (success or failure)
+            document.cookie = `group_invite_token=; path=/; max-age=0; SameSite=Lax`;
+
+            if (response.ok) {
+              console.log("Group invitation processed successfully from signin page");
+              // Redirect to organization setup
+              router.push("/organization?group_setup=true");
+            } else {
+              console.error("Failed to process group invitation from signin page");
+              // On error, redirect to dashboard as fallback
+              router.push("/dashboard");
+            }
+          } catch (error) {
+            console.error("Error processing group invitation from signin page:", error);
+            // Clear cookie and redirect to dashboard on error
+            document.cookie = `group_invite_token=; path=/; max-age=0; SameSite=Lax`;
+            router.push("/dashboard");
+          }
+        };
+
+        processGroupInvitation();
+        return;
+      }
+
+      // Check if there's a regular invitation token cookie
       const inviteTokenMatch = document.cookie.match(/invite_token=([^;]+)/);
       const inviteToken = inviteTokenMatch ? inviteTokenMatch[1] : null;
       
@@ -75,7 +118,7 @@ const SignInContent = React.memo(function SignInContent() {
       const redirectTo = returnUrl || "/dashboard";
       router.push(redirectTo);
     }
-  }, [user, router, returnUrl]);
+  }, [user, router, returnUrl, searchParams]);
 
   const handleSignIn = async () => {
     setLoading(true);

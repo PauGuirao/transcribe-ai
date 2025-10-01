@@ -10,7 +10,12 @@ import {
   logAuthError,
   logNoAuthCode
 } from "@/lib/auth-callback-helpers";
-import { processInvitation, hasInvitationToken } from "@/lib/invitation-processor";
+import { 
+  processInvitation, 
+  hasInvitationToken, 
+  processGroupInvitation, 
+  hasGroupInvitationToken 
+} from "@/lib/invitation-processor";
 import { 
   determineRedirectAfterAuth, 
   createRedirectResponse, 
@@ -73,7 +78,15 @@ export async function GET(request: NextRequest) {
       // Send welcome email if needed
       await sendWelcomeEmailIfNeeded(supabase, user, existingProfile);
 
-      // Process invitation if present
+      // Check for group invitation first (higher priority)
+      const groupInviteToken = hasGroupInvitationToken(cookieStore);
+      if (groupInviteToken) {
+        console.log(`Group invitation token found: ${groupInviteToken}`);
+        // Process group invitation and redirect to organization setup
+        return await processGroupInvitation(supabase, user, groupInviteToken, cookieStore, origin);
+      }
+
+      // Process regular invitation if present
       const inviteToken = hasInvitationToken(cookieStore);
       if (inviteToken) {
         console.log(`Invitation token found: ${inviteToken}`);

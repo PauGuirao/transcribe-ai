@@ -159,6 +159,78 @@ class MailerooService {
 
     return this.sendTemplatedEmail(request);
   }
+
+  async sendGroupInvitationEmail(
+    userEmail: string, 
+    joinUrl: string, 
+    organizationName: string, 
+    amountPaid: number,
+    currency: string = 'EUR'
+  ): Promise<MailerooResponse> {
+    const templateId = parseInt(process.env.MAILEROO_GROUP_INVITATION_TEMPLATE_ID!);
+    
+    if (!templateId) {
+      throw new Error('MAILEROO_GROUP_INVITATION_TEMPLATE_ID environment variable is required');
+    }
+
+    const formattedAmount = new Intl.NumberFormat('ca-ES', {
+      style: 'currency',
+      currency: currency.toUpperCase(),
+    }).format(amountPaid / 100); // Stripe amounts are in cents
+
+    const request: MailerooTemplateRequest = {
+      from: {
+        address: this.fromEmail,
+        display_name: this.fromName,
+      },
+      to: {
+        address: userEmail,
+      },
+      subject: `🎉 Benvingut a ${organizationName} - Pla Grup Activat`,
+      template_id: templateId,
+      template_data: {
+        organization_name: organizationName,
+        amount_paid: formattedAmount,
+        join_url: joinUrl,
+        app_name: 'Transcriu',
+        support_email: this.fromEmail,
+        plan_features: `
+          <ul style="margin: 16px 0; padding-left: 20px; color: #374151;">
+            <li style="margin-bottom: 8px;">✅ Fins a 40 membres en la vostra organització</li>
+            <li style="margin-bottom: 8px;">✅ Transcripcions il·limitades per a tot l'equip</li>
+            <li style="margin-bottom: 8px;">✅ Gestió centralitzada de projectes</li>
+            <li style="margin-bottom: 8px;">✅ Suport prioritari per a empreses</li>
+            <li style="margin-bottom: 8px;">✅ Funcions avançades de col·laboració</li>
+          </ul>
+        `,
+        join_button: `<table cellpadding="0" cellspacing="0" border="0" style="margin: 24px 0;">
+          <tr>
+            <td style="border-radius: 12px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); text-align: center; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+              <a href="${joinUrl}" style="display: inline-block; padding: 18px 36px; color: #ffffff; text-decoration: none; font-weight: bold; font-size: 18px; border-radius: 12px; font-family: Arial, sans-serif;">
+                🚀 Unir-se a ${organizationName}
+              </a>
+            </td>
+          </tr>
+        </table>`,
+        expiry_notice: `<p style="margin: 16px 0; padding: 12px; background-color: #fef3c7; border-left: 4px solid #f59e0b; color: #92400e; font-size: 14px; border-radius: 4px;">
+          ⏰ Aquest enllaç d'invitació és vàlid durant 30 dies. Si necessiteu ajuda, contacteu amb nosaltres a ${this.fromEmail}
+        </p>`,
+      },
+      tracking: true,
+      tags: {
+        email_type: 'group_invitation',
+        organization: organizationName,
+        plan_type: 'group',
+        amount_paid: formattedAmount,
+      },
+      headers: {
+        'X-Email-Type': 'group_invitation',
+        'X-Plan-Type': 'group',
+      },
+    };
+
+    return this.sendTemplatedEmail(request);
+  }
 }
 
 // Export singleton instance

@@ -78,8 +78,8 @@ const TeamPage = React.memo(function TeamPage() {
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
 
   const handleInviteClick = () => {
-    // Check if user has individual plan
-    if (planType === 'individual') {
+    // Check if user has free plan
+    if (planType === 'free') {
       setIsUpgradeModalOpen(true);
     } else {
       setIsInviteModalOpen(true);

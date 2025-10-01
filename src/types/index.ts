@@ -21,12 +21,13 @@ export interface TranscriptionSegment {
   start: number;
   end: number;
   text: string;
-  tokens: number[];
-  temperature: number;
-  avg_logprob: number;
-  compression_ratio: number;
-  no_speech_prob: number;
   speakerId?: string;
+  // Optional heavy fields (not required in saved JSON)
+  tokens?: number[];
+  temperature?: number;
+  avg_logprob?: number;
+  compression_ratio?: number;
+  no_speech_prob?: number;
 }
 
 export interface Transcription {
@@ -78,7 +79,7 @@ export interface Organization {
   id: string;
   name: string;
   owner_id: string;
-  plan_type: 'free' | 'organization';
+  plan_type: 'free' | 'pro' | 'group';
   max_members: number;
   stripe_customer_id?: string;
   stripe_subscription_id?: string;

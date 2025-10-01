@@ -100,3 +100,74 @@ export async function processInvitation(
 export function hasInvitationToken(cookieStore: any): string | null {
   return cookieStore.get('invite_token')?.value || null;
 }
+
+export function hasGroupInvitationToken(cookieStore: any): string | null {
+  return cookieStore.get('group_invite_token')?.value || null;
+}
+
+export async function processGroupInvitation(
+  supabase: any,
+  user: any,
+  groupInviteToken: string,
+  cookieStore: any,
+  origin: string
+): Promise<NextResponse> {
+  console.log(`Found group invite token: ${groupInviteToken}`);
+  
+  try {
+    // Validate the group invitation token
+    const { data: invitationData, error } = await supabase
+      .from("group_invitations")
+      .select(`
+        id,
+        email,
+        organization_name,
+        amount_paid,
+        currency,
+        payment_status,
+        expires_at,
+        is_used,
+        stripe_customer_id,
+        organization_settings,
+        created_at
+      `)
+      .eq("token", groupInviteToken)
+      .single();
+
+    if (error || !invitationData) {
+      console.log(error);
+      console.log(`No group invitation found for token: ${groupInviteToken}`);
+      cookieStore.set('group_invite_token', '', { maxAge: 0 });
+      return NextResponse.redirect(`${origin}/dashboard`);
+    }
+
+    // Check if invitation is expired or already used
+    if (invitationData.is_used || new Date() > new Date(invitationData.expires_at)) {
+      console.log(`Group invitation is expired or already used: ${groupInviteToken}`);
+      cookieStore.set('group_invite_token', '', { maxAge: 0 });
+      return NextResponse.redirect(`${origin}/dashboard`);
+    }
+
+    // Check if user email matches invitation email
+    console.log(`User email: ${user.email}`);
+    console.log(`Invitation: ${JSON.stringify(invitationData)}`);
+    if (user.email !== invitationData.email) {
+      console.log(`User email ${user.email} doesn't match invitation email ${invitationData.email}`);
+      cookieStore.set('group_invite_token', '', { maxAge: 0 });
+      return NextResponse.redirect(`${origin}/dashboard`);
+    }
+
+    console.log(`Group invitation validated for user ${user.id}. Token will be processed in organization setup.`);
+
+    // Don't clear the cookie yet - we need it in the organization page
+    // The organization page will handle updating the organization and clearing the token
+
+    // Redirect to organization setup with group setup flag
+    return NextResponse.redirect(`${origin}/organization?group_setup=true`);
+
+  } catch (error) {
+    console.error("Error processing group invitation:", error);
+    cookieStore.set('group_invite_token', '', { maxAge: 0 });
+    return NextResponse.redirect(`${origin}/dashboard`);
+  }
+}

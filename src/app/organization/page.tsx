@@ -1,21 +1,105 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { AlertCircle, Building2, Loader2 } from "lucide-react";
+import { AlertCircle, Building2, Loader2, Crown } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
-const OrganizationPage = React.memo(function OrganizationPage() {
+const OrganizationPageContent = React.memo(function OrganizationPageContent() {
   const [organizationName, setOrganizationName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [nameError, setNameError] = useState<string | null>(null);
+  const [isCheckingAccess, setIsCheckingAccess] = useState(true);
+  const [isGroupSetup, setIsGroupSetup] = useState(false);
+  const [groupInvitationData, setGroupInvitationData] = useState<any>(null);
   const router = useRouter();
-  const { refreshTokens } = useAuth();
+  const searchParams = useSearchParams();
+  const { refreshTokens, organization } = useAuth();
+
+  // Check if user should have access to this page
+  useEffect(() => {
+    const checkAccess = async () => {
+      try {
+        // Check if this is a group setup flow
+        const groupSetup = searchParams.get('group_setup') === 'true';
+        setIsGroupSetup(groupSetup);
+
+        if (groupSetup) {
+          // For group setup, validate the group invitation token
+          try {
+            // Get the token from cookies
+            const groupInviteToken = document.cookie
+              .split('; ')
+              .find(row => row.startsWith('group_invite_token='))
+              ?.split('=')[1];
+
+            if (!groupInviteToken) {
+              console.error('No group invitation token found in cookies');
+              router.push('/dashboard');
+              return;
+            }
+
+            const response = await fetch(`/api/group-invite/validate/${groupInviteToken}`, {
+              method: 'GET',
+              credentials: 'include'
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              setGroupInvitationData(data.invitation);
+              setOrganizationName(data.invitation.organization_name);
+              setIsCheckingAccess(false);
+              return;
+            } else {
+              // Invalid token, redirect to dashboard
+              router.push('/dashboard');
+              return;
+            }
+          } catch (error) {
+            console.error('Error validating group invitation token:', error);
+            router.push('/dashboard');
+            return;
+          }
+        }
+
+        // If user has an organization with free or pro plan, redirect to dashboard
+        if (organization && (organization.plan_type === 'free' || organization.plan_type === 'pro')) {
+          router.push('/dashboard');
+          return;
+        }
+        
+        // If user has an organization that's not named "test", redirect to dashboard
+        if (organization && organization.name && organization.name !== 'test') {
+          router.push('/dashboard');
+          return;
+        }
+        
+        setIsCheckingAccess(false);
+      } catch (error) {
+        console.error('Error checking organization access:', error);
+        setIsCheckingAccess(false);
+      }
+    };
+
+    checkAccess();
+  }, [organization, router, searchParams]);
+
+  // Show loading while checking access
+  if (isCheckingAccess) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex items-center gap-3">
+          <Loader2 className="w-6 h-6 animate-spin" />
+          <span>Verificant accés...</span>
+        </div>
+      </div>
+    );
+  }
 
   const validateName = (name: string) => {
     if (!name.trim()) {
@@ -71,6 +155,8 @@ const OrganizationPage = React.memo(function OrganizationPage() {
         },
         body: JSON.stringify({
           name: organizationName.trim(),
+          isGroupSetup: isGroupSetup,
+          groupInvitationData: groupInvitationData, // Include the group invitation data
         }),
       });
 
@@ -122,17 +208,35 @@ const OrganizationPage = React.memo(function OrganizationPage() {
           <CardContent className="space-y-8 p-8">
             <div className="space-y-2 text-center">
               <div className="mx-auto w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
-                <Building2 className="w-8 h-8 text-primary" />
+                {isGroupSetup ? (
+                  <Crown className="w-8 h-8 text-primary" />
+                ) : (
+                  <Building2 className="w-8 h-8 text-primary" />
+                )}
               </div>
               <p className="text-sm font-medium text-primary">
-                Últim pas!
+                {isGroupSetup ? "Configuració del Pla Grup" : "Últim pas!"}
               </p>
               <h2 className="text-3xl font-semibold tracking-tight text-foreground">
-                Nom de l'organització
+                {isGroupSetup ? "Configura la teva organització" : "Nom de l'organització"}
               </h2>
               <p className="text-sm text-muted-foreground">
-                Dona un nom a la teva organització per començar a col·laborar amb el teu equip.
+                {isGroupSetup 
+                  ? "Finalitza la configuració de la teva organització amb el pla grup."
+                  : "Dona un nom a la teva organització per començar a col·laborar amb el teu equip."
+                }
               </p>
+              {isGroupSetup && groupInvitationData && (
+                <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                  <div className="flex items-center gap-2 text-sm text-green-700 dark:text-green-300">
+                    <Crown className="w-4 h-4" />
+                    <span className="font-medium">Pla Grup Activat</span>
+                  </div>
+                  <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+                    Fins a 10 membres • Funcions avançades incloses
+                  </p>
+                </div>
+              )}
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -208,5 +312,13 @@ const OrganizationPage = React.memo(function OrganizationPage() {
     </div>
   );
 });
+
+const OrganizationPage = () => {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+      <OrganizationPageContent />
+    </Suspense>
+  );
+};
 
 export default OrganizationPage;
