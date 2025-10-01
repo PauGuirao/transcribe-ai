@@ -194,6 +194,7 @@ class MailerooService {
         join_url: joinUrl,
         app_name: 'Transcriu',
         support_email: this.fromEmail,
+        user_email: userEmail,
         plan_features: `
           <ul style="margin: 16px 0; padding-left: 20px; color: #374151;">
             <li style="margin-bottom: 8px;">✅ Fins a 40 membres en la vostra organització</li>

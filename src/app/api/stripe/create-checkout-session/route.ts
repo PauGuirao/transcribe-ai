@@ -14,6 +14,7 @@ const stripe = new Stripe(stripeSecretKey, {
 
 const priceMap: Record<string, string | undefined> = {
   paid: process.env.STRIPE_PRICE_PRO,
+  group: process.env.STRIPE_PRICE_GROUP,
 };
 
 export async function POST(request: NextRequest) {
@@ -47,7 +48,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { plan } = await request.json();
+  const { plan, invitationEmail, organizationName, organizationSettings } = await request.json();
 
   if (!plan || typeof plan !== "string") {
     return NextResponse.json({ error: "Plan inválido." }, { status: 400 });
@@ -73,8 +74,14 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const session = await stripe.checkout.sessions.create({
+    // Configure payment methods based on plan type
+    const paymentMethodTypes = plan === "group" 
+      ? ["card", "sepa_debit"] // Bank transfers for group plans
+      : ["card"]; // Only cards for regular plans
+
+    const sessionConfig: any = {
       mode: "subscription",
+      payment_method_types: paymentMethodTypes,
       line_items: [
         {
           price: priceId,
@@ -88,7 +95,18 @@ export async function POST(request: NextRequest) {
         userId: user.id,
         plan,
       },
-    });
+    };
+
+    // Add group plan specific metadata
+    if (plan === "group" && invitationEmail && organizationName) {
+      sessionConfig.metadata.invitationEmail = invitationEmail;
+      sessionConfig.metadata.organizationName = organizationName;
+      if (organizationSettings) {
+        sessionConfig.metadata.organizationSettings = JSON.stringify(organizationSettings);
+      }
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionConfig);
 
     return NextResponse.json({ url: session.url });
   } catch (error) {

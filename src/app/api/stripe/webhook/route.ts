@@ -100,8 +100,6 @@ export async function POST(request: NextRequest) {
           const joinUrl = `${process.env.NEXT_PUBLIC_APP_URL}/group-invite/${invitationData[0].token}`;
           console.log("🔗 Generated join URL:", joinUrl);
 
-          
-          /*
           await mailerooService.sendGroupInvitationEmail(
             invitationEmail,
             joinUrl,
@@ -109,8 +107,7 @@ export async function POST(request: NextRequest) {
             session.amount_total || 0,
             session.currency || 'eur'
           );
-          */
-
+          
           console.log("✅ Group invitation email sent successfully to:", invitationEmail);
           
           console.log("🎉 Group invitation webhook processing completed successfully");
@@ -208,6 +205,103 @@ export async function POST(request: NextRequest) {
 
       console.log("✅ User profile updated successfully");
       console.log("🎉 Webhook processing completed successfully");
+    }
+
+    // Handle payment_intent.created for immediate activation on bank transfers
+    if (event.type === "payment_intent.created") {
+      console.log("🎯 Handling payment_intent.created event");
+      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+      
+      // Check if this is a bank transfer payment method
+      const paymentMethodTypes = paymentIntent.payment_method_types;
+      const isBankTransfer = paymentMethodTypes.includes('sepa_debit') || 
+                            paymentMethodTypes.includes('bancontact') || 
+                            paymentMethodTypes.includes('sofort');
+      
+      if (isBankTransfer && paymentIntent.metadata?.plan === "group") {
+        console.log("🏦 Bank transfer payment detected for group plan");
+        
+        const invitationEmail = paymentIntent.metadata?.invitationEmail;
+        const organizationName = paymentIntent.metadata?.organizationName;
+        
+        if (invitationEmail && organizationName) {
+          try {
+            // Create group invitation with 'pending' payment status for immediate activation
+            const { data: invitationData, error: invitationError } = await supabaseAdmin
+              .rpc('create_group_invitation', {
+                p_email: invitationEmail,
+                p_organization_name: organizationName,
+                p_stripe_payment_intent_id: paymentIntent.id,
+                p_stripe_customer_id: paymentIntent.customer as string,
+                p_amount_paid: paymentIntent.amount || 0,
+                p_currency: paymentIntent.currency || 'eur',
+                p_organization_settings: paymentIntent.metadata?.organizationSettings ? 
+                  JSON.parse(paymentIntent.metadata.organizationSettings) : {}
+              });
+
+            if (invitationError) {
+              console.error("❌ Failed to create group invitation:", invitationError);
+              return NextResponse.json(
+                { error: "Failed to create group invitation" },
+                { status: 500 }
+              );
+            }
+
+            console.log("✅ Group invitation created with pending payment status:", invitationData);
+            
+            // Send group invitation email with join button
+            const joinUrl = `${process.env.NEXT_PUBLIC_APP_URL}/group-invite/${invitationData[0].token}`;
+            console.log("🔗 Generated join URL:", joinUrl);
+
+            await mailerooService.sendGroupInvitationEmail(
+              invitationEmail,
+              joinUrl,
+              organizationName,
+              paymentIntent.amount || 0,
+              paymentIntent.currency || 'eur'
+            );
+
+            console.log("✅ Group invitation email sent successfully to:", invitationEmail);
+            console.log("🎉 Bank transfer group invitation processing completed successfully");
+            
+          } catch (error) {
+            console.error("❌ Bank transfer group invitation processing error:", error);
+            return NextResponse.json(
+              { error: "Failed to process bank transfer invitation" },
+              { status: 500 }
+            );
+          }
+        }
+      }
+    }
+
+    // Handle payment_intent.payment_failed for account deactivation
+    if (event.type === "payment_intent.payment_failed") {
+      console.log("🎯 Handling payment_intent.payment_failed event");
+      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+      
+      if (paymentIntent.metadata?.plan === "group") {
+        console.log("❌ Group plan payment failed, deactivating invitation");
+        
+        try {
+          // Update group invitation to mark as failed
+          const { error: updateError } = await supabaseAdmin
+            .from("group_invitations")
+            .update({ 
+              payment_status: 'failed',
+              is_used: true // Prevent further use
+            })
+            .eq("stripe_payment_intent_id", paymentIntent.id);
+
+          if (updateError) {
+            console.error("❌ Failed to update group invitation status:", updateError);
+          } else {
+            console.log("✅ Group invitation marked as failed");
+          }
+        } catch (error) {
+          console.error("❌ Error handling payment failure:", error);
+        }
+      }
     } else {
       console.log("ℹ️ Unhandled event type:", event.type);
     }

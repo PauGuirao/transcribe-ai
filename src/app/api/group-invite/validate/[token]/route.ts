@@ -64,8 +64,8 @@ export async function GET(
       );
     }
 
-    // Check payment status
-    if (invitation.payment_status !== 'completed') {
+    // Check payment status - allow 'pending' for bank transfers
+    if (invitation.payment_status !== 'completed' && invitation.payment_status !== 'pending') {
       return NextResponse.json(
         { error: "El pagament per aquesta invitació no s'ha completat" },
         { status: 400 }
