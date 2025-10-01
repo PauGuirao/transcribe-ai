@@ -111,10 +111,7 @@ const TeamPage = React.memo(function TeamPage() {
         throw new Error(errorData.error || 'Failed to remove member');
       }
 
-      // Refresh organization data to update the UI
-      await refreshOrganizationData();
-      
-      // Also update local state immediately to reflect the change
+      // Update local state immediately to reflect the change without causing UI flicker
       if (data) {
         const updatedMembers = data.members.filter(
           member => member.profiles.id !== memberToRemove.profiles.id
@@ -124,6 +121,9 @@ const TeamPage = React.memo(function TeamPage() {
           members: updatedMembers
         });
       }
+
+      // Refresh organization data in the background
+      refreshOrganizationData();
       
       // Close dialog and reset state
       setIsRemoveDialogOpen(false);
@@ -187,9 +187,12 @@ const TeamPage = React.memo(function TeamPage() {
       return;
     }
 
-    // If we have organization but no members data yet, keep loading
-    setLoading(true);
-  }, [user, authLoading, organization, organizationMembers, currentUserRole]);
+    // If we have organization but no members data yet, only show loading if we haven't initialized yet
+    // This prevents the UI from flickering when data is being refreshed
+    if (!hasInitialized) {
+      setLoading(true);
+    }
+  }, [user, authLoading, organization, organizationMembers, currentUserRole, hasInitialized]);
 
   const getRoleDisplayName = (role: string) => {
     switch (role) {
