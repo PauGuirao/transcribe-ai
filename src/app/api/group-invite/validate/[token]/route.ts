@@ -32,7 +32,8 @@ export async function GET(
         expires_at,
         is_used,
         created_at,
-        stripe_customer_id
+        stripe_customer_id,
+        user_tokens
       `)
       .eq("token", token)
       .single();
@@ -83,7 +84,8 @@ export async function GET(
         expires_at: invitation.expires_at,
         is_used: invitation.is_used,
         created_at: invitation.created_at,
-        stripe_customer_id: invitation.stripe_customer_id
+        stripe_customer_id: invitation.stripe_customer_id,
+        user_tokens: invitation.user_tokens
       }
     });
 

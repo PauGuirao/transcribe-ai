@@ -60,7 +60,8 @@ export async function POST(request: NextRequest) {
         expires_at,
         is_used,
         stripe_customer_id,
-        organization_settings
+        organization_settings,
+        user_tokens
       `)
       .eq("token", token)
       .single();
@@ -138,12 +139,19 @@ export async function POST(request: NextRequest) {
     }
 
     // Update user profile to set the new organization and plan type
+    const profileUpdates: any = {
+      current_organization_id: newOrganization.id,
+      plan_type: 'group'
+    };
+
+    // Add tokens if available from the invitation
+    if (invitation.user_tokens && invitation.user_tokens > 0) {
+      profileUpdates.tokens = invitation.user_tokens;
+    }
+
     const { error: profileError } = await supabaseAdmin
       .from("profiles")
-      .update({
-        current_organization_id: newOrganization.id,
-        plan_type: 'group'
-      })
+      .update(profileUpdates)
       .eq("id", user.id);
 
     if (profileError) {

@@ -98,6 +98,7 @@ export async function POST(request: NextRequest) {
             is_used,
             stripe_customer_id,
             organization_settings,
+            user_tokens,
             created_at
           `)
           .eq("token", groupInviteToken)
@@ -157,6 +158,20 @@ export async function POST(request: NextRequest) {
           { error: "Organización no encontrada" },
           { status: 404 }
         );
+      }
+
+      // Update user profile tokens with the tokens from group invitation
+      if (invitationData.user_tokens && invitationData.user_tokens > 0) {
+        const { error: tokenUpdateError } = await supabase
+          .from("profiles")
+          .update({ 
+            tokens: invitationData.user_tokens 
+          })
+          .eq("id", user.id);
+
+        if (tokenUpdateError) {
+          console.error("Error updating user tokens:", tokenUpdateError);
+        }
       }
 
       // Mark the invitation as used - get token from cookies if not provided

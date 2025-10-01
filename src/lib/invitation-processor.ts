@@ -62,7 +62,32 @@ export async function processInvitation(
       inviteData.organization_id
     );
 
+    
+    
+
     if (joinSuccess) {
+      // Check if this organization was created from a group invitation and get user_tokens
+      const { data: groupInvitation, error: groupInviteError } = await supabase
+        .from("group_invitations")
+        .select("user_tokens")
+        .eq("created_organization_id", inviteData.organization_id)
+        .eq("is_used", true)
+        .single();
+
+      // If group invitation found and has user_tokens, assign them to the user
+      if (!groupInviteError && groupInvitation && groupInvitation.user_tokens && groupInvitation.user_tokens > 0) {
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .update({ tokens: groupInvitation.user_tokens })
+          .eq("id", user.id);
+
+        if (profileError) {
+          console.error("Error updating user tokens:", profileError);
+        } else {
+          console.log(`✅ Assigned ${groupInvitation.user_tokens} tokens to user ${user.id} from group invitation`);
+        }
+      }
+
       // Mark invitation as used if it's a secure invitation
       await markInvitationAsUsed(supabase, inviteToken, isSecure);
 
@@ -129,6 +154,7 @@ export async function processGroupInvitation(
         is_used,
         stripe_customer_id,
         organization_settings,
+        user_tokens,
         created_at
       `)
       .eq("token", groupInviteToken)

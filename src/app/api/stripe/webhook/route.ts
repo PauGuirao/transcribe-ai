@@ -62,29 +62,41 @@ export async function POST(request: NextRequest) {
       const plan = session.metadata?.plan ?? "pro";
       const invitationEmail = session.metadata?.invitationEmail;
       const organizationName = session.metadata?.organizationName;
+      const userTokens = session.metadata?.userTokens;
 
       console.log("👤 User ID from metadata:", userId);
       console.log("📋 Plan from metadata:", plan);
       console.log("📧 Invitation email from metadata:", invitationEmail);
       console.log("🏢 Organization name from metadata:", organizationName);
+      console.log("🎫 User tokens from metadata:", userTokens);
 
       // Handle group plan invitations (bank transfer payments)
       if (plan === "group" && invitationEmail && organizationName) {
         console.log("🎯 Processing group plan invitation");
-        
         try {
+          // Generate a unique token for the invitation
+          const token = crypto.randomUUID();
+
           // Create group invitation record
           const { data: invitationData, error: invitationError } = await supabaseAdmin
-            .rpc('create_group_invitation', {
-              p_email: invitationEmail,
-              p_organization_name: organizationName,
-              p_stripe_payment_intent_id: session.payment_intent as string,
-              p_stripe_customer_id: session.customer as string,
-              p_amount_paid: session.amount_total || 0,
-              p_currency: session.currency || 'eur',
-              p_organization_settings: session.metadata?.organizationSettings ? 
-                JSON.parse(session.metadata.organizationSettings) : {}
-            });
+            .from("group_invitations")
+            .insert({
+              email: invitationEmail,
+              organization_name: organizationName,
+              stripe_payment_intent_id: session.payment_intent as string,
+              stripe_customer_id: session.customer as string,
+              amount_paid: session.amount_total || 0,
+              currency: session.currency || 'eur',
+              organization_settings: session.metadata?.organizationSettings ? 
+                JSON.parse(session.metadata.organizationSettings) : {},
+              user_tokens: userTokens ? parseInt(userTokens) : null,
+              payment_status: 'completed',
+              token: token,
+              created_at: new Date().toISOString(),
+              expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days from now
+            })
+            .select()
+            .single();
 
           if (invitationError) {
             console.error("❌ Failed to create group invitation:", invitationError);
@@ -97,7 +109,7 @@ export async function POST(request: NextRequest) {
           console.log("✅ Group invitation created successfully:", invitationData);
           
           // Send group invitation email with join button
-          const joinUrl = `${process.env.NEXT_PUBLIC_APP_URL}/group-invite/${invitationData[0].token}`;
+          const joinUrl = `${process.env.NEXT_PUBLIC_APP_URL}/group-invite/${invitationData.token}`;
           console.log("🔗 Generated join URL:", joinUrl);
 
           await mailerooService.sendGroupInvitationEmail(
@@ -223,21 +235,33 @@ export async function POST(request: NextRequest) {
         
         const invitationEmail = paymentIntent.metadata?.invitationEmail;
         const organizationName = paymentIntent.metadata?.organizationName;
+        const userTokens = paymentIntent.metadata?.userTokens;
         
         if (invitationEmail && organizationName) {
           try {
+            // Generate a unique token for the invitation
+            const token = crypto.randomUUID();
+
             // Create group invitation with 'pending' payment status for immediate activation
             const { data: invitationData, error: invitationError } = await supabaseAdmin
-              .rpc('create_group_invitation', {
-                p_email: invitationEmail,
-                p_organization_name: organizationName,
-                p_stripe_payment_intent_id: paymentIntent.id,
-                p_stripe_customer_id: paymentIntent.customer as string,
-                p_amount_paid: paymentIntent.amount || 0,
-                p_currency: paymentIntent.currency || 'eur',
-                p_organization_settings: paymentIntent.metadata?.organizationSettings ? 
-                  JSON.parse(paymentIntent.metadata.organizationSettings) : {}
-              });
+              .from("group_invitations")
+              .insert({
+                email: invitationEmail,
+                organization_name: organizationName,
+                stripe_payment_intent_id: paymentIntent.id,
+                stripe_customer_id: paymentIntent.customer as string,
+                amount_paid: paymentIntent.amount || 0,
+                currency: paymentIntent.currency || 'eur',
+                organization_settings: paymentIntent.metadata?.organizationSettings ? 
+                  JSON.parse(paymentIntent.metadata.organizationSettings) : {},
+                user_tokens: userTokens ? parseInt(userTokens) : null,
+                payment_status: 'pending',
+                token: token,
+                created_at: new Date().toISOString(),
+                expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days from now
+              })
+              .select()
+              .single();
 
             if (invitationError) {
               console.error("❌ Failed to create group invitation:", invitationError);
@@ -250,7 +274,7 @@ export async function POST(request: NextRequest) {
             console.log("✅ Group invitation created with pending payment status:", invitationData);
             
             // Send group invitation email with join button
-            const joinUrl = `${process.env.NEXT_PUBLIC_APP_URL}/group-invite/${invitationData[0].token}`;
+            const joinUrl = `${process.env.NEXT_PUBLIC_APP_URL}/group-invite/${invitationData.token}`;
             console.log("🔗 Generated join URL:", joinUrl);
 
             await mailerooService.sendGroupInvitationEmail(

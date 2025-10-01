@@ -232,9 +232,6 @@ const OrganizationPageContent = React.memo(function OrganizationPageContent() {
                     <Crown className="w-4 h-4" />
                     <span className="font-medium">Pla Grup Activat</span>
                   </div>
-                  <p className="text-xs text-green-600 dark:text-green-400 mt-1">
-                    Fins a 10 membres • Funcions avançades incloses
-                  </p>
                 </div>
               )}
             </div>

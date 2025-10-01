@@ -190,15 +190,6 @@ export default function GroupInvitePage() {
               <p className="text-gray-600 dark:text-gray-400 mb-4">
                 Heu estat convidat a unir-vos a aquesta organització amb un pla de grup.
               </p>
-              <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-4">
-                <Crown className="w-6 h-6 text-green-600 mx-auto mb-2" />
-                <p className="text-sm text-green-700 dark:text-green-400 font-medium">
-                  Pla Grup Activat
-                </p>
-                <p className="text-xs text-green-600 dark:text-green-500">
-                  Fins a 40 membres • Transcripcions il·limitades
-                </p>
-              </div>
             </div>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
               Si us plau, inicieu sessió amb <strong>{invitation?.email}</strong> per continuar.
