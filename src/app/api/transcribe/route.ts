@@ -67,6 +67,41 @@ export async function POST(request: NextRequest) {
     }
 
     console.log(`🔄 Processing transcription for audioId: ${audioId}`);
+    
+    // Check and deduct tokens before starting transcription
+    console.log(`💰 Checking tokens for user: ${userId}`);
+    const { data: tokenResult, error: tokenError } = await supabase.rpc(
+      "start_transcription",
+      {
+        p_user_id: userId,
+        p_audio_id: audioId,
+        p_token_cost: 1
+      }
+    );
+
+    if (tokenError || !tokenResult?.success) {
+      console.error("Token deduction failed:", tokenError || tokenResult?.error);
+      const errorMessage = tokenResult?.error || tokenError?.message || "Failed to process transcription";
+      
+      // Handle specific error cases
+      if (errorMessage.includes("Insufficient tokens")) {
+        return NextResponse.json(
+          { 
+            success: false, 
+            error: "Insufficient tokens. Please purchase more tokens to continue.",
+            remaining_tokens: tokenResult?.remaining_tokens || 0
+          },
+          { status: 402 } // Payment Required
+        );
+      }
+      
+      return NextResponse.json(
+        { success: false, error: errorMessage },
+        { status: 400 }
+      );
+    }
+
+    console.log(`✅ Tokens deducted successfully. Remaining: ${tokenResult.remaining_tokens}`);
     // Legacy inline processing path removed (migrated to Cloudflare Workers)
 
     // New ingestion path: if Cloudflare Worker ingest URL is configured, create durable job and forward to Worker

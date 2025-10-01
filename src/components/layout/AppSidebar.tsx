@@ -11,7 +11,6 @@ import {
   CheckCircle,
   AlertCircle,
   RefreshCw,
-  PenTool,
   User,
 } from "lucide-react";
 import {
@@ -94,11 +93,6 @@ export default function AppSidebar({
       title: "Transcriure",
       icon: Mic,
       path: "/transcribe",
-    },
-    {
-      title: "Anotar",
-      icon: PenTool,
-      path: "/annotate",
     },
     {
       title: "Biblioteca",
