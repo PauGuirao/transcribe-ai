@@ -62,16 +62,12 @@ export async function processInvitation(
       inviteData.organization_id
     );
 
-    
-    
-
     if (joinSuccess) {
       // Check if this organization was created from a group invitation and get user_tokens
       const { data: groupInvitation, error: groupInviteError } = await supabase
         .from("group_invitations")
         .select("user_tokens")
         .eq("created_organization_id", inviteData.organization_id)
-        .eq("is_used", true)
         .single();
 
       // If group invitation found and has user_tokens, assign them to the user
