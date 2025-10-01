@@ -55,14 +55,38 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    if (event.type === "checkout.session.completed") {
-      console.log("🎯 Handling checkout.session.completed event");
-      const session = event.data.object as Stripe.Checkout.Session;
-      const userId = session.metadata?.userId;
-      const plan = session.metadata?.plan ?? "pro";
-      const invitationEmail = session.metadata?.invitationEmail;
-      const organizationName = session.metadata?.organizationName;
-      const userTokens = session.metadata?.userTokens;
+    if (event.type === "checkout.session.completed" || event.type === "invoice.payment_succeeded") {
+      console.log(`🎯 Handling ${event.type} event`);
+      
+      // Handle both checkout sessions and invoices
+      let metadata: any;
+      let paymentIntentId: string;
+      let customerId: string;
+      let amountTotal: number;
+      let currency: string;
+      
+      if (event.type === "checkout.session.completed") {
+        const session = event.data.object as Stripe.Checkout.Session;
+        metadata = session.metadata;
+        paymentIntentId = session.payment_intent as string;
+        customerId = session.customer as string;
+        amountTotal = session.amount_total || 0;
+        currency = session.currency || 'eur';
+      } else {
+        // invoice.payment_succeeded - payment confirmed
+        const invoice = event.data.object as Stripe.Invoice;
+        metadata = invoice.metadata;
+        paymentIntentId = invoice.payment_intent as string;
+        customerId = invoice.customer as string;
+        amountTotal = invoice.amount_paid || 0;
+        currency = invoice.currency || 'eur';
+      }
+      
+      const userId = metadata?.userId;
+      const plan = metadata?.plan ?? "pro";
+      const invitationEmail = metadata?.invitationEmail;
+      const organizationName = metadata?.organizationName;
+      const userTokens = metadata?.userTokens;
 
       console.log("👤 User ID from metadata:", userId);
       console.log("📋 Plan from metadata:", plan);
@@ -83,12 +107,12 @@ export async function POST(request: NextRequest) {
             .insert({
               email: invitationEmail,
               organization_name: organizationName,
-              stripe_payment_intent_id: session.payment_intent as string,
-              stripe_customer_id: session.customer as string,
-              amount_paid: session.amount_total || 0,
-              currency: session.currency || 'eur',
-              organization_settings: session.metadata?.organizationSettings ? 
-                JSON.parse(session.metadata.organizationSettings) : {},
+              stripe_payment_intent_id: paymentIntentId,
+              stripe_customer_id: customerId,
+              amount_paid: amountTotal,
+              currency: currency,
+              organization_settings: metadata?.organizationSettings ? 
+                JSON.parse(metadata.organizationSettings) : {},
               user_tokens: userTokens ? parseInt(userTokens) : null,
               payment_status: 'completed',
               token: token,
@@ -116,8 +140,8 @@ export async function POST(request: NextRequest) {
             invitationEmail,
             joinUrl,
             organizationName,
-            session.amount_total || 0,
-            session.currency || 'eur'
+            amountTotal,
+            currency
           );
           
           console.log("✅ Group invitation email sent successfully to:", invitationEmail);
@@ -182,8 +206,10 @@ export async function POST(request: NextRequest) {
         .update({
           plan_type: plan === "paid" ? "group" : "pro",
           max_members: plan === "paid" ? 10 : 1,
-          stripe_customer_id: session.customer,
-          stripe_subscription_id: session.subscription,
+          stripe_customer_id: customerId,
+          stripe_subscription_id: event.type === "checkout.session.completed" ? 
+            (event.data.object as Stripe.Checkout.Session).subscription : 
+            (event.data.object as Stripe.Invoice).subscription,
           subscription_status: "active",
         })
         .eq("id", profile.current_organization_id);
