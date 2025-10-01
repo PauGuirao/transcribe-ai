@@ -219,15 +219,18 @@ Informació de la sol·licitud:
           
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/pricing" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+            <button 
+              onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+              className="text-sm text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
+            >
               Preus
-            </Link>
-            <Link href="/about" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
-              Sobre nosaltres
-            </Link>
-            <Link href="/contact" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+            </button>
+            <button 
+              onClick={() => setIsContactOpen(true)}
+              className="text-sm text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
+            >
               Contacte
-            </Link>
+            </button>
           </nav>
 
           <div className="hidden md:flex items-center space-x-3">
@@ -276,15 +279,24 @@ Informació de la sol·licitud:
           <div className="md:hidden bg-white border-t border-gray-100">
             <div className="mx-auto max-w-6xl px-6 py-4 space-y-3">
               <div className="space-y-2">
-                <Link href="/pricing" className="block text-sm text-gray-600 hover:text-gray-900 py-2">
+                <button 
+                  onClick={() => {
+                    document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="block text-sm text-gray-600 hover:text-gray-900 py-2 w-full text-left"
+                >
                   Preus
-                </Link>
-                <Link href="/about" className="block text-sm text-gray-600 hover:text-gray-900 py-2">
-                  Sobre nosaltres
-                </Link>
-                <Link href="/contact" className="block text-sm text-gray-600 hover:text-gray-900 py-2">
+                </button>
+                <button 
+                  onClick={() => {
+                    setIsContactOpen(true);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="block text-sm text-gray-600 hover:text-gray-900 py-2 w-full text-left"
+                >
                   Contacte
-                </Link>
+                </button>
               </div>
               <div className="pt-4 border-t border-gray-100 space-y-3">
                 {user ? (
@@ -549,7 +561,7 @@ Informació de la sol·licitud:
         </section>
 
         {/* Pricing Section */}
-        <section className="py-20">
+        <section id="pricing" className="py-20">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               Plans per a cada necessitat
