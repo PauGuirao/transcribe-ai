@@ -13,7 +13,7 @@ export function MobileEditWarning({ show }: MobileEditWarningProps) {
     return null;
   }
   return (
-    <div className="fixed inset-0 z-[9999] bg-black/80 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[90] bg-black/80 flex items-center justify-center p-4">
       <Card className="w-full max-w-md mx-auto">
         <CardContent className="p-6 text-center space-y-4">
           <div className="flex justify-center space-x-4 mb-4">

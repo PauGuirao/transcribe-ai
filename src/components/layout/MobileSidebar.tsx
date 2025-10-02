@@ -79,7 +79,7 @@ export default function MobileSidebar() {
   return (
     <>
       {/* Mobile Sidebar Trigger Button - Fixed Bottom Left */}
-      <div className="md:hidden fixed bottom-6 left-6 z-50">
+      <div className="md:hidden fixed bottom-6 left-6 z-99">
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>
             <Button
