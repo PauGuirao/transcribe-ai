@@ -54,6 +54,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface AudioFile {
   id: string;
@@ -125,6 +126,126 @@ const LibraryPage = React.memo(function LibraryPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const renderMobileCards = (files: AudioFile[]) => {
+    return (
+      <div className="space-y-4">
+        {files.map((file) => (
+          <Card 
+            key={file.id}
+            className="cursor-pointer hover:shadow-md transition-shadow"
+            onClick={() => router.push(`/transcribe?audioId=${file.id}`)}
+          >
+            <CardHeader className="pb-3">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <FileText className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <CardTitle className="text-base truncate">
+                      {file.customName || file.originalName}
+                    </CardTitle>
+                  </div>
+                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-8 w-8 p-0 flex-shrink-0"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    {file.status === "uploaded" ? (
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleTranscribe(file.id);
+                        }}
+                      >
+                        <FileText className="h-4 w-4 mr-2" />
+                        Transcriure
+                      </DropdownMenuItem>
+                    ) : (
+                      <>
+                        {file.status === "completed" && (
+                          <>
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDownloadPDF(file.transcription!.id);
+                              }}
+                            >
+                              <Download className="h-4 w-4 mr-2" />
+                              Descargar PDF
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDownloadDOCX(file.transcription!.id);
+                              }}
+                            >
+                              <Download className="h-4 w-4 mr-2" />
+                              Descargar Word
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                router.push(`/annotate?audioId=${file.id}`);
+                              }}
+                            >
+                              <PenTool className="h-4 w-4 mr-2" />
+                              Anotar
+                            </DropdownMenuItem>
+                          </>
+                        )}
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEdit(file);
+                          }}
+                        >
+                          <Edit className="h-4 w-4 mr-2" />
+                          Editar nom
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(file.id);
+                          }}
+                          className="text-red-600"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Eliminar
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">Estat:</span>
+                  {getStatusBadge(file.status)}
+                </div>
+                <span className="text-sm text-muted-foreground">
+                  {new Date(file.uploadDate).toLocaleDateString("ca-ES", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
   };
 
   useEffect(() => {
@@ -510,16 +631,16 @@ const LibraryPage = React.memo(function LibraryPage() {
                             }}
                           >
                             <Edit className="h-4 w-4 mr-2" />
-                            Editar
+                            Editar nom
                           </DropdownMenuItem>
                         </>
                       )}
                       <DropdownMenuItem
-                        className="text-destructive"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDelete(file.id);
                         }}
+                        className="text-red-600"
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
                         Eliminar
@@ -773,7 +894,16 @@ const LibraryPage = React.memo(function LibraryPage() {
         ) : (
           <div>
             {filterType === "default" ? (
-              renderFileTable(files)
+              <>
+                {/* Desktop table view */}
+                <div className="hidden md:block">
+                  {renderFileTable(files)}
+                </div>
+                {/* Mobile card view */}
+                <div className="block md:hidden">
+                  {renderMobileCards(files)}
+                </div>
+              </>
             ) : (
               <div className="space-y-6">
                 {groupFilesByDay(files).map(([dateKey, dayFiles]) => (
@@ -781,7 +911,14 @@ const LibraryPage = React.memo(function LibraryPage() {
                     <h3 className="text-md font-semibold text-gray-800 border-b border-gray-200 pb-2">
                       {dateKey}
                     </h3>
-                    {renderFileTable(dayFiles)}
+                    {/* Desktop table view */}
+                    <div className="hidden md:block">
+                      {renderFileTable(dayFiles)}
+                    </div>
+                    {/* Mobile card view */}
+                    <div className="block md:hidden">
+                      {renderMobileCards(dayFiles)}
+                    </div>
                   </div>
                 ))}
               </div>

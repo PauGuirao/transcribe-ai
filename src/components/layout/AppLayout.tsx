@@ -3,6 +3,7 @@
 import React from 'react';
 import Navbar from './Navbar';
 import AppSidebar from './AppSidebar';
+import MobileSidebar from './MobileSidebar';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { AudioUploadResult } from '@/types';
 
@@ -18,13 +19,17 @@ export default function AppLayout({ children, selectedAudioId, onAudioSelect, on
   const noopUpload: (result: AudioUploadResult) => void = () => {};
   const handleAudioSelect = onAudioSelect ?? noopSelect;
   const handleUploadComplete = onUploadComplete ?? noopUpload;
+
   return (
     <div className="h-screen flex flex-col">
+      {/* Mobile Sidebar */}
+      <MobileSidebar />
+      
       {/* Top Navbar - Full Width */}
       <Navbar />
       
-      {/* Sidebar and Main Content */}
-      <div className="flex-1 flex pt-[65px]">
+      {/* Desktop Layout with Sidebar */}
+      <div className="hidden md:flex flex-1 pt-[65px]">
         <SidebarProvider>
           <AppSidebar 
             selectedAudioId={selectedAudioId}
@@ -37,6 +42,11 @@ export default function AppLayout({ children, selectedAudioId, onAudioSelect, on
             </div>
           </SidebarInset>
         </SidebarProvider>
+      </div>
+      
+      {/* Mobile Layout - Full width content */}
+      <div className="md:hidden flex-1 pt-[65px] overflow-auto">
+        {children}
       </div>
     </div>
   );

@@ -65,7 +65,7 @@ export default function Navbar() {
         <Link href="/">
           <img src="/logo3.png" alt="TranscribeAI Logo" className="h-10" />
         </Link>
-        <h1 className="text-xl font-semibold text-gray-900">transcriu</h1>
+        <h1 className="hidden md:block text-xl font-semibold text-gray-900">transcriu</h1>
       </div>
       <div className="flex items-center gap-3">
         {user && isSubscribed === false && currentUserRole === 'owner' && (
@@ -81,9 +81,10 @@ export default function Navbar() {
           </Button>
         )}
         
-        {/* Organization display - only show for group plan */}
+        {/* Organization display - only show for group plan and hide on mobile */}
         {organization && organization.plan_type === 'group' && (
-          <DropdownMenu>
+          <div className="hidden md:block">
+            <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <div className="flex items-center gap-2 px-4 py-1 bg-white rounded-md border-2 border-border shadow-md hover:bg-gray-50 transition-colors cursor-pointer">
                 <Users className="h-4 w-4 text-muted-foreground" />
@@ -165,6 +166,7 @@ export default function Navbar() {
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
+          </div>
         )}
         
         <DropdownMenu>

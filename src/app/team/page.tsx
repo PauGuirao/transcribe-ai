@@ -378,7 +378,7 @@ const TeamPage = React.memo(function TeamPage() {
                   className="flex items-center gap-2"
                 >
                   <UserPlus className="h-4 w-4" />
-                  Convidar membres
+                  Convidar
                 </Button>
               )}
             </div>
@@ -395,25 +395,102 @@ const TeamPage = React.memo(function TeamPage() {
                 </p>
               </div>
             ) : (
-              <div className="rounded-lg border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Nom</TableHead>
-                      <TableHead>Rols</TableHead>
-                      <TableHead>Data de unió</TableHead>
-                      {data.currentUserRole && (data.currentUserRole === 'admin' || data.currentUserRole === 'owner') && (
-                        <TableHead className="w-[50px]"></TableHead>
-                      )}
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {data.members.map((member, index) => (
-                      <TableRow key={member.id}>
-                        <TableCell>
-                          <div className="flex items-center gap-3">
+              <>
+                {/* Desktop Table */}
+                <div className="hidden md:block rounded-lg border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Nom</TableHead>
+                        <TableHead>Rols</TableHead>
+                        <TableHead>Data de unió</TableHead>
+                        {data.currentUserRole && (data.currentUserRole === 'admin' || data.currentUserRole === 'owner') && (
+                          <TableHead className="w-[50px]"></TableHead>
+                        )}
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {data.members.map((member, index) => (
+                        <TableRow key={member.id}>
+                          <TableCell>
+                            <div className="flex items-center gap-3">
+                              <div className="relative">
+                                <Avatar className="h-10 w-10 ring-2 ring-primary/20">
+                                  <AvatarFallback className="bg-primary/15 text-primary font-semibold border border-primary/20">
+                                    {(member.profiles.full_name || member.profiles.email)
+                                      .charAt(0)
+                                      .toUpperCase()}
+                                  </AvatarFallback>
+                                </Avatar>
+                                {(member.role === 'admin' || member.role === 'owner') && (
+                                  <div className="absolute -top-1 -right-1 p-1 bg-primary rounded-full shadow-sm">
+                                    <Crown className="h-3 w-3 text-primary-foreground" />
+                                  </div>
+                                )}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="font-semibold text-foreground truncate">
+                                  {member.profiles.full_name || "Usuario"}
+                                </div>
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                  <Mail className="h-3.5 w-3.5" />
+                                  <span className="truncate">{member.profiles.email}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={getRoleBadgeVariant(member.role)}
+                              className="flex items-center gap-1 text-xs px-2 py-1 shadow-sm w-fit"
+                            >
+                              {getRoleIcon(member.role)}
+                              {getRoleDisplayName(member.role)}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="text-sm text-muted-foreground">
+                              {new Date(member.joined_at).toLocaleDateString("es-ES", {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                              })}
+                            </div>
+                          </TableCell>
+                          {data.currentUserRole && (data.currentUserRole === 'admin' || data.currentUserRole === 'owner') && (
+                            <TableCell>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem 
+                                    className="text-destructive"
+                                    onClick={() => handleRemoveClick(member)}
+                                  >
+                                    Elimina del equip
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </TableCell>
+                          )}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {/* Mobile Cards */}
+                <div className="md:hidden space-y-4">
+                  {data.members.map((member) => (
+                    <Card key={member.id} className="p-4">
+                      <CardContent className="p-0">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
                             <div className="relative">
-                              <Avatar className="h-10 w-10 ring-2 ring-primary/20">
+                              <Avatar className="h-12 w-12 ring-2 ring-primary/20">
                                 <AvatarFallback className="bg-primary/15 text-primary font-semibold border border-primary/20">
                                   {(member.profiles.full_name || member.profiles.email)
                                     .charAt(0)
@@ -430,36 +507,32 @@ const TeamPage = React.memo(function TeamPage() {
                               <div className="font-semibold text-foreground truncate">
                                 {member.profiles.full_name || "Usuario"}
                               </div>
-                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                                 <Mail className="h-3.5 w-3.5" />
                                 <span className="truncate">{member.profiles.email}</span>
                               </div>
+                              <div className="flex items-center justify-between">
+                                <Badge
+                                  variant={getRoleBadgeVariant(member.role)}
+                                  className="flex items-center gap-1 text-xs px-2 py-1 shadow-sm w-fit"
+                                >
+                                  {getRoleIcon(member.role)}
+                                  {getRoleDisplayName(member.role)}
+                                </Badge>
+                                <div className="text-xs text-muted-foreground">
+                                  {new Date(member.joined_at).toLocaleDateString("es-ES", {
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "numeric",
+                                  })}
+                                </div>
+                              </div>
                             </div>
                           </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={getRoleBadgeVariant(member.role)}
-                            className="flex items-center gap-1 text-xs px-2 py-1 shadow-sm w-fit"
-                          >
-                            {getRoleIcon(member.role)}
-                            {getRoleDisplayName(member.role)}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="text-sm text-muted-foreground">
-                            {new Date(member.joined_at).toLocaleDateString("es-ES", {
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                            })}
-                          </div>
-                        </TableCell>
-                        {data.currentUserRole && (data.currentUserRole === 'admin' || data.currentUserRole === 'owner') && (
-                          <TableCell>
+                          {data.currentUserRole && (data.currentUserRole === 'admin' || data.currentUserRole === 'owner') && (
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 ml-2">
                                   <MoreHorizontal className="h-4 w-4" />
                                 </Button>
                               </DropdownMenuTrigger>
@@ -472,13 +545,13 @@ const TeamPage = React.memo(function TeamPage() {
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
-                          </TableCell>
-                        )}
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </>
             )}
           </div>
         )}

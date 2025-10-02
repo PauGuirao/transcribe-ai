@@ -84,6 +84,12 @@ export function EmptyState({
     router.push("/payment");
   };
 
+  const handleResetUpload = () => {
+    setPendingUpload(null);
+    setUploadError(null);
+    setManualTranscribeError(null);
+  };
+
   // If user has no tokens, show subscription message
   if (tokens === 0 || tokens === null) {
     return (
@@ -187,13 +193,15 @@ export function EmptyState({
 
         <div className="mt-6 w-full rounded-3xl border border-dashed border-muted-foreground/40 bg-background/60 p-4 text-left shadow-sm">
           <div className="space-y-4">
-            <AudioUpload
-              autoTranscribe={false}
-              variant="minimal"
-              showUploadedFiles={false}
-              onUploadComplete={handleManualUploadComplete}
-              onUploadError={handleManualUploadError}
-            />
+            {!pendingUpload && (
+              <AudioUpload
+                autoTranscribe={false}
+                variant="minimal"
+                showUploadedFiles={false}
+                onUploadComplete={handleManualUploadComplete}
+                onUploadError={handleManualUploadError}
+              />
+            )}
 
             {pendingUpload && (
               <div className="space-y-4 rounded-2xl border border-muted-foreground/20 bg-muted/30 p-4">
@@ -206,28 +214,38 @@ export function EmptyState({
                       Archivo listo. Inicia la transcripción cuando quieras.
                     </p>
                   </div>
-                  <Button
-                    className="relative gap-2 group overflow-hidden"
-                    onClick={handleManualTranscribe}
-                    disabled={manualTranscribeLoading}
-                  >
-                    {manualTranscribeLoading ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Transcribiendo...
-                      </>
-                    ) : (
-                      <>
-                        <span>Transcriure ara</span>
-                        <ArrowRight className="h-4 w-4 transition-transform duration-200 ease-out group-hover:translate-x-1" />
-                        {/* underline grows in on hover */}
-                        <span
-                          aria-hidden
-                          className="pointer-events-none absolute bottom-0 left-0 h-px w-full origin-left scale-x-0 bg-current/40 transition-transform duration-300 ease-out group-hover:scale-x-100"
-                        />
-                      </>
-                    )}
-                  </Button>
+                  <div className="flex flex-col gap-2 md:flex-row md:gap-2">
+                    <Button
+                      className="relative gap-2 group overflow-hidden"
+                      onClick={handleManualTranscribe}
+                      disabled={manualTranscribeLoading}
+                    >
+                      {manualTranscribeLoading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Transcribiendo...
+                        </>
+                      ) : (
+                        <>
+                          <span>Transcriure ara</span>
+                          <ArrowRight className="h-4 w-4 transition-transform duration-200 ease-out group-hover:translate-x-1" />
+                          {/* underline grows in on hover */}
+                          <span
+                            aria-hidden
+                            className="pointer-events-none absolute bottom-0 left-0 h-px w-full origin-left scale-x-0 bg-current/40 transition-transform duration-300 ease-out group-hover:scale-x-100"
+                          />
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={handleResetUpload}
+                      disabled={manualTranscribeLoading}
+                      className="text-sm"
+                    >
+                      Vull cambiar d'audio
+                    </Button>
+                  </div>
                 </div>
                 {manualTranscribeError && (
                   <p className="text-xs text-destructive">
