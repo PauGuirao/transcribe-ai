@@ -52,7 +52,7 @@ export function AudioUpload({
       });
 
       if (!response.ok) {
-        throw new Error("Upload failed");
+        throw new Error("Pujada fallida");
       }
 
       const result = await response.json();
@@ -87,6 +87,11 @@ export function AudioUpload({
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (file) {
+      // Clean previous state when starting a new upload
+      setUploadProgress(null);
+      setUploadedFiles([]);
+      
+      // Set the new file and start upload
       setUploadedFiles([file]);
       uploadFile(file);
     }
