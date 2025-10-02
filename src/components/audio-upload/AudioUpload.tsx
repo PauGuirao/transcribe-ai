@@ -95,7 +95,7 @@ export function AudioUpload({
   const { getRootProps, getInputProps, isDragActive, fileRejections } =
     useDropzone({
       onDrop,
-      maxFiles: 1,
+      multiple: false,
       noClick: false,
       noKeyboard: false,
       validator: (file) => {
@@ -116,14 +116,6 @@ export function AudioUpload({
           return {
             code: 'file-too-large',
             message: `El fitxer és massa gran. La mida màxima és ${Math.round(MAX_FILE_SIZE / (1024 * 1024))} MB`
-          };
-        }
-        
-        // Check max files (since we removed maxFiles from dropzone config)
-        if (uploadedFiles.length >= 1) {
-          return {
-            code: 'too-many-files',
-            message: 'Només es pot pujar un fitxer alhora'
           };
         }
         
