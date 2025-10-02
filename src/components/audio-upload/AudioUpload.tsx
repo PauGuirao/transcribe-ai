@@ -8,6 +8,8 @@ import { Progress } from "@/components/ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { UploadProgress, AudioUploadResult, AudioUploadProps } from "@/types";
+import { useAuth } from "@/contexts/AuthContext";
+import { trackFileRejections } from "@/lib/failed-upload-tracker";
 
 const ACCEPTED_AUDIO_TYPES = {
   "audio/mpeg": [".mp3"],
@@ -34,6 +36,7 @@ export function AudioUpload({
     null
   );
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const { user } = useAuth();
 
   const uploadFile = async (file: File) => {
     const formData = new FormData();
@@ -71,9 +74,9 @@ export function AudioUpload({
       setUploadProgress({
         progress: 0,
         status: "error",
-        message: "Upload failed",
+        message: "Error de pujada",
       });
-      onUploadError(error instanceof Error ? error.message : "Upload failed");
+      onUploadError(error instanceof Error ? error.message : "Error de pujada");
 
       setTimeout(() => {
         setUploadProgress(null);
@@ -92,10 +95,48 @@ export function AudioUpload({
   const { getRootProps, getInputProps, isDragActive, fileRejections } =
     useDropzone({
       onDrop,
-      accept: ACCEPTED_AUDIO_TYPES,
       maxFiles: 1,
-      maxSize: MAX_FILE_SIZE,
+      noClick: false,
+      noKeyboard: false,
+      validator: (file) => {
+        // Custom validation with Catalan error messages
+        const acceptedTypes = Object.keys(ACCEPTED_AUDIO_TYPES);
+        const acceptedExtensions = Object.values(ACCEPTED_AUDIO_TYPES).flat();
+        
+        // Check file type
+        if (!acceptedTypes.includes(file.type) && !acceptedExtensions.some(ext => file.name.toLowerCase().endsWith(ext))) {
+          return {
+            code: 'file-invalid-type',
+            message: `El tipus de fitxer ha de ser un dels següents: ${acceptedExtensions.join(', ')}`
+          };
+        }
+        
+        // Check file size
+        if (file.size > MAX_FILE_SIZE) {
+          return {
+            code: 'file-too-large',
+            message: `El fitxer és massa gran. La mida màxima és ${Math.round(MAX_FILE_SIZE / (1024 * 1024))} MB`
+          };
+        }
+        
+        // Check max files (since we removed maxFiles from dropzone config)
+        if (uploadedFiles.length >= 1) {
+          return {
+            code: 'too-many-files',
+            message: 'Només es pot pujar un fitxer alhora'
+          };
+        }
+        
+        return null;
+      },
     });
+
+  // Track failed upload attempts when files are rejected
+  React.useEffect(() => {
+    if (fileRejections.length > 0 && user?.email) {
+      trackFileRejections([...fileRejections], user.email);
+    }
+  }, [fileRejections, user?.email]);
 
   const removeFile = () => {
     setUploadedFiles([]);
@@ -209,16 +250,16 @@ export function AudioUpload({
               <AlertCircle className="h-5 w-5 text-destructive mt-0.5" />
               <div className="space-y-1">
                 <p className="text-sm font-medium text-destructive">
-                  Upload Error
+                  Error de pujada
                 </p>
-                {fileRejections.map(({ file, errors }) => (
+                {fileRejections.map(({ file, errors }, fileIndex) => (
                   <div
-                    key={file.name}
+                    key={`${file.name}-${fileIndex}`}
                     className="text-sm text-muted-foreground"
                   >
                     <p className="font-medium">{file.name}</p>
-                    {errors.map((error) => (
-                      <p key={error.code} className="text-destructive">
+                    {errors.map((error, errorIndex) => (
+                      <p key={`${file.name}-${error.code}-${errorIndex}`} className="text-destructive">
                         {error.message}
                       </p>
                     ))}
@@ -235,7 +276,7 @@ export function AudioUpload({
         <Card>
           <CardContent className="p-4">
             <div className="space-y-2">
-              <p className="text-sm font-medium">Uploaded Files</p>
+              <p className="text-sm font-medium">Fitxers pujats</p>
               {uploadedFiles.map((file, index) => (
                 <div
                   key={index}
