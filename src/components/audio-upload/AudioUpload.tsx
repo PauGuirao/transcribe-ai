@@ -256,11 +256,11 @@ export function AudioUpload({
                   ? "Suelta aquí tu audio"
                   : "Puja un arxiu d'àudio"}
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-md text-muted-foreground">
                 Arrossega i deixa anar o fes clic per seleccionar
               </p>
-              <p className="text-xs text-muted-foreground">
-                MP3, WAV, M4A, OGG, WebM, FLAC, AAC, WMA, AIFF (máx. 25 MB)
+              <p className="text-lg text-muted-foreground">
+                MP3, WAV, M4A, OGG, WebM, FLAC, AAC, WMA, AIFF (máx. 50 MB)
               </p>
             </div>
           </div>
