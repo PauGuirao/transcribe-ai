@@ -21,10 +21,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { AudioUpload } from "@/components/audio-upload/AudioUpload";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { Audio, AudioUploadResult } from "@/types";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";

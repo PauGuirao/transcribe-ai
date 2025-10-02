@@ -12,6 +12,8 @@ import { ErrorState } from './states/ErrorState';
 import { ProcessingState } from './states/ProcessingState';
 import { TranscriptionErrorState } from './states/TranscriptionErrorState';
 import { TranscriptionHeader } from './TranscriptionHeader';
+import { MobileEditWarning } from '@/components/ui/mobile-edit-warning';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { AudioUploadResult, TranscriptionSegment, AudioPlayerRef } from '@/types';
 
 interface MainLayoutProps {
@@ -22,6 +24,7 @@ interface MainLayoutProps {
 
 export function MainLayout({ selectedAudioId, onAudioSelect, onUploadComplete }: MainLayoutProps) {
   const [audioPlayerRef, setAudioPlayerRef] = useState<AudioPlayerRef | null>(null);
+  const isMobile = useIsMobile();
   
   const {
     audio,
@@ -154,6 +157,8 @@ export function MainLayout({ selectedAudioId, onAudioSelect, onUploadComplete }:
               onSegmentsChange={handleSegmentsChange}
             />
           </div>
+          {/* Mobile Edit Warning Popup */}
+          <MobileEditWarning show={isMobile} />
         </div>
       );
     }
