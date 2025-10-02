@@ -63,25 +63,44 @@ export async function processInvitation(
     );
 
     if (joinSuccess) {
+      console.log(`🔍 DEBUG: joinSuccess is true for user ${user.id}, organization ${inviteData.organization_id}`);
+      
       // Check if this organization was created from a group invitation and get user_tokens
+      console.log(`🔍 DEBUG: Checking for group invitation with created_organization_id: ${inviteData.organization_id}`);
       const { data: groupInvitation, error: groupInviteError } = await supabase
         .from("group_invitations")
         .select("user_tokens")
         .eq("created_organization_id", inviteData.organization_id)
         .single();
 
+      console.log(`🔍 DEBUG: Group invitation query result:`, {
+        groupInvitation,
+        groupInviteError,
+        hasData: !!groupInvitation,
+        userTokens: groupInvitation?.user_tokens
+      });
+
       // If group invitation found and has user_tokens, assign them to the user
       if (!groupInviteError && groupInvitation && groupInvitation.user_tokens && groupInvitation.user_tokens > 0) {
+        console.log(`🔍 DEBUG: About to assign ${groupInvitation.user_tokens} tokens to user ${user.id}`);
+        
         const { error: profileError } = await supabase
           .from("profiles")
           .update({ tokens: groupInvitation.user_tokens })
           .eq("id", user.id);
 
         if (profileError) {
-          console.error("Error updating user tokens:", profileError);
+          console.error("❌ Error updating user tokens:", profileError);
         } else {
-          console.log(`✅ Assigned ${groupInvitation.user_tokens} tokens to user ${user.id} from group invitation`);
+          console.log(`✅ Successfully assigned ${groupInvitation.user_tokens} tokens to user ${user.id} from group invitation`);
         }
+      } else {
+        console.log(`🔍 DEBUG: Token assignment skipped. Reasons:`, {
+          hasGroupInviteError: !!groupInviteError,
+          hasGroupInvitation: !!groupInvitation,
+          userTokensValue: groupInvitation?.user_tokens,
+          userTokensGreaterThanZero: groupInvitation?.user_tokens > 0
+        });
       }
 
       // Mark invitation as used if it's a secure invitation
