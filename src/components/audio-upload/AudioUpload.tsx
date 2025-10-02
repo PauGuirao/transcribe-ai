@@ -23,7 +23,7 @@ const ACCEPTED_AUDIO_TYPES = {
   "audio/aiff": [".aiff"],
 };
 
-const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
+const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
 
 export function AudioUpload({
   onUploadComplete,
@@ -39,23 +39,85 @@ export function AudioUpload({
   const { user } = useAuth();
 
   const uploadFile = async (file: File) => {
-    const formData = new FormData();
-    formData.append("audio", file);
-    formData.append("autoTranscribe", autoTranscribe ? "true" : "false");
-
     try {
       setUploadProgress({ progress: 0, status: "uploading" });
 
-      const response = await fetch("/api/upload", {
+      // Step 1: Get presigned URL
+      const presignedResponse = await fetch("/api/upload/presigned", {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fileName: file.name,
+          fileType: file.type,
+          fileSize: file.size,
+        }),
       });
 
-      if (!response.ok) {
-        throw new Error("Pujada fallida");
+      if (!presignedResponse.ok) {
+        const errorData = await presignedResponse.json();
+        throw new Error(errorData.error || "Failed to get upload URL");
       }
 
-      const result = await response.json();
+      const { uploadUrl, audioId, filename, originalName } = await presignedResponse.json();
+
+      setUploadProgress({ progress: 25, status: "uploading" });
+
+      // Step 2: Upload directly to Supabase Storage with progress tracking
+      const xhr = new XMLHttpRequest();
+      
+      const uploadPromise = new Promise<void>((resolve, reject) => {
+        xhr.upload.addEventListener('progress', (event) => {
+          if (event.lengthComputable) {
+            // Progress from 25% to 75% during upload
+            const uploadProgress = (event.loaded / event.total) * 50; // 50% of total progress
+            setUploadProgress({ 
+              progress: 25 + uploadProgress, 
+              status: "uploading" 
+            });
+          }
+        });
+
+        xhr.addEventListener('load', () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve();
+          } else {
+            reject(new Error('Failed to upload file to storage'));
+          }
+        });
+
+        xhr.addEventListener('error', () => {
+          reject(new Error('Network error during upload'));
+        });
+
+        xhr.open('PUT', uploadUrl);
+        xhr.setRequestHeader('Content-Type', file.type);
+        xhr.send(file);
+      });
+
+      await uploadPromise;
+
+      setUploadProgress({ progress: 75, status: "uploading" });
+
+      // Step 3: Complete upload and start transcription
+      const completeResponse = await fetch("/api/upload/complete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          audioId,
+          autoTranscribe,
+        }),
+      });
+
+      if (!completeResponse.ok) {
+        const errorData = await completeResponse.json();
+        throw new Error(errorData.error || "Failed to complete upload");
+      }
+
+      const result = await completeResponse.json();
 
       setUploadProgress({ progress: 100, status: "completed" });
       onUploadComplete({
