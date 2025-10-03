@@ -78,8 +78,8 @@ export async function POST(request: NextRequest) {
       }
 
       // If we have a Cloudflare Worker endpoint configured, trigger transcription
-      const workerUrl = process.env.CLOUDFLARE_WORKER_URL;
-      const ingestApiKey = process.env.CLOUDFLARE_WORKER_API_KEY;
+      const workerUrl = process.env.CLOUDFLARE_INGEST_URL;
+      const ingestApiKey = process.env.CLOUDFLARE_INGEST_API_KEY;
 
       if (workerUrl && ingestApiKey) {
         try {
