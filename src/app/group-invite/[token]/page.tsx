@@ -144,7 +144,7 @@ export default function GroupInvitePage() {
   // Show invitation expired or used
   if (invitation && (invitation.is_used || new Date(invitation.expires_at) < new Date())) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-orange-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <XCircle className="w-12 h-12 text-yellow-500 mx-auto mb-4" />
