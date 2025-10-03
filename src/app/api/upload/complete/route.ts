@@ -83,10 +83,15 @@ export async function POST(request: NextRequest) {
 
       if (workerUrl && ingestApiKey) {
         try {
+          // Create an idempotency key for this transcription job
+          const idempotencyKey = `${user.id}:${audioId}:${audioRecord.filename}:workers_ai`;
+          
           // Create a transcription job
           const { data: jobData, error: jobError } = await supabase
-            .rpc('create_transcription_job', {
+            .rpc('upsert_transcription_job', {
+              p_user_id: user.id,
               p_audio_id: audioId,
+              p_idempotency_key: idempotencyKey,
               p_provider: 'workers_ai'
             });
 
