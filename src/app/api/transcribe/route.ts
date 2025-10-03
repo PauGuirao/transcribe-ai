@@ -159,15 +159,37 @@ export async function POST(request: NextRequest) {
         if (!res.ok) {
           const text = await res.text();
           console.error("Cloudflare processing failed:", res.status, text);
+          console.error("Request payload was:", JSON.stringify({
+            jobId,
+            userId,
+            audioId,
+            filename,
+            originalName,
+            filePath,
+            provider,
+          }));
           return NextResponse.json(
-            { success: false, error: "Failed to process transcription" },
+            { success: false, error: `Failed to process transcription: ${res.status} - ${text}` },
             { status: 502 }
           );
         }
       } catch (err) {
         console.error("Cloudflare processing error:", err);
+        console.error("Error details:", {
+          message: err instanceof Error ? err.message : 'Unknown error',
+          stack: err instanceof Error ? err.stack : undefined,
+          requestData: {
+            jobId,
+            userId,
+            audioId,
+            filename,
+            originalName,
+            filePath,
+            provider,
+          }
+        });
         return NextResponse.json(
-          { success: false, error: "Failed to process transcription" },
+          { success: false, error: `Failed to process transcription: ${err instanceof Error ? err.message : 'Unknown error'}` },
           { status: 502 }
         );
       }
