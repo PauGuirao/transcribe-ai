@@ -47,16 +47,12 @@ export function EmptyState({
     setManualTranscribeError(null);
 
     try {
-      const response = await fetch("/api/transcribe", {
+      const response = await fetch("/api/upload/complete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // 👇 CORRECTED THIS PART
         body: JSON.stringify({
           audioId: pendingUpload.audioId,
-          filename: pendingUpload.filename, // Added this line
-          originalName: pendingUpload.originalName, // Added this line
-          filePath: pendingUpload.filePath,
-          provider: "workers-ai",
+          autoTranscribe: true, // Force transcription through Cloudflare Worker
         }),
       });
 

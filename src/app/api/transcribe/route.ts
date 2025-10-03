@@ -143,6 +143,16 @@ export async function POST(request: NextRequest) {
         if (CF_INGEST_API_KEY) {
           headers["Authorization"] = `Bearer ${CF_INGEST_API_KEY}`;
         }
+        console.log(`Sending job to worker: ${targetUrl}/transcribe-direct`);
+            // add log of the payload
+            console.log(`Payload: ${JSON.stringify({
+                jobId: jobId,
+                userId: user.id,
+                audioId: audioId,
+                filename: filename,
+                originalName: filename,
+                filePath: filePath,
+              })}`);
         const res = await fetch(targetUrl, {
           method: "POST",
           headers,

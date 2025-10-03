@@ -93,7 +93,18 @@ export async function POST(request: NextRequest) {
           if (jobError) {
             console.error("Failed to create transcription job:", jobError);
           } else if (jobData?.job_id) {
+            console.log(`Successfully created transcription job with ID: ${jobData.job_id}`);
             // Send job to Cloudflare Worker
+            console.log(`Sending job to worker: ${workerUrl}/transcribe-direct`);
+            // add log of the payload
+            console.log(`Payload: ${JSON.stringify({
+                jobId: jobData.job_id,
+                userId: user.id,
+                audioId: audioId,
+                filename: audioRecord.filename,
+                originalName: audioRecord.filename,
+                filePath: audioRecord.storage_path,
+              })}`);
             const workerResponse = await fetch(`${workerUrl}/transcribe-direct`, {
               method: 'POST',
               headers: {
