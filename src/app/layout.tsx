@@ -24,21 +24,6 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "Transcriu - Transcripció d'Àudio",
   description: "App per transcriure sessions de logopèdia i àudios de forma ràpida i precisa",
-  manifest: "/manifest.json",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "Transcriu",
-  },
-  other: {
-    "mobile-web-app-capable": "yes",
-    "apple-mobile-web-app-capable": "yes",
-    "apple-mobile-web-app-status-bar-style": "default",
-    "apple-mobile-web-app-title": "Transcriu",
-    "application-name": "Transcriu",
-    "msapplication-TileColor": "#2563eb",
-    "msapplication-config": "none",
-  },
 };
 
 export default function RootLayout({
@@ -54,23 +39,6 @@ export default function RootLayout({
         <AuthProvider>
           {children}
         </AuthProvider>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js')
-                    .then(function(registration) {
-                      console.log('Service Worker registered successfully:', registration.scope);
-                    })
-                    .catch(function(error) {
-                      console.log('Service Worker registration failed:', error);
-                    });
-                });
-              }
-            `,
-          }}
-        />
       </body>
     </html>
   );
