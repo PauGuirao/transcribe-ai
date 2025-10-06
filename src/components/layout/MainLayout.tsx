@@ -42,28 +42,25 @@ export function MainLayout({ selectedAudioId, onAudioSelect, onUploadComplete }:
     saveTitle,
   } = useTranscriptionData(selectedAudioId);
   
+  // Reset audio player ref when audio changes to prevent stale references
+  React.useEffect(() => {
+    setAudioPlayerRef(null);
+  }, [selectedAudioId]);
+  
   const wordCount = editedSegments.reduce((count, segment) => {
     return count + segment.text.trim().split(/\s+/).filter(Boolean).length;
   }, 0);
 
   const handleSegmentClick = (segment: TranscriptionSegment) => {
-    console.log('Segment clicked:', segment);
     if (audioPlayerRef) {
-      console.log('Seeking to:', segment.start);
       audioPlayerRef.seekTo(segment.start);
-    } else {
-      console.error('Audio player ref not available');
     }
   };
 
   const handleSegmentDoubleClick = (segment: TranscriptionSegment) => {
-    console.log('Segment double-clicked:', segment);
     if (audioPlayerRef) {
-      console.log('Seeking and playing from:', segment.start);
       audioPlayerRef.seekTo(segment.start);
       audioPlayerRef.play();
-    } else {
-      console.error('Audio player ref not available for double-click');
     }
   };
   

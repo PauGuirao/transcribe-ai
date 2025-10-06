@@ -161,11 +161,11 @@ export function AudioPlayer({ audioId, className, onRef }: AudioPlayerProps) {
 
   const seekTo = useCallback((time: number) => {
     const audio = audioRef.current;
-    if (audio && duration) {
-      audio.currentTime = Math.min(Math.max(0, time), duration);
+    if (audio && audio.duration) {
+      audio.currentTime = Math.min(Math.max(0, time), audio.duration);
       setCurrentTime(audio.currentTime);
     }
-  }, [duration]);
+  }, []);
 
   const play = useCallback(async () => {
     const audio = audioRef.current;
