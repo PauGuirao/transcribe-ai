@@ -4,6 +4,8 @@ import React from 'react';
 import Link from 'next/link';
 import AppLayout from '@/components/layout/AppLayout';
 import WhatsAppButton from '@/components/WhatsAppButton';
+import SharedAudioHandler from '@/components/shared/SharedAudioHandler';
+import InstallPrompt from '@/components/pwa/InstallPrompt';
 import { Mic, PencilLine, Library, ArrowRight } from 'lucide-react';
 
 const DashboardPage = React.memo(function DashboardPage() {
@@ -48,6 +50,8 @@ const DashboardPage = React.memo(function DashboardPage() {
         </div>
       </div>
       <WhatsAppButton />
+      <SharedAudioHandler />
+      <InstallPrompt />
     </AppLayout>
   );
 });
