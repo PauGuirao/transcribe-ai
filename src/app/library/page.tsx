@@ -631,7 +631,7 @@ const LibraryPage = React.memo(function LibraryPage() {
                             }}
                           >
                             <Edit className="h-4 w-4 mr-2" />
-                            Editar nom
+                            Editar
                           </DropdownMenuItem>
                         </>
                       )}

@@ -12,6 +12,7 @@ import {
   AlertCircle,
   RefreshCw,
   User,
+  GraduationCap,
 } from "lucide-react";
 import {
   Sidebar,
@@ -100,6 +101,11 @@ export default function AppSidebar({
       title: "Alumnes",
       icon: User,
       path: "/profiles",
+    },
+    {
+      title: "Tutorials",
+      icon: GraduationCap,
+      path: "/tutorials",
     },
   ];
 
