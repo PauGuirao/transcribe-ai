@@ -22,6 +22,13 @@ interface EditableTranscriptionSegmentsProps {
   currentTime?: number;
 }
 
+// Interface for undo history entries
+interface UndoHistoryEntry {
+  segments: TranscriptionSegment[];
+  action: string;
+  timestamp: number;
+}
+
 export function EditableTranscriptionSegments({ 
   segments, 
   speakers,
@@ -38,6 +45,43 @@ export function EditableTranscriptionSegments({
   const [cursorPosition, setCursorPosition] = useState<number>(0);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Undo functionality state
+  const [undoHistory, setUndoHistory] = useState<UndoHistoryEntry[]>([]);
+  const maxUndoHistory = 50; // Limit history to prevent memory issues
+
+  // Function to save current state to undo history
+  const saveToUndoHistory = (action: string) => {
+    const newEntry: UndoHistoryEntry = {
+      segments: [...editedSegments],
+      action,
+      timestamp: Date.now()
+    };
+
+    setUndoHistory(prev => {
+      const newHistory = [...prev, newEntry];
+      // Keep only the last maxUndoHistory entries
+      return newHistory.slice(-maxUndoHistory);
+    });
+  };
+
+  // Function to perform undo
+  const performUndo = () => {
+    if (undoHistory.length === 0) return;
+
+    const lastEntry = undoHistory[undoHistory.length - 1];
+    
+    // Remove the last entry from history
+    setUndoHistory(prev => prev.slice(0, -1));
+    
+    // Restore the segments state
+    setEditedSegments(lastEntry.segments);
+    onSegmentsChange?.(lastEntry.segments);
+    
+    // Cancel any current editing
+    setEditingIndex(null);
+    setEditText('');
+  };
 
   // Function to determine which segment is currently playing
   const getCurrentSegmentIndex = (): number | null => {
@@ -98,9 +142,16 @@ export function EditableTranscriptionSegments({
     }
   }, [currentSegmentIndex]);
 
-  // Keyboard event listener for L and N keys when hovering, and ESC when editing
+  // Keyboard event listener for L and N keys when hovering, ESC when editing, and Ctrl+Z for undo
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
+      // Ctrl+Z (Cmd+Z on Mac) for undo
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        performUndo();
+        return;
+      }
+      
       // ESC key to cancel editing
       if (e.key === 'Escape' && editingIndex !== null) {
         e.preventDefault();
@@ -122,9 +173,12 @@ export function EditableTranscriptionSegments({
 
     document.addEventListener('keydown', handleKeyPress);
     return () => document.removeEventListener('keydown', handleKeyPress);
-  }, [hoveredIndex, editingIndex]);
+  }, [hoveredIndex, editingIndex, undoHistory]);
 
   const updateSegmentSpeaker = (index: number, speakerName: string) => {
+    // Save current state to undo history before making changes
+    saveToUndoHistory(`Update speaker for segment ${index + 1}`);
+    
     // Find the speaker by name to get their ID
     const speaker = speakers.find(s => s.name === speakerName);
     const speakerId = speaker?.id;
@@ -163,8 +217,13 @@ export function EditableTranscriptionSegments({
   const saveEdit = () => {
     if (editingIndex === null) return;
 
+    // Only save to undo history if the text actually changed
+    const current = editedSegments[editingIndex];
+    if (current && current.text.trim() !== editText.trim()) {
+      saveToUndoHistory(`Edit segment ${editingIndex + 1}`);
+    }
+
     const updatedSegments = [...editedSegments];
-    const current = updatedSegments[editingIndex];
     if (!current) return;
     updatedSegments[editingIndex] = { ...current, text: editText };
 
@@ -177,8 +236,13 @@ export function EditableTranscriptionSegments({
   const saveEditAndMoveToNext = () => {
     if (editingIndex === null) return;
 
+    // Only save to undo history if the text actually changed
+    const current = editedSegments[editingIndex];
+    if (current && current.text.trim() !== editText.trim()) {
+      saveToUndoHistory(`Edit segment ${editingIndex + 1}`);
+    }
+
     const updatedSegments = [...editedSegments];
-    const current = updatedSegments[editingIndex];
     if (!current) return;
     updatedSegments[editingIndex] = { ...current, text: editText };
 
@@ -209,8 +273,13 @@ export function EditableTranscriptionSegments({
   const saveEditAndMoveToPrevious = () => {
     if (editingIndex === null) return;
 
+    // Only save to undo history if the text actually changed
+    const current = editedSegments[editingIndex];
+    if (current && current.text.trim() !== editText.trim()) {
+      saveToUndoHistory(`Edit segment ${editingIndex + 1}`);
+    }
+
     const updatedSegments = [...editedSegments];
-    const current = updatedSegments[editingIndex];
     if (!current) return;
     updatedSegments[editingIndex] = { ...current, text: editText };
 
@@ -239,6 +308,9 @@ export function EditableTranscriptionSegments({
   };
 
   const deleteSegment = (index: number) => {
+    // Save current state to undo history before deleting
+    saveToUndoHistory(`Delete segment ${index + 1}`);
+    
     const updatedSegments = [...editedSegments];
     updatedSegments.splice(index, 1);
     setEditedSegments(updatedSegments);
@@ -251,6 +323,9 @@ export function EditableTranscriptionSegments({
   };
 
   const handleSpeakerChange = (index: number, speakerId: string) => {
+    // Save current state to undo history before making changes
+    saveToUndoHistory(`Change speaker for segment ${index + 1}`);
+    
     const updatedSegments = [...editedSegments];
     const current = updatedSegments[index];
     if (!current) return;
@@ -266,6 +341,9 @@ export function EditableTranscriptionSegments({
   };
 
   const insertEmptySegment = (afterIndex: number) => {
+    // Save current state to undo history before inserting
+    saveToUndoHistory(`Insert empty segment after ${afterIndex + 1}`);
+    
     const currentSegment = editedSegments[afterIndex];
     const nextSegment = editedSegments[afterIndex + 1];
     if (!currentSegment) return;
@@ -299,6 +377,9 @@ export function EditableTranscriptionSegments({
 
   const combineWithPreviousSegment = (index: number) => {
     if (index <= 0) return; // Can't combine if it's the first segment
+
+    // Save current state to undo history before combining
+    saveToUndoHistory(`Combine segment ${index + 1} with previous`);
 
     const currentSegment = editedSegments[index];
     const previousSegment = editedSegments[index - 1];
