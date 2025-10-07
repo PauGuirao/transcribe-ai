@@ -12,7 +12,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-import { Download, Settings, Info, Users, GraduationCap, Loader2 } from 'lucide-react';
+import { Download, Settings, Info, Users, GraduationCap, Loader2, Copy } from 'lucide-react';
+import { FaGoogleDrive, FaFilePdf, FaFileWord } from 'react-icons/fa';
+import { SiGmail } from 'react-icons/si';
 import { Audio, Transcription, Speaker } from '@/types';
 
 interface RightSidebarProps {
@@ -46,6 +48,143 @@ export function RightSidebar({
   const [alumnesError, setAlumnesError] = useState<string | null>(null)
   const [selectedAlumne, setSelectedAlumne] = useState<string>('none')
   const [assigningAlumne, setAssigningAlumne] = useState(false)
+
+  // Helper function to format time in MM:SS format
+  const formatTime = (time: number) => {
+    if (isNaN(time)) return '0:00';
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  // Function to copy entire transcription to clipboard with proper formatting
+  const handleCopyTranscription = async () => {
+    if (!transcription) return;
+
+    let textToCopy = '';
+    
+    try {
+      // If we have segments, format them with speaker and indices
+      if (transcription.segments && transcription.segments.length > 0) {
+        const formattedSegments = transcription.segments.map((segment, index) => {
+          const segmentNumber = (index + 1).toString().padStart(1, '0');
+          
+          // Find speaker name if speakerId exists, otherwise use 'persona'
+          let speakerName = 'persona';
+          if (segment.speakerId && speakers && speakers.length > 0) {
+            const speaker = speakers.find(s => s.id === segment.speakerId);
+            speakerName = speaker ? speaker.name : 'persona';
+          }
+          
+          return `${segmentNumber}. [${speakerName}]\n${segment.text.trim()}\n`;
+        });
+        
+        textToCopy = formattedSegments.join('\n');
+      } 
+      // Fallback to editedText if available
+      else if (transcription.editedText && transcription.editedText.trim()) {
+        textToCopy = transcription.editedText;
+      } 
+      // Final fallback to originalText
+      else if (transcription.originalText) {
+        textToCopy = transcription.originalText;
+      }
+
+      if (textToCopy) {
+        await navigator.clipboard.writeText(textToCopy);
+        // You could add a toast notification here if you have a toast system
+        console.log('Transcription copied to clipboard');
+      }
+    } catch (error) {
+      console.error('Failed to copy transcription:', error);
+      // Fallback for older browsers
+      try {
+        const textArea = document.createElement('textarea');
+        textArea.value = textToCopy;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        console.log('Transcription copied to clipboard (fallback)');
+      } catch (fallbackError) {
+        console.error('Fallback copy also failed:', fallbackError);
+      }
+    }
+  };
+
+  // Function to share transcription via email
+  const handleEmailShare = () => {
+    if (!transcription) return;
+
+    let textToShare = '';
+    
+    // Use the same formatting logic as copy function
+    if (transcription.segments && transcription.segments.length > 0) {
+      const formattedSegments = transcription.segments.map((segment, index) => {
+        const segmentNumber = (index + 1).toString().padStart(1, '0');
+        
+        // Find speaker name if speakerId exists, otherwise use 'persona'
+        let speakerName = 'persona';
+        if (segment.speakerId && speakers && speakers.length > 0) {
+          const speaker = speakers.find(s => s.id === segment.speakerId);
+          speakerName = speaker ? speaker.name : 'persona';
+        }
+        
+        return `${segmentNumber}. [${speakerName}]\n${segment.text.trim()}\n`;
+      });
+      
+      textToShare = formattedSegments.join('\n');
+    } 
+    else if (transcription.editedText && transcription.editedText.trim()) {
+      textToShare = transcription.editedText;
+    } 
+    else if (transcription.originalText) {
+      textToShare = transcription.originalText;
+    }
+
+    const subject = encodeURIComponent('Transcripció compartida');
+    const body = encodeURIComponent(textToShare);
+    const mailtoUrl = `mailto:?subject=${subject}&body=${body}`;
+    
+    window.open(mailtoUrl, '_blank');
+  };
+
+  // Function to share transcription via Google Drive (Google Docs)
+  const handleGoogleDriveShare = () => {
+    if (!transcription) return;
+
+    let textToShare = '';
+    
+    // Use the same formatting logic as copy function
+    if (transcription.segments && transcription.segments.length > 0) {
+      const formattedSegments = transcription.segments.map((segment, index) => {
+        const segmentNumber = (index + 1).toString().padStart(1, '0');
+        
+        // Find speaker name if speakerId exists, otherwise use 'persona'
+        let speakerName = 'persona';
+        if (segment.speakerId && speakers && speakers.length > 0) {
+          const speaker = speakers.find(s => s.id === segment.speakerId);
+          speakerName = speaker ? speaker.name : 'persona';
+        }
+        
+        return `${segmentNumber}. [${speakerName}]\n${segment.text.trim()}\n`;
+      });
+      
+      textToShare = formattedSegments.join('\n');
+    } 
+    else if (transcription.editedText && transcription.editedText.trim()) {
+      textToShare = transcription.editedText;
+    } 
+    else if (transcription.originalText) {
+      textToShare = transcription.originalText;
+    }
+
+    // Create a Google Docs URL with the transcription content
+    const encodedText = encodeURIComponent(textToShare);
+    const googleDocsUrl = `https://docs.google.com/document/create?title=Transcripció&body=${encodedText}`;
+    
+    window.open(googleDocsUrl, '_blank');
+  };
 
   useEffect(() => {
     if (transcription) {
@@ -119,20 +258,59 @@ export function RightSidebar({
             <h3 className="text-base font-medium">Exportar</h3>
           </div>
           <div className="space-y-3">
-            <Button 
-              onClick={() => onExport('pdf')} 
-              className="w-full justify-start"
-              variant="outline"
-            >
-              Exportar com PDF
-            </Button>
-            <Button 
-              onClick={() => onExport('docx')} 
-              className="w-full justify-start"
-              variant="outline"
-            >
-              Exportar com DOCX
-            </Button>
+            {/* PDF and DOCX buttons side by side */}
+            <div className="flex gap-2">
+              <Button 
+                onClick={() => onExport('pdf')} 
+                className="flex-1 justify-start bg-gray-100 hover:bg-gray-200 border-gray-300"
+                variant="outline"
+              >
+                <FaFilePdf className="h-4 w-4 mr-2 text-red-600" />
+                PDF
+              </Button>
+              <Button 
+                onClick={() => onExport('docx')} 
+                className="flex-1 justify-start bg-gray-100 hover:bg-gray-200 border-gray-300"
+                variant="outline"
+              >
+                <FaFileWord className="h-4 w-4 mr-2 text-blue-600" />
+                 WORD
+              </Button>
+            </div>
+            
+            {/* Copy, Email, and Google Drive buttons in the same row */}
+            <div className="flex gap-2">
+              <Button 
+                onClick={handleCopyTranscription} 
+                className="flex-1 justify-center bg-gray-100 hover:bg-gray-200 border-gray-300"
+                variant="outline"
+                disabled={!transcription}
+                size="sm"
+              >
+                Copiar
+                <Copy className="h-4 w-4" />
+              </Button>
+              <Button 
+                onClick={handleEmailShare} 
+                className="flex-1 justify-center bg-gray-100 hover:bg-gray-200 border-gray-300"
+                variant="outline"
+                disabled={!transcription}
+                size="sm"
+              >
+                Mail
+                <SiGmail className="h-4 w-4 text-red-500" />
+              </Button>
+              <Button 
+                onClick={handleGoogleDriveShare} 
+                className="flex-1 justify-center bg-gray-100 hover:bg-gray-200 border-gray-300"
+                variant="outline"
+                disabled={!transcription}
+                size="sm"
+              >
+                Drive
+                <FaGoogleDrive className="h-4 w-4 text-blue-500" />
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -204,6 +382,17 @@ export function RightSidebar({
         <Separator />
 
       </div>
+      
+      {/* Unsaved changes notification */}
+      {hasUnsavedChanges && (
+        <div className="fixed bottom-4 right-4 bg-yellow-100 border border-yellow-300 text-yellow-800 px-3 py-1.5 rounded-md shadow-md flex items-center gap-1.5 z-50 max-w-60">
+          <Info className="h-3.5 w-3.5 flex-shrink-0" />
+          <div className="text-sm font-medium leading-tight">
+            <div>Tens canvis sense guardar,</div>
+            <div>guarda els canvis!</div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

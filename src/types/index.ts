@@ -156,6 +156,7 @@ export interface AudioPlayerProps {
   audioId: string;
   className?: string;
   onRef?: (ref: AudioPlayerRef) => void;
+  onTimeUpdate?: (currentTime: number) => void;
 }
 
 export interface AudioPlayerRef {

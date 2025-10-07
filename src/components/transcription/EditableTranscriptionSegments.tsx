@@ -7,7 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Play, Edit3, Save, Trash2, User, Plus, Merge } from 'lucide-react';
-import type { TranscriptionSegment, Speaker } from '@/types';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import type { TranscriptionSegment, Speaker, AudioPlayerRef } from '@/types';
 import { cn } from '@/lib/utils';
 
 interface EditableTranscriptionSegmentsProps {
@@ -17,6 +18,8 @@ interface EditableTranscriptionSegmentsProps {
   onSegmentDoubleClick?: (segment: TranscriptionSegment) => void;
   onSegmentsChange?: (segments: TranscriptionSegment[]) => void;
   className?: string;
+  audioPlayerRef?: AudioPlayerRef | null;
+  currentTime?: number;
 }
 
 export function EditableTranscriptionSegments({ 
@@ -25,7 +28,9 @@ export function EditableTranscriptionSegments({
   onSegmentClick, 
   onSegmentDoubleClick,
   onSegmentsChange,
-  className 
+  className,
+  audioPlayerRef,
+  currentTime = 0
 }: EditableTranscriptionSegmentsProps) {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editedSegments, setEditedSegments] = useState<TranscriptionSegment[]>(segments);
@@ -33,6 +38,39 @@ export function EditableTranscriptionSegments({
   const [cursorPosition, setCursorPosition] = useState<number>(0);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Function to determine which segment is currently playing
+  const getCurrentSegmentIndex = (): number | null => {
+    // Find the last segment that starts before or at the current time
+    let bestMatch = -1;
+    for (let i = 0; i < editedSegments.length; i++) {
+      const segment = editedSegments[i];
+      if (currentTime >= segment.start) {
+        // If current time is within this segment's range, return it
+        if (currentTime <= segment.end) {
+          return i;
+        }
+        // Otherwise, keep track of the latest segment that has started
+        bestMatch = i;
+      } else {
+        // We've passed the current time, stop searching
+        break;
+      }
+    }
+    
+    // If no exact match found but we have a segment that started before current time,
+    // check if we're close to its end (within 0.1 seconds tolerance)
+    if (bestMatch >= 0) {
+      const segment = editedSegments[bestMatch];
+      if (currentTime <= segment.end + 0.1) {
+        return bestMatch;
+      }
+    }
+    
+    return null;
+  };
+
+  const currentSegmentIndex = getCurrentSegmentIndex();
 
   useEffect(() => {
     setEditedSegments(segments);
@@ -45,6 +83,20 @@ export function EditableTranscriptionSegments({
       textarea.setSelectionRange(cursorPosition, cursorPosition);
     }
   }, [editingIndex, cursorPosition]);
+
+  // Auto-scroll to current segment
+  useEffect(() => {
+    if (currentSegmentIndex !== null) {
+      const segmentElement = document.querySelector(`[data-segment-index="${currentSegmentIndex}"]`);
+      if (segmentElement) {
+        segmentElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'nearest'
+        });
+      }
+    }
+  }, [currentSegmentIndex]);
 
   // Keyboard event listener for L and N keys when hovering, and ESC when editing
   useEffect(() => {
@@ -308,6 +360,8 @@ export function EditableTranscriptionSegments({
               "relative group p-3 border rounded-xl bg-white transition-all duration-300 ease-in-out hover:shadow-md hover:border-blue-200 cursor-pointer",
               editingIndex === index 
                 ? "ring-2 ring-blue-400 bg-gradient-to-r from-blue-50 to-indigo-50 shadow-lg border-blue-300" 
+                : currentSegmentIndex === index
+                ? "ring-2 ring-green-400 bg-gradient-to-r from-green-50 to-emerald-50 shadow-lg border-green-300"
                 : "border-gray-200 hover:bg-gray-50"
             )}
             onMouseEnter={() => setHoveredIndex(index)}
@@ -329,40 +383,57 @@ export function EditableTranscriptionSegments({
               }
             }}
           >
-            {/* Combine with Previous Segment Button - Only show on hover and not on first segment */}
-            {index > 0 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="absolute -top-4 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 h-8 w-8 p-0 bg-white border border-gray-300 hover:bg-orange-50 hover:border-orange-400 shadow-sm z-10"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  combineWithPreviousSegment(index);
-                }}
-                title="Combine with previous segment"
-              >
-                <Merge className="h-4 w-4 text-gray-600" />
-              </Button>
-            )}
-            {/* Add Empty Segment Button - Only show on hover and not on last segment */}
-            {index < editedSegments.length - 1 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 h-8 w-8 p-0 bg-white border border-gray-300 hover:bg-blue-50 hover:border-blue-400 shadow-sm z-10"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  insertEmptySegment(index);
-                }}
-                title="Add empty segment after this one"
-              >
-                <Plus className="h-4 w-4 text-gray-600" />
-              </Button>
+            {/* Combined Action Buttons - Show at bottom on hover */}
+            {(index > 0 || index < editedSegments.length - 1) && (
+              <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-1 z-10">
+                {/* Combine with Previous Segment Button */}
+                {index > 0 && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 bg-white border border-gray-300 hover:bg-orange-50 hover:border-orange-400 shadow-sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          combineWithPreviousSegment(index);
+                        }}
+                      >
+                        <Merge className="h-4 w-4 text-gray-600" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Combina amb el segment anterior</p>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+                {/* Add Empty Segment Button */}
+                {index < editedSegments.length - 1 && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 bg-white border border-gray-300 hover:bg-blue-50 hover:border-blue-400 shadow-sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          insertEmptySegment(index);
+                        }}
+                      >
+                        <Plus className="h-4 w-4 text-gray-600" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Afegeix un segment buit després d'aquest</p>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+              </div>
             )}
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-3 flex-wrap">
                 <Badge variant="secondary" className="text-xs font-medium bg-gray-100 text-gray-700 px-2 py-1">
-                  #{(index + 1).toString().padStart(3, '0')}
+                  {(index + 1).toString().padStart(1, '0')}
                 </Badge>
 
                 {/* Speaker Selection */}

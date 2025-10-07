@@ -24,6 +24,7 @@ interface MainLayoutProps {
 
 export function MainLayout({ selectedAudioId, onAudioSelect, onUploadComplete }: MainLayoutProps) {
   const [audioPlayerRef, setAudioPlayerRef] = useState<AudioPlayerRef | null>(null);
+  const [currentTime, setCurrentTime] = useState<number>(0);
   const isMobile = useIsMobile();
   
   const {
@@ -152,6 +153,8 @@ export function MainLayout({ selectedAudioId, onAudioSelect, onUploadComplete }:
               onSegmentClick={handleSegmentClick}
               onSegmentDoubleClick={handleSegmentDoubleClick}
               onSegmentsChange={handleSegmentsChange}
+              audioPlayerRef={audioPlayerRef}
+              currentTime={currentTime}
             />
           </div>
           {/* Mobile Edit Warning Popup */}
@@ -189,7 +192,11 @@ export function MainLayout({ selectedAudioId, onAudioSelect, onUploadComplete }:
       {audio?.status === 'completed' && (
         <div className="fixed bottom-0 left-80 right-80 bg-gray-100 border-t z-30">
           <div className="max-w-4xl mx-auto p-2">
-            <AudioPlayer audioId={audio.id} onRef={setAudioPlayerRef} />
+            <AudioPlayer 
+              audioId={audio.id} 
+              onRef={setAudioPlayerRef} 
+              onTimeUpdate={setCurrentTime}
+            />
           </div>
         </div>
       )}

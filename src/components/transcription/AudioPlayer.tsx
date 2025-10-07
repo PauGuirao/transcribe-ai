@@ -16,7 +16,7 @@ import {
 import { cn } from '@/lib/utils';
 import { AudioPlayerProps, AudioPlayerRef } from '@/types';
 
-export function AudioPlayer({ audioId, className, onRef }: AudioPlayerProps) {
+export function AudioPlayer({ audioId, className, onRef, onTimeUpdate }: AudioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -37,7 +37,9 @@ export function AudioPlayer({ audioId, className, onRef }: AudioPlayerProps) {
     };
 
     const handleTimeUpdate = () => {
-      setCurrentTime(audio.currentTime);
+      const currentTime = audio.currentTime;
+      setCurrentTime(currentTime);
+      onTimeUpdate?.(currentTime);
     };
 
     const handleEnded = () => {
