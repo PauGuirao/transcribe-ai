@@ -83,6 +83,41 @@ export async function POST(request: NextRequest) {
 
       if (workerUrl && ingestApiKey) {
         try {
+          // Check and deduct tokens before starting transcription
+          console.log(`💰 Checking tokens for user: ${user.id}`);
+          const { data: tokenResult, error: tokenError } = await supabase.rpc(
+            "start_transcription",
+            {
+              p_user_id: user.id,
+              p_audio_id: audioId,
+              p_token_cost: 1
+            }
+          );
+
+          if (tokenError || !tokenResult?.success) {
+            console.error("Token deduction failed:", tokenError || tokenResult?.error);
+            const errorMessage = tokenResult?.error || tokenError?.message || "Failed to process transcription";
+            
+            // Handle specific error cases
+            if (errorMessage.includes("Insufficient tokens")) {
+              return NextResponse.json(
+                { 
+                  success: false, 
+                  error: "Tokens insuficients. Si us plau, compra més tokens per continuar.",
+                  remaining_tokens: tokenResult?.remaining_tokens || 0
+                },
+                { status: 402 } // Payment Required
+              );
+            }
+            
+            return NextResponse.json(
+              { success: false, error: errorMessage },
+              { status: 400 }
+            );
+          }
+
+          console.log(`✅ Tokens deducted successfully. Remaining: ${tokenResult.remaining_tokens}`);
+
           // Create an idempotency key for this transcription job
           const idempotencyKey = `${user.id}:${audioId}:${audioRecord.filename}:workers_ai`;
           
