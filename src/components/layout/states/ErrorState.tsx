@@ -17,7 +17,7 @@ export function ErrorState({ message, onRetry }: ErrorStateProps) {
           <h2 className="text-lg font-semibold mb-2">Error</h2>
           <p className="text-sm text-muted-foreground mb-4">{message}</p>
           <Button onClick={onRetry} variant="outline">
-            Intentar de nuevo
+            Tornar a intentar
           </Button>
         </CardContent>
       </Card>

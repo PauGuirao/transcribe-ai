@@ -222,7 +222,7 @@ function InviteModalComponent({ isOpen, onClose }: InviteModalProps) {
           // Existing invite found
           const cacheData = setCachedInvite(getData.inviteUrl);
           dispatch({ type: 'SET_CACHED_URL', payload: cacheData });
-          console.log("Enlace de invitación existente recuperado");
+          console.log("Enllaç d'invitació existent recuperat");
           return;
         }
       }
@@ -246,7 +246,7 @@ function InviteModalComponent({ isOpen, onClose }: InviteModalProps) {
       if (postData.inviteUrl) {
         const cacheData = setCachedInvite(postData.inviteUrl);
         dispatch({ type: 'SET_CACHED_URL', payload: cacheData });
-        console.log("Nuevo enlace de invitación generado");
+        console.log("Nou enllaç d'invitació generat");
       } else {
         throw new Error("No invite URL received");
       }
@@ -266,7 +266,7 @@ function InviteModalComponent({ isOpen, onClose }: InviteModalProps) {
       } else {
         dispatch({ 
           type: 'SET_ERROR', 
-          payload: "Error al obtener el enlace de invitación. Por favor, inténtalo de nuevo." 
+          payload: "Error en obtenir l'enllaç d'invitació. Si us plau, torna-ho a intentar." 
         });
       }
     }
@@ -278,7 +278,7 @@ function InviteModalComponent({ isOpen, onClose }: InviteModalProps) {
     try {
       await navigator.clipboard.writeText(state.inviteUrl);
       dispatch({ type: 'SET_COPIED', payload: true });
-      console.log("Enlace copiado al portapapeles");
+      console.log("Enllaç copiat al porta-retalls");
     } catch (error) {
       console.error("Error copying to clipboard:", error);
       // Fallback for older browsers
@@ -289,10 +289,10 @@ function InviteModalComponent({ isOpen, onClose }: InviteModalProps) {
       try {
         document.execCommand("copy");
         dispatch({ type: 'SET_COPIED', payload: true });
-        console.log("Enlace copiado al portapapeles");
+        console.log("Enllaç copiat al porta-retalls");
       } catch (fallbackError) {
         console.error("Fallback copy failed:", fallbackError);
-        alert("Error al copiar el enlace");
+        alert("Error en copiar l'enllaç");
       }
       document.body.removeChild(textArea);
     }

@@ -20,6 +20,7 @@ interface EditableTranscriptionSegmentsProps {
   className?: string;
   audioPlayerRef?: AudioPlayerRef | null;
   currentTime?: number;
+  onCurrentTimeChange?: (time: number) => void;
 }
 
 // Interface for undo history entries
@@ -37,7 +38,8 @@ export function EditableTranscriptionSegments({
   onSegmentsChange,
   className,
   audioPlayerRef,
-  currentTime = 0
+  currentTime = 0,
+  onCurrentTimeChange
 }: EditableTranscriptionSegmentsProps) {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editedSegments, setEditedSegments] = useState<TranscriptionSegment[]>(segments);
@@ -85,13 +87,18 @@ export function EditableTranscriptionSegments({
 
   // Function to determine which segment is currently playing
   const getCurrentSegmentIndex = (): number | null => {
+    // Use a small epsilon for floating point comparison
+    const epsilon = 0.001; // 1ms tolerance for floating point precision
+    
     // Find the last segment that starts before or at the current time
     let bestMatch = -1;
     for (let i = 0; i < editedSegments.length; i++) {
       const segment = editedSegments[i];
-      if (currentTime >= segment.start) {
+      
+      // Use epsilon for floating point comparison
+      if (currentTime >= (segment.start - epsilon)) {
         // If current time is within this segment's range, return it
-        if (currentTime <= segment.end) {
+        if (currentTime <= (segment.end + epsilon)) {
           return i;
         }
         // Otherwise, keep track of the latest segment that has started
@@ -193,6 +200,19 @@ export function EditableTranscriptionSegments({
   };
 
   const handleSegmentClick = (segment: TranscriptionSegment) => {
+    // Set currentTime to the middle of the segment to ensure proper highlighting
+    // This avoids boundary issues where segment.start might equal previous segment.end
+    const middleTime = segment.start + (segment.end - segment.start) / 2;
+    
+    console.log(middleTime)
+    // Update the parent's currentTime state
+    onCurrentTimeChange?.(middleTime);
+    
+    // If there's an audio player, seek to the middle of the segment
+    if (audioPlayerRef?.seekTo) {
+      audioPlayerRef.seekTo(middleTime);
+    }
+    
     onSegmentClick?.(segment);
   };
 
@@ -452,7 +472,10 @@ export function EditableTranscriptionSegments({
               const target = e.target as HTMLElement;
               const isInteractiveElement = target.closest('button, select, textarea, input, [role="combobox"], [data-radix-select-trigger]');
               if (!isInteractiveElement) {
-                onSegmentClick?.(segment);
+                console.log(`🖱️ SEGMENT CLICKED: Index ${index}, Start: ${segment.start}, End: ${segment.end}, Text: "${segment.text.substring(0, 50)}..."`);
+                handleSegmentClick(segment);
+              } else {
+                console.log(`🚫 Click ignored - interactive element clicked:`, target);
               }
             }}
             onDoubleClick={(e) => {

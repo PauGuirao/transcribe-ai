@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     
     if (userError || !user) {
       return NextResponse.json(
-        { success: false, error: "Authentication required. Please sign in." },
+        { success: false, error: "Autenticació requerida. Si us plau, inicia sessió." },
         { status: 401 }
       );
     }
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     if (uploadError) {
       console.error("Presigned URL error:", uploadError);
       return NextResponse.json(
-        { success: false, error: "Failed to create upload URL" },
+        { success: false, error: "Error en crear l'URL de pujada" },
         { status: 500 }
       );
     }
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
     if (dbError) {
       console.error("Database insert error:", dbError);
       return NextResponse.json(
-        { success: false, error: "Failed to create audio record" },
+        { success: false, error: "Error en crear la informació de l'àudio" },
         { status: 500 }
       );
     }
@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Presigned URL creation error:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to create upload URL" },
+      { success: false, error: "Error en crear l'URL de pujada" },
       { status: 500 }
     );
   }

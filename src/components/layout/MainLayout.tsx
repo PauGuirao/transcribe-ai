@@ -53,6 +53,10 @@ export function MainLayout({ selectedAudioId, onAudioSelect, onUploadComplete }:
   }, 0);
 
   const handleSegmentClick = (segment: TranscriptionSegment) => {
+    // Set currentTime to the middle of the segment to ensure proper highlighting
+    const middleTime = segment.start + (segment.end - segment.start) / 2;
+    setCurrentTime(middleTime);
+    
     if (audioPlayerRef) {
       audioPlayerRef.seekTo(segment.start);
     }
@@ -155,6 +159,7 @@ export function MainLayout({ selectedAudioId, onAudioSelect, onUploadComplete }:
               onSegmentsChange={handleSegmentsChange}
               audioPlayerRef={audioPlayerRef}
               currentTime={currentTime}
+              onCurrentTimeChange={setCurrentTime}
             />
           </div>
           {/* Mobile Edit Warning Popup */}

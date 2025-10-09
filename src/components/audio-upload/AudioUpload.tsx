@@ -253,14 +253,14 @@ export function AudioUpload({
             <div className="space-y-2">
               <p className={titleClassName}>
                 {isDragActive
-                  ? "Suelta aquí tu audio"
+                  ? "Deixa anar aquí el teu àudio"
                   : "Puja un arxiu d'àudio"}
               </p>
               <p className="text-md text-muted-foreground">
                 Arrossega i deixa anar o fes clic per seleccionar
               </p>
               <p className="text-lg text-muted-foreground">
-                MP3, WAV, M4A, OGG, WebM, FLAC, AAC, WMA, AIFF (máx. 50 MB)
+                MP3, WAV, M4A, OGG, WebM, FLAC, AAC, WMA, AIFF (màx. 50 MB)
               </p>
             </div>
           </div>

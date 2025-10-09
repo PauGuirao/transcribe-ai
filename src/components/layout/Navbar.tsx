@@ -76,7 +76,7 @@ export default function Navbar() {
           >
             <Link href="/payment">
               <Sparkles className="h-4 w-4" />
-              {checkingSubscription ? "Cargant..." : "Millorar el pla"}
+              {checkingSubscription ? "Carregant..." : "Millorar el pla"}
             </Link>
           </Button>
         )}

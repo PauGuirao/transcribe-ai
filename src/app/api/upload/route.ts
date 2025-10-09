@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser();
     if (userError || !user) {
       return NextResponse.json(
-        { success: false, error: "Authentication required. Please sign in." },
+        { success: false, error: "Autenticació requerida. Si us plau, inicia sessió." },
         { status: 401 }
       );
     }
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
 
     if (!file) {
       return NextResponse.json(
-        { success: false, error: "No file provided" },
+        { success: false, error: "No s'ha proporcionat cap fitxer" },
         { status: 400 }
       );
     }
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: "Invalid file type. Please upload an audio file.",
+          error: "Tipus de fitxer no vàlid. Si us plau, puja un fitxer d'àudio.",
         },
         { status: 400 }
       );
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
     // Validate file size
     if (file.size > MAX_FILE_SIZE) {
       return NextResponse.json(
-        { success: false, error: "File too large. Maximum size is 25MB." },
+        { success: false, error: "Fitxer massa gran. La mida màxima és 25MB." },
         { status: 400 }
       );
     }
@@ -246,7 +246,7 @@ export async function POST(request: NextRequest) {
     if (uploadError) {
       console.error("Supabase upload error:", uploadError);
       return NextResponse.json(
-        { success: false, error: "Failed to upload file to storage" },
+        { success: false, error: "Error en pujar el fitxer a l'emmagatzematge" },
         { status: 500 }
       );
     }
@@ -274,7 +274,7 @@ export async function POST(request: NextRequest) {
       await supabase.storage.from("audio-files").remove([uploadData.path]);
 
       return NextResponse.json(
-        { success: false, error: "Failed to save audio record" },
+        { success: false, error: "Error en guardar la informació de l'àudio" },
         { status: 500 }
       );
     }
@@ -325,14 +325,14 @@ export async function POST(request: NextRequest) {
       originalName: file.name,
       autoTranscribe,
       message: autoTranscribe
-        ? "Archivo subido y transcripción iniciada correctamente."
-        : "Archivo subido. Inicia la transcripción cuando estés listo.",
+        ? "Fitxer pujat i transcripció iniciada correctament."
+        : "Fitxer pujat. Inicia la transcripció quan estiguis llest.",
     });
   } catch (error) {
     console.error("Upload error:", error);
 
     return NextResponse.json(
-      { success: false, error: "Failed to upload file" },
+      { success: false, error: "Error en pujar el fitxer" },
       { status: 500 }
     );
   }

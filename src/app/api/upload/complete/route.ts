@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     
     if (userError || !user) {
       return NextResponse.json(
-        { success: false, error: "Authentication required. Please sign in." },
+        { success: false, error: "Autenticació requerida. Si us plau, inicia sessió." },
         { status: 401 }
       );
     }
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
 
     if (!audioId) {
       return NextResponse.json(
-        { success: false, error: "Audio ID is required" },
+        { success: false, error: "L'ID de l'àudio és obligatori" },
         { status: 400 }
       );
     }
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
 
     if (audioError || !audioRecord) {
       return NextResponse.json(
-        { success: false, error: "Audio record not found" },
+        { success: false, error: "No s'ha trobat la informació de l'àudio" },
         { status: 404 }
       );
     }
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
       if (updateError) {
         console.error("Failed to update audio status:", updateError);
         return NextResponse.json(
-          { success: false, error: "Failed to update audio status" },
+          { success: false, error: "Error en actualitzar l'estat de l'àudio" },
           { status: 500 }
         );
       }
@@ -147,7 +147,7 @@ export async function POST(request: NextRequest) {
       if (updateError) {
         console.error("Failed to update audio status:", updateError);
         return NextResponse.json(
-          { success: false, error: "Failed to update audio status" },
+          { success: false, error: "Error en actualitzar l'estat de l'àudio" },
           { status: 500 }
         );
       }
@@ -157,13 +157,13 @@ export async function POST(request: NextRequest) {
       success: true,
       audioId,
       status: autoTranscribe ? "processing" : "completed",
-      message: autoTranscribe ? "Upload completed, transcription started" : "Upload completed"
+      message: autoTranscribe ? "Pujada completada, transcripció iniciada" : "Pujada completada"
     });
 
   } catch (error) {
     console.error("Upload completion error:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to complete upload" },
+      { success: false, error: "Error en completar la pujada" },
       { status: 500 }
     );
   }
