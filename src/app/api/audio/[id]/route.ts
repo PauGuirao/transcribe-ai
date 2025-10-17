@@ -95,9 +95,10 @@ export async function GET(
           // We need to extract userId and filename from the path
           const pathParts = path.split('/');
           const userId = pathParts[0];
+          const audioId = pathParts[1];
           const filename = pathParts[pathParts.length - 1]; // Get the last part (filename)
           
-          const workerResponse = await fetch(`${workerUrl}/download/transcriptions/${userId}/${filename}`, {
+          const workerResponse = await fetch(`${workerUrl}/download/transcriptions/${userId}/${audioId}/${filename}`, {
             headers: {
               'Authorization': `Bearer ${session.access_token}`,
             },
