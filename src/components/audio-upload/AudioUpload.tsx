@@ -36,42 +36,34 @@ export function AudioUpload({
     null
   );
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-  const { user } = useAuth();
-
+  const { user, session } = useAuth();
   const uploadFile = async (file: File) => {
     try {
       setUploadProgress({ progress: 0, status: "uploading" });
 
-      // Step 1: Get presigned URL
-      const presignedResponse = await fetch("/api/upload/presigned", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          fileName: file.name,
-          fileType: file.type,
-          fileSize: file.size,
-        }),
-      });
-
-      if (!presignedResponse.ok) {
-        const errorData = await presignedResponse.json();
-        throw new Error(errorData.error || "Failed to get upload URL");
+      // Get the user session for authentication
+      if (!session?.access_token) {
+        throw new Error("Authentication required");
       }
 
-      const { uploadUrl, audioId, filename, originalName } = await presignedResponse.json();
+      // Get worker URL from environment - use the same URL pattern as other API calls
+      const workerUrl = process.env.NEXT_PUBLIC_CLOUDFLARE_WORKER_URL || 'https://transcribe-worker.guiraocastells.workers.dev';
 
       setUploadProgress({ progress: 25, status: "uploading" });
 
-      // Step 2: Upload directly to Supabase Storage with progress tracking
+      // Create FormData for direct upload to worker
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('originalFilename', file.name);
+
+      // Upload directly to Cloudflare Worker with progress tracking
       const xhr = new XMLHttpRequest();
       
-      const uploadPromise = new Promise<void>((resolve, reject) => {
+      const uploadPromise = new Promise<any>((resolve, reject) => {
         xhr.upload.addEventListener('progress', (event) => {
           if (event.lengthComputable) {
-            // Progress from 25% to 75% during upload
-            const uploadProgress = (event.loaded / event.total) * 50; // 50% of total progress
+            // Progress from 25% to 90% during upload
+            const uploadProgress = (event.loaded / event.total) * 65; // 65% of total progress
             setUploadProgress({ 
               progress: 25 + uploadProgress, 
               status: "uploading" 
@@ -81,9 +73,19 @@ export function AudioUpload({
 
         xhr.addEventListener('load', () => {
           if (xhr.status >= 200 && xhr.status < 300) {
-            resolve();
+            try {
+              const response = JSON.parse(xhr.responseText);
+              resolve(response);
+            } catch (e) {
+              reject(new Error('Invalid response from server'));
+            }
           } else {
-            reject(new Error('Failed to upload file to storage'));
+            try {
+              const errorResponse = JSON.parse(xhr.responseText);
+              reject(new Error(errorResponse.error || 'Upload failed'));
+            } catch (e) {
+              reject(new Error(`Upload failed with status ${xhr.status}`));
+            }
           }
         });
 
@@ -91,40 +93,25 @@ export function AudioUpload({
           reject(new Error('Network error during upload'));
         });
 
-        xhr.open('PUT', uploadUrl);
-        xhr.setRequestHeader('Content-Type', file.type);
-        xhr.send(file);
+        xhr.open('POST', `${workerUrl}/upload`);
+        xhr.setRequestHeader('Authorization', `Bearer ${session.access_token}`);
+        xhr.send(formData);
       });
 
-      await uploadPromise;
+      const response = await uploadPromise;
 
-      setUploadProgress({ progress: 75, status: "uploading" });
-
-      // Step 3: Complete upload and start transcription
-      const completeResponse = await fetch("/api/upload/complete", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          audioId,
-          autoTranscribe,
-        }),
-      });
-
-      if (!completeResponse.ok) {
-        const errorData = await completeResponse.json();
-        throw new Error(errorData.error || "Failed to complete upload");
+      if (!response.success) {
+        throw new Error(response.error || 'Upload failed');
       }
 
-      const result = await completeResponse.json();
-
       setUploadProgress({ progress: 100, status: "completed" });
+
+      // Upload completed - return the upload information
       onUploadComplete({
-        audioId: result.audioId,
-        filename: result.filename,
-        filePath: result.filePath,
-        originalName: result.originalName ?? file.name,
+        audioId: response.audioId,
+        filename: response.filename,
+        filePath: response.filePath,
+        originalName: response.originalName,
         autoTranscribe,
       });
 

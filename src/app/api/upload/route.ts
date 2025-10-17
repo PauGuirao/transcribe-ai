@@ -280,43 +280,6 @@ export async function POST(request: NextRequest) {
     }
     console.log("Audio record saved successfully:", audioRecord);
 
-    // Start transcription process (async)
-    if (autoTranscribe) {
-      const transcribeUrl = `${request.nextUrl.origin}/api/transcribe`;
-      console.log("Transcribe URL:", transcribeUrl);
-      console.log("Starting transcription for audioId:", audioId);
-      console.log("Transcribe URL:", transcribeUrl);
-      const cookieHeader = request.headers.get("cookie");
-
-      fetch(transcribeUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(cookieHeader && { Cookie: cookieHeader }),
-        },
-        body: JSON.stringify({
-          audioId,
-          filename: uniqueFilename,
-          originalName: file.name,
-          filePath: uploadData.path,
-          provider: "workers-ai",
-        }),
-      })
-        .then((response) => {
-          console.log(
-            "Transcription request sent, response status:",
-            response.status
-          );
-          return response.json();
-        })
-        .then((data) => {
-          console.log("Transcription response:", data);
-        })
-        .catch((error) => {
-          console.error("Failed to start transcription:", error);
-        });
-    }
-
     return NextResponse.json({
       success: true,
       audioId,

@@ -64,8 +64,6 @@ export async function middleware(req: NextRequest) {
   const protectedPaths = [
     '/dashboard',
     '/api/upload',
-    '/api/transcribe',
-    '/api/transcription',
     '/api/audio',
     '/api/export',
   ]
@@ -89,7 +87,6 @@ export const config = {
   matcher: [
     '/dashboard/:path*',
     '/api/upload/:path*',
-    '/api/transcribe/:path*',
     '/api/transcription/:path*',
     '/api/audio/:path*',
     '/api/export/:path*',

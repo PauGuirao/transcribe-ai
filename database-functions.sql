@@ -179,7 +179,7 @@ CREATE TABLE IF NOT EXISTS transcription_jobs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   audio_id UUID NOT NULL REFERENCES audios(id) ON DELETE CASCADE,
-  provider TEXT NOT NULL DEFAULT 'replicate',
+  provider TEXT NOT NULL DEFAULT 'cloudflare',
   status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','claimed','processing','completed','failed','cancelled')),
   idempotency_key TEXT NOT NULL,
   attempts INTEGER NOT NULL DEFAULT 0,
@@ -236,7 +236,7 @@ CREATE OR REPLACE FUNCTION upsert_transcription_job(
   p_user_id UUID,
   p_audio_id UUID,
   p_idempotency_key TEXT,
-  p_provider TEXT DEFAULT 'replicate'
+  p_provider TEXT DEFAULT 'cloudflare'
 )
 RETURNS JSON
 LANGUAGE plpgsql

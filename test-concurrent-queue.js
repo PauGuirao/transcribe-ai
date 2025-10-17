@@ -43,7 +43,7 @@ const MOCK_AUDIO_FILES = [
     filename: 'test-audio-2.wav',
     originalName: 'Grabación de prueba 2.wav',
     filePath: 'test/test-audio-2.wav',
-    provider: 'replicate'
+    provider: 'cloudflare'
   },
   {
     audioId: 'test-audio-3',

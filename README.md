@@ -118,7 +118,6 @@ Before you begin, ensure you have the following installed:
 - `GET /api/audio` - Get all audio files
 - `GET /api/audio/[id]` - Get specific audio file
 - `GET /api/audio/[id]/file` - Stream audio file
-- `POST /api/transcribe` - Transcribe audio
 - `GET/PATCH /api/transcription/[id]` - Get/update transcription
 - `POST /api/export` - Export transcription
 
@@ -127,7 +126,6 @@ Before you begin, ensure you have the following installed:
 | Variable                        | Description                                       | Required |
 | ------------------------------- | ------------------------------------------------- | -------- |
 | `OPENAI_API_KEY`                | OpenAI API key for Whisper                        | Yes      |
-| `REPLICATE_API_TOKEN`           | Replicate API token for alternative transcription | No       |
 | `NEXT_PUBLIC_SUPABASE_URL`      | Supabase project URL                              | Yes      |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key                            | Yes      |
 | `SUPABASE_SERVICE_ROLE_KEY`     | Supabase service role key                         | Yes      |
