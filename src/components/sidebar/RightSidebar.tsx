@@ -27,6 +27,10 @@ interface RightSidebarProps {
   onSpeakersChange: (speakers: Speaker[]) => void;
 }
 
+declare global {
+  interface Window { google?: any }
+}
+
 export function RightSidebar({ 
   audio, 
   transcription, 
@@ -48,6 +52,7 @@ export function RightSidebar({
   const [alumnesError, setAlumnesError] = useState<string | null>(null)
   const [selectedAlumne, setSelectedAlumne] = useState<string>('none')
   const [assigningAlumne, setAssigningAlumne] = useState(false)
+  const [isDriveExporting, setIsDriveExporting] = useState(false)
 
   // Helper function to format time in MM:SS format
   const formatTime = (time: number) => {
@@ -149,41 +154,127 @@ export function RightSidebar({
     window.open(mailtoUrl, '_blank');
   };
 
-  // Function to share transcription via Google Drive (Google Docs)
-  const handleGoogleDriveShare = () => {
+  // Funció per crear un Google Doc al Drive via API (OAuth + Google Docs API)
+  const handleGoogleDriveShare = async () => {
     if (!transcription) return;
 
+    const baseName = audio?.customName || audio?.filename || 'Transcripcio';
+    const docTitle = `Transcripcio - ${baseName}`;
+
+    // Formata el text de la transcripció
     let textToShare = '';
-    
-    // Use the same formatting logic as copy function
     if (transcription.segments && transcription.segments.length > 0) {
-      const formattedSegments = transcription.segments.map((segment, index) => {
-        const segmentNumber = (index + 1).toString().padStart(1, '0');
-        
-        // Find speaker name if speakerId exists, otherwise use 'persona'
-        let speakerName = 'persona';
-        if (segment.speakerId && speakers && speakers.length > 0) {
-          const speaker = speakers.find(s => s.id === segment.speakerId);
-          speakerName = speaker ? speaker.name : 'persona';
-        }
-        
+      textToShare = transcription.segments.map((segment, index) => {
+        const speaker = segment.speakerId && speakers?.length
+          ? speakers.find((s) => s.id === segment.speakerId)
+          : undefined;
+        const speakerName = speaker?.name ?? 'persona';
+        const segmentNumber = (index + 1).toString();
         return `${segmentNumber}. [${speakerName}]\n${segment.text.trim()}\n`;
-      });
-      
-      textToShare = formattedSegments.join('\n');
-    } 
-    else if (transcription.editedText && transcription.editedText.trim()) {
+      }).join('\n');
+    } else if (transcription.editedText && transcription.editedText.trim()) {
       textToShare = transcription.editedText;
-    } 
-    else if (transcription.originalText) {
+    } else if (transcription.originalText) {
       textToShare = transcription.originalText;
     }
 
-    // Create a Google Docs URL with the transcription content
-    const encodedText = encodeURIComponent(textToShare);
-    const googleDocsUrl = `https://docs.google.com/document/create?title=Transcripció&body=${encodedText}`;
-    
-    window.open(googleDocsUrl, '_blank');
+    // Assegura que GIS estigui carregat
+    const ensureGisLoaded = async () => {
+      if (window.google?.accounts?.oauth2) return;
+      await new Promise<void>((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://accounts.google.com/gsi/client';
+        script.async = true;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error("No s'ha pogut carregar Google Identity Services"));
+        document.head.appendChild(script);
+      });
+    };
+
+    // Obté un token d'accés amb l'abast de Google Docs
+    const getAccessToken = async () => {
+      const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+      if (!clientId) throw new Error("Falta NEXT_PUBLIC_GOOGLE_CLIENT_ID a la configuracio.");
+
+      await ensureGisLoaded();
+
+      const token: string = await new Promise((resolve, reject) => {
+        try {
+          const tokenClient = window.google.accounts.oauth2.initTokenClient({
+            client_id: clientId,
+            scope: 'https://www.googleapis.com/auth/documents',
+            prompt: '',
+            callback: (response: any) => {
+              if (response?.access_token) resolve(response.access_token);
+              else reject(new Error("No s'ha obtingut cap token d'acces"));
+            },
+          });
+          tokenClient.requestAccessToken();
+        } catch (err) {
+          reject(err);
+        }
+      });
+      return token;
+    };
+
+    // Crea el document i insereix el contingut
+    const createDocAndInsert = async (accessToken: string, title: string, content: string) => {
+      // Crea el document
+      const createRes = await fetch('https://docs.googleapis.com/v1/documents', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title }),
+      });
+      if (!createRes.ok) {
+        const errText = await createRes.text().catch(() => '');
+        throw new Error(`Error al crear el document: ${createRes.status} ${errText}`);
+      }
+      const created = await createRes.json();
+      const docId = created.documentId;
+      if (!docId) throw new Error('No s\'ha pogut obtenir l\'ID del document');
+
+      // Insereix el text al començament del document
+      const requests = [
+        {
+          insertText: {
+            location: { index: 1 },
+            text: content || '',
+          },
+        },
+      ];
+
+      const updateRes = await fetch(`https://docs.googleapis.com/v1/documents/${docId}:batchUpdate`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ requests }),
+      });
+      if (!updateRes.ok) {
+        const errText = await updateRes.text().catch(() => '');
+        throw new Error(`Error al escriure al document: ${updateRes.status} ${errText}`);
+      }
+
+      return docId;
+    };
+
+    try {
+      setIsDriveExporting(true);
+      const accessToken = await getAccessToken();
+      const docId = await createDocAndInsert(accessToken, docTitle, textToShare);
+      const docUrl = `https://docs.google.com/document/d/${docId}/edit`;
+      window.open(docUrl, '_blank');
+      console.log('Document creat correctament:', docId);
+    } catch (error) {
+      console.error("No s'ha pogut crear el Google Doc:", error);
+      alert(error instanceof Error ? error.message : "No s'ha pogut crear el Google Doc");
+    } finally {
+      setIsDriveExporting(false);
+    }
   };
 
   useEffect(() => {
@@ -304,11 +395,20 @@ export function RightSidebar({
                 onClick={handleGoogleDriveShare} 
                 className="flex-1 justify-center bg-gray-100 hover:bg-gray-200 border-gray-300"
                 variant="outline"
-                disabled={!transcription}
+                disabled={!transcription || isDriveExporting}
                 size="sm"
               >
-                Drive
-                <FaGoogleDrive className="h-4 w-4 text-blue-500" />
+                {isDriveExporting ? (
+                  <>
+                    Exportant
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  </>
+                ) : (
+                  <>
+                    Drive
+                    <FaGoogleDrive className="h-4 w-4 text-blue-500" />
+                  </>
+                )}
               </Button>
             </div>
           </div>

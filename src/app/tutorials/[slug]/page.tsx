@@ -188,7 +188,7 @@ const tutorials = {
       {
         type: 'tip',
         title: 'Consell',
-        content: 'Organitzar les transcripcions per alumnes et permet fer un seguiment més eficient del progrés de cada estudiant i generar informes personalitzats.'
+        content: 'Organitzar les transcripcions per alumnes et permet fer un seguiment més eficient del progrés de cada estudiant.'
       }
     ]
   },
