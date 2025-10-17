@@ -156,7 +156,7 @@ const ProfilesPage = React.memo(function ProfilesPage() {
         throw new Error(data?.error || 'No s\'han pogut carregar les transcripcions')
       }
       const data = await res.json()
-      setTranscriptions(data.transcriptions || [])
+      setTranscriptions(data.data.transcriptions || [])
     } catch (err) {
       setTranscriptionsError(err instanceof Error ? err.message : 'No s\'han pogut carregar les transcripcions')
       setTranscriptions([])
