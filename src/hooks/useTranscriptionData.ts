@@ -38,14 +38,31 @@ export function useTranscriptionData(audioId?: string) {
     setLoading(true);
     setError(null);
     try {
+      console.log(`🔍 Fetching data for audioId: ${audioId}`);
       const response = await fetch(`/api/audio/${audioId}`, {
         cache: "no-store",
       });
       if (!response.ok) throw new Error("Failed to fetch audio data");
       const data = await response.json();
+      console.log(`📥 Received API response:`, {
+        success: data.success,
+        hasAudio: !!data.audio,
+        hasTranscription: !!data.transcription,
+        audioStatus: data.audio?.status,
+        transcriptionSegments: data.transcription?.segments?.length || 0
+      });
+      
       setAudio(data.audio);
       setTranscription(data.transcription);
       setEditedSegments(data.transcription?.segments || []);
+      
+      console.log(`🎯 Updated frontend state:`, {
+        audioSet: !!data.audio,
+        transcriptionSet: !!data.transcription,
+        segmentsCount: data.transcription?.segments?.length || 0,
+        editedSegmentsCount: (data.transcription?.segments || []).length
+      });
+      
       const existingSpeakers = data.transcription?.speakers || [];
       if (existingSpeakers.length === 0) {
         setSpeakers([

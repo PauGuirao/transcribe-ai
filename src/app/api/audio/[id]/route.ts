@@ -80,6 +80,7 @@ export async function GET(
           user.id,
           audioFile.id
         );
+        console.log(`Resolved path for transcription download: ${path}`);
         
         // Get user's access token for Worker authentication
         const { data: { session } } = await supabase.auth.getSession();
@@ -99,7 +100,13 @@ export async function GET(
 
           if (workerResponse.ok) {
             const jsonText = await workerResponse.text();
+            console.log(`✅ Successfully fetched transcription from Worker for audio ${audioFile.id}:`, jsonText.substring(0, 200) + '...');
             const transcriptionData = JSON.parse(jsonText);
+            console.log(`📊 Parsed transcription data:`, {
+              hasText: !!transcriptionData.text,
+              segmentsCount: transcriptionData.segments?.length || 0,
+              speakersCount: transcriptionData.speakers?.length || 0
+            });
 
             transformedTranscription = {
               id: audioFile.id, // Using audio ID as transcription ID
@@ -127,6 +134,12 @@ export async function GET(
               createdAt: audioFile.created_at,
               updatedAt: audioFile.updated_at,
             };
+            console.log(`🔄 Transformed transcription:`, {
+              id: transformedTranscription.id,
+              hasOriginalText: !!transformedTranscription.originalText,
+              segmentsCount: transformedTranscription.segments.length,
+              speakersCount: transformedTranscription.speakers.length
+            });
           } else {
             console.log(
               `Failed to fetch transcription from Worker for audio ${audioFile.id}:`,
@@ -195,6 +208,15 @@ export async function GET(
       status: audioFile.status,
       transcription: transformedTranscription,
     };
+
+    console.log(`🎯 Final API response for audio ${audioFile.id}:`, {
+      success: true,
+      audioId: audio.id,
+      audioStatus: audio.status,
+      hasTranscription: !!transformedTranscription,
+      transcriptionId: transformedTranscription?.id,
+      transcriptionSegments: transformedTranscription?.segments?.length || 0
+    });
 
     return NextResponse.json({
       success: true,
