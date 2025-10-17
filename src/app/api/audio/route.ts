@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
-import { cookies } from "next/headers";
 import { SmartPagination, PaginationPerformanceMonitor } from "@/lib/smart-pagination";
-import { createOptimizedSupabaseClient } from "@/lib/database-optimized";
+import { getAuth, jsonError } from "@/lib/api-helpers";
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,32 +10,28 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "20");
     const search = searchParams.get("search") || "";
     const orderBy = searchParams.get("orderBy") || "created_at";
-    const orderDirection = (searchParams.get("orderDirection") || "desc") as 'asc' | 'desc';
+    const orderDirection = (searchParams.get("orderDirection") || "desc") as "asc" | "desc";
 
-    // Create optimized Supabase client
-    const supabase = await createOptimizedSupabaseClient();
+    // Create optimized Supabase client via shared auth helper
+    const { supabase, user, error: userError } = await getAuth();
     const pagination = new SmartPagination(supabase);
     const performanceMonitor = new PaginationPerformanceMonitor();
 
     // Check authentication
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required. Please sign in.' },
-        { status: 401 }
-      );
+      return jsonError("Authentication required. Please sign in.", { status: 401 });
     }
 
     // Use smart pagination with search capabilities
     const startTime = Date.now();
-    
+
     let result;
     if (search) {
       // Search across filename and custom_name
       result = await pagination.searchWithPagination(
-        'audios',
+        "audios",
         search,
-        ['filename', 'custom_name'],
+        ["filename", "custom_name"],
         {
           page,
           limit,
@@ -50,8 +44,6 @@ export async function GET(request: NextRequest) {
               original_text,
               edited_text,
               segments,
-              language,
-              confidence,
               status,
               created_at,
               updated_at,
@@ -59,43 +51,38 @@ export async function GET(request: NextRequest) {
             )
           `,
           filters: {
-            user_id: user.id
-          }
+            user_id: user.id,
+          },
         }
       );
     } else {
       // Regular pagination
-      result = await pagination.paginateWithOffset(
-        'audios',
-        {
-          page,
-          limit,
-          orderBy,
-          orderDirection,
-          select: `
-            *,
-            transcriptions (
-              id,
-              original_text,
-              edited_text,
-              segments,
-              language,
-              confidence,
-              status,
-              created_at,
-              updated_at,
-              alumne_id
-            )
-          `,
-          filters: {
-            user_id: user.id
-          }
-        }
-      );
+      result = await pagination.paginateWithOffset("audios", {
+        page,
+        limit,
+        orderBy,
+        orderDirection,
+        select: `
+          *,
+          transcriptions (
+            id,
+            original_text,
+            edited_text,
+            segments,
+            status,
+            created_at,
+            updated_at,
+            alumne_id
+          )
+        `,
+        filters: {
+          user_id: user.id,
+        },
+      });
     }
 
     const queryTime = Date.now() - startTime;
-    performanceMonitor.trackQuery('audio_list', queryTime);
+    performanceMonitor.trackQuery("audio_list", queryTime);
 
     // Transform the data to match frontend interface
     const transformedAudioFiles = result.data.map((audioFile: any) => ({
@@ -107,16 +94,18 @@ export async function GET(request: NextRequest) {
       uploadDate: audioFile.created_at,
       status: audioFile.status,
       alumneId: audioFile.alumne_id,
-      transcription: audioFile.transcriptions?.[0] ? {
-        id: audioFile.transcriptions[0].id,
-        audioId: audioFile.id,
-        originalText: audioFile.transcriptions[0].original_text,
-        editedText: audioFile.transcriptions[0].edited_text,
-        segments: audioFile.transcriptions[0].segments,
-        createdAt: audioFile.transcriptions[0].created_at,
-        updatedAt: audioFile.transcriptions[0].updated_at,
-        alumneId: audioFile.transcriptions[0].alumne_id,
-      } : null,
+      transcription: audioFile.transcriptions?.[0]
+        ? {
+            id: audioFile.transcriptions[0].id,
+            audioId: audioFile.id,
+            originalText: audioFile.transcriptions[0].original_text,
+            editedText: audioFile.transcriptions[0].edited_text,
+            segments: audioFile.transcriptions[0].segments,
+            createdAt: audioFile.transcriptions[0].created_at,
+            updatedAt: audioFile.transcriptions[0].updated_at,
+            alumneId: audioFile.transcriptions[0].alumne_id,
+          }
+        : null,
     }));
 
     return NextResponse.json({
@@ -126,14 +115,10 @@ export async function GET(request: NextRequest) {
       meta: {
         ...result.meta,
         search: search || undefined,
-      }
+      },
     });
-
   } catch (error) {
-    console.error('Error fetching audio files:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to fetch audio files' },
-      { status: 500 }
-    );
+    console.error("Error fetching audio files:", error);
+    return jsonError("Failed to fetch audio files", { status: 500 });
   }
 }

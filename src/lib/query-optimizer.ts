@@ -85,8 +85,6 @@ export class QueryOptimizer {
         transcriptions!left (
           id,
           status,
-          language,
-          confidence,
           created_at,
           updated_at
         )
