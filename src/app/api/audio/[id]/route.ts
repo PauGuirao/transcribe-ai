@@ -90,9 +90,14 @@ export async function GET(
           // Fetch transcription JSON from Worker's R2 download endpoint
           const workerUrl = process.env.NEXT_PUBLIC_CLOUDFLARE_WORKER_URL || 'https://transcribe-worker.guiraocastells.workers.dev';
           
-          // Use the full path as returned by resolveLatestTranscriptionPath
-          // The Worker expects the full R2 path structure: userId/audioId/filename or userId/audioId.json
-          const workerResponse = await fetch(`${workerUrl}/download/transcriptions/${path}`, {
+          // The Worker expects format: /download/{bucket}/{userId}/{filename}
+          // The path from resolveLatestTranscriptionPath is: userId/audioId/filename or userId/audioId.json
+          // We need to extract userId and filename from the path
+          const pathParts = path.split('/');
+          const userId = pathParts[0];
+          const filename = pathParts[pathParts.length - 1]; // Get the last part (filename)
+          
+          const workerResponse = await fetch(`${workerUrl}/download/transcriptions/${userId}/${filename}`, {
             headers: {
               'Authorization': `Bearer ${session.access_token}`,
             },
