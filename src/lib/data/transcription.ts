@@ -34,7 +34,7 @@ export async function getTranscriptionById(
     .from("transcriptions")
     .select(
       `
-      id, audio_id, created_at, updated_at, json_path, original_text, edited_text, segments, speakers,
+      id, audio_id, created_at, updated_at, json_path, original_text, edited_text, segments,
       audios!inner ( user_id )
     `
     )
