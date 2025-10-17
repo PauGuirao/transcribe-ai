@@ -70,7 +70,7 @@ export async function GET(
       alumneId = alumneRows[0].alumne_id ?? null;
     }
 
-    // Fetch transcription data from Storage bucket JSON file
+    // Fetch transcription data from Cloudflare Worker R2 instead of Supabase Storage
     let transformedTranscription = null;
 
     if (audioFile.status === "completed") {
@@ -80,48 +80,101 @@ export async function GET(
           user.id,
           audioFile.id
         );
-        // Add timestamp to force cache refresh
-        const { data: jsonData, error: storageError } = await supabase.storage
-          .from("transcriptions")
-          .download(path);
-
-        if (!storageError && jsonData) {
-          const jsonText = await jsonData.text();
-          const transcriptionData = JSON.parse(jsonText);
-
-          transformedTranscription = {
-            id: audioFile.id, // Using audio ID as transcription ID
-            audioId: audioFile.id,
-            originalText: transcriptionData.text || "",
-            editedText: transcriptionData.text || "", // For now, same as original
-            segments: transcriptionData.segments || [],
-            speakers:
-              transcriptionData.speakers &&
-              transcriptionData.speakers.length > 0
-                ? transcriptionData.speakers
-                : [
-                    {
-                      id: "speaker-logopeda",
-                      name: "Logopeda",
-                      color: "#3B82F6",
-                    },
-                    {
-                      id: "speaker-alumne",
-                      name: "Alumne",
-                      color: "#EF4444",
-                    },
-                  ],
-            alumneId,
-            createdAt: audioFile.created_at,
-            updatedAt: audioFile.updated_at,
-          };
+        
+        // Get user's access token for Worker authentication
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.access_token) {
+          console.log('No session token available for transcription download');
         } else {
-          console.log(
-            `No transcription JSON found for audio ${audioFile.id}:`,
-            storageError
-          );
-          // If audio is completed but transcription file is not available yet,
-          // return null transcription so the frontend can show loading state
+          // Fetch transcription JSON from Worker's R2 download endpoint
+          const workerUrl = process.env.NEXT_PUBLIC_CLOUDFLARE_WORKER_URL || 'https://transcribe-worker.guiraocastells.workers.dev';
+          
+          // Extract filename from path (last part after the last slash)
+          const filename = path.split('/').pop();
+          
+          const workerResponse = await fetch(`${workerUrl}/download/transcriptions/${user.id}/${filename}`, {
+            headers: {
+              'Authorization': `Bearer ${session.access_token}`,
+            },
+          });
+
+          if (workerResponse.ok) {
+            const jsonText = await workerResponse.text();
+            const transcriptionData = JSON.parse(jsonText);
+
+            transformedTranscription = {
+              id: audioFile.id, // Using audio ID as transcription ID
+              audioId: audioFile.id,
+              originalText: transcriptionData.text || "",
+              editedText: transcriptionData.text || "", // For now, same as original
+              segments: transcriptionData.segments || [],
+              speakers:
+                transcriptionData.speakers &&
+                transcriptionData.speakers.length > 0
+                  ? transcriptionData.speakers
+                  : [
+                      {
+                        id: "speaker-logopeda",
+                        name: "Logopeda",
+                        color: "#3B82F6",
+                      },
+                      {
+                        id: "speaker-alumne",
+                        name: "Alumne",
+                        color: "#EF4444",
+                      },
+                    ],
+              alumneId,
+              createdAt: audioFile.created_at,
+              updatedAt: audioFile.updated_at,
+            };
+          } else {
+            console.log(
+              `Failed to fetch transcription from Worker for audio ${audioFile.id}:`,
+              workerResponse.status, workerResponse.statusText
+            );
+            // Fallback to Supabase Storage if Worker fails
+            const { data: jsonData, error: storageError } = await supabase.storage
+              .from("transcriptions")
+              .download(path);
+
+            if (!storageError && jsonData) {
+              const jsonText = await jsonData.text();
+              const transcriptionData = JSON.parse(jsonText);
+
+              transformedTranscription = {
+                id: audioFile.id,
+                audioId: audioFile.id,
+                originalText: transcriptionData.text || "",
+                editedText: transcriptionData.text || "",
+                segments: transcriptionData.segments || [],
+                speakers:
+                  transcriptionData.speakers &&
+                  transcriptionData.speakers.length > 0
+                    ? transcriptionData.speakers
+                    : [
+                        {
+                          id: "speaker-logopeda",
+                          name: "Logopeda",
+                          color: "#3B82F6",
+                        },
+                        {
+                          id: "speaker-alumne",
+                          name: "Alumne",
+                          color: "#EF4444",
+                        },
+                      ],
+                alumneId,
+                createdAt: audioFile.created_at,
+                updatedAt: audioFile.updated_at,
+              };
+            } else {
+              console.log(
+                `No transcription JSON found for audio ${audioFile.id}:`,
+                storageError
+              );
+            }
+          }
         }
       } catch (error) {
         console.error(

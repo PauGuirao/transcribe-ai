@@ -53,21 +53,35 @@ export async function GET(
       );
     }
 
-    // Download file from Supabase Storage
-    const { data: fileData, error: storageError } = await supabase.storage
-      .from('audio-files')
-      .download(audioFile.storage_path);
-
-    if (storageError || !fileData) {
-      console.error('Storage download error:', storageError);
+    // Download file from Cloudflare Worker R2 instead of Supabase Storage
+    const workerUrl = process.env.NEXT_PUBLIC_CLOUDFLARE_WORKER_URL || 'https://transcribe-worker.guiraocastells.workers.dev';
+    
+    // Get user's access token for Worker authentication
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) {
       return NextResponse.json(
-        { success: false, error: 'Failed to download audio file' },
+        { success: false, error: 'Authentication token not available' },
+        { status: 401 }
+      );
+    }
+
+    // Fetch file from Worker's R2 download endpoint
+    const workerResponse = await fetch(`${workerUrl}/download/audio-files/${user.id}/${audioFile.filename}`, {
+      headers: {
+        'Authorization': `Bearer ${session.access_token}`,
+      },
+    });
+
+    if (!workerResponse.ok) {
+      console.error('Worker download error:', workerResponse.status, workerResponse.statusText);
+      return NextResponse.json(
+        { success: false, error: 'Failed to download audio file from R2' },
         { status: 500 }
       );
     }
 
-    // Convert blob to array buffer
-    const fileBuffer = await fileData.arrayBuffer();
+    // Get file buffer from Worker response
+    const fileBuffer = await workerResponse.arrayBuffer();
     const contentType = audioFile.mime_type || getContentType(audioFile.filename);
 
     return new NextResponse(fileBuffer, {
