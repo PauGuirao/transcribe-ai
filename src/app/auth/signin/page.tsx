@@ -174,7 +174,7 @@ const SignInContent = React.memo(function SignInContent() {
               onClick={handleSignIn}
               disabled={loading}
               size="lg"
-              className="w-full justify-center gap-3 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
+              className="w-full justify-center gap-3 rounded-xl bg-black text-primary-foreground hover:bg-black/80 cursor-pointer h-12"
             >
               {loading ? (
                 <>

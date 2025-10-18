@@ -9,6 +9,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
+import { Hero } from "@/components/Hero";
+import { HowItWorks } from "@/components/HowItWorks";
+import { Features } from "@/components/Features";
+import { Footer } from "@/components/Footer";
+import { Navbar } from "@/components/Navbar";
 import {
   BrainCircuit,
   CheckCircle2,
@@ -100,7 +105,7 @@ const plans = [
   },
   {
     key: "paid",
-    name: "Pro",
+    name: "Individual",
     price: "10€",
     description:
       "Transcripcions il·limitades per a professionals.",
@@ -134,16 +139,27 @@ export default function Home() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [numberOfUsers, setNumberOfUsers] = useState(10);
+  const [showTooltip, setShowTooltip] = useState(false);
   const [contactForm, setContactForm] = useState({
     company: "",
     email: "",
     users: "",
     requirements: "",
   });
+
+  // Pricing formula for organization plan
+  const calculatePricePerUser = (N: number) => {
+    if (N <= 0) return 10;
+    const base = 10; // €
+    const minFraction = 0.65; // minimum = 6.5 €
+    const discountFraction = 1 - minFraction; // 0.35
+    const rate = 0.02; // speed of discount curve
+    return base * (minFraction + discountFraction * Math.exp(-rate * (N - 1)));
+  };
 
   const handlePrimaryAction = async () => {
     if (user) {
@@ -207,364 +223,20 @@ Informació de la sol·licitud:
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-6 relative">
-          <Link href="/" className="flex items-center space-x-2">
-            <Image 
-              src="/logo3.png" 
-              alt="Transcriu Logo" 
-              width={32} 
-              height={32} 
-              className="rounded-lg"
-            />
-            <h1 className="text-xl font-bold text-gray-900">transcriu</h1>
-          </Link>
-          
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8 absolute left-1/2 transform -translate-x-1/2">
-            <button 
-              onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
-              className="text-md text-gray-600 hover:text-gray-900 transition-all duration-300 cursor-pointer px-4 py-2 rounded-lg hover:bg-gray-50 hover:scale-105 transform"
-            >
-              Preus
-            </button>
-            <button 
-              onClick={() => setIsContactOpen(true)}
-              className="text-md text-gray-600 hover:text-gray-900 transition-all duration-300 cursor-pointer px-4 py-2 rounded-lg hover:bg-gray-50 hover:scale-105 transform"
-            >
-              Contacte
-            </button>
-          </nav>
-
-          <div className="hidden md:flex items-center space-x-3">
-            {user ? (
-              <Button variant="ghost" onClick={() => router.push("/dashboard")} className="text-sm h-11 px-6 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border border-blue-200 hover:border-blue-300">
-                Anar al panell
-              </Button>
-            ) : (
-              <Button asChild variant="ghost" className="text-sm h-11 px-6 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border border-blue-200 hover:border-blue-300">
-                <Link href="/auth/signin">Inicia sessió</Link>
-              </Button>
-            )}
-            <Button
-              onClick={handlePrimaryAction}
-              disabled={authLoading || loading}
-              className="bg-blue-500 hover:bg-blue-600 text-white text-sm h-11 px-6 font-medium shadow-sm"
-            >
-              {authLoading || loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Preparant...
-                </>
-              ) : user ? (
-                "Obrir Transcriu"
-              ) : (
-                "Comença gratis"
-              )}
-            </Button>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <div className="md:hidden">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-gray-600 hover:text-gray-900"
-            >
-              {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </Button>
-          </div>
-        </div>
-
-        {/* Mobile Navigation Panel */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-100">
-            <div className="mx-auto max-w-6xl px-6 py-4 space-y-3">
-              <div className="space-y-2">
-                <button 
-                  onClick={() => {
-                    document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="block text-lg font-medium text-gray-600 hover:text-gray-900 py-3 px-4 w-full text-left rounded-lg hover:bg-gray-50 transition-all duration-300 transform hover:scale-105"
-                >
-                  Preus
-                </button>
-                <button 
-                  onClick={() => {
-                    setIsContactOpen(true);
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="block text-lg font-medium text-gray-600 hover:text-gray-900 py-3 px-4 w-full text-left rounded-lg hover:bg-gray-50 transition-all duration-300 transform hover:scale-105"
-                >
-                  Contacte
-                </button>
-              </div>
-              <div className="pt-4 border-t border-gray-100 space-y-3">
-                {user ? (
-                  <Button 
-                  variant="ghost" 
-                  onClick={() => {
-                    router.push("/dashboard");
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="w-full justify-start text-sm h-11 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border border-blue-200 hover:border-blue-300"
-                >
-                  Anar al panell
-                </Button>
-              ) : (
-                <Button 
-                  asChild 
-                  variant="ghost"
-                  className="w-full justify-start text-sm h-11 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border border-blue-200 hover:border-blue-300"
-                >
-                  <Link 
-                    href="/auth/signin"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Inicia sessió
-                  </Link>
-                </Button>
-              )}
-                <Button
-                  onClick={() => {
-                    handlePrimaryAction();
-                    setIsMobileMenuOpen(false);
-                  }}
-                  disabled={authLoading || loading}
-                  className="w-full bg-blue-500 hover:bg-blue-600 text-white text-sm h-11 font-medium shadow-sm"
-                >
-                  {authLoading || loading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Preparant...
-                    </>
-                  ) : user ? (
-                    "Obrir Transcriu"
-                  ) : (
-                    "Comença gratis"
-                  )}
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
-      </header>
-
+    <div className="min-h-screen bg-gray-20">
+      <div id="nav-sentinel" className="h-1" />
+      <Navbar onContactClick={() => setIsContactOpen(true)} />
       {/* Main Content */}
-      <main className="mx-auto w-full max-w-7xl px-6 pb-24 pt-16">
+      <main className="mx-auto w-full max-w-7xl px-6 pb-24 pt-4">
         {/* Hero Section */}
-        <section className="text-center space-y-6 py-8">
-          <div className="space-y-4 max-w-4xl mx-auto">
-            <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-gray-900 leading-[1] max-w-3xl mx-auto">
-              Transcriu sessions de
-              <span className="text-gray-900"> logopèdia amb facilitat</span>
-            </h1>
-            <p className="text-2xl md:text-2xl text-gray-500 max-w-2xl mx-auto leading-tight font-bold">
-              Utilitza una plataforma dissenyada per a alta precisió. Confiada per professionals de totes les mides per gestionar milions de paraules cada mes.
-            </p>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-            <Button
-              size="lg"
-              onClick={handlePrimaryAction}
-              disabled={authLoading || loading}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-7 rounded-lg font-semibold text-lg transition-colors"
-            >
-              {authLoading || loading ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Preparant l'experiència
-                </>
-              ) : user ? (
-                "Anar al panell"
-              ) : (
-                "Prova-ho gratis"
-              )}
-            </Button>
-            <Button size="lg" variant="outline" className="px-6 py-7 rounded-lg font-semibold text-lg border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-colors">
-              Veure característiques
-            </Button>
-          </div>
-        </section>
+        <Hero />
+
+        {/* How It Works Section */}
+        <HowItWorks />
 
         {/* Features Section */}
-        <section className="py-20">
-          <div className="max-w-7xl mx-auto space-y-24">
-            {/* Feature 1: Transcription - Text Left, Image Right */}
-            <div className="grid md:grid-cols-2 gap-12 items-stretch">
-              <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100 space-y-6 flex flex-col justify-center h-96">
-                <h3 className="text-3xl font-bold text-gray-900">
-                  Transcripció automàtica precisa
-                </h3>
-                <p className="text-lg text-gray-600 leading-relaxed">
-                  Converteix les teves sessions d'àudio en text editable amb la nostra IA especialitzada en català i espanyol. 
-                  Transcripció ràpida i precisa que reconeix terminologia mèdica i logopèdica per obtenir resultats professionals.
-                </p>
-                <Button className="bg-blue-600 hover:bg-blue-700 w-fit">
-                  Prova la transcripció
-                </Button>
-              </div>
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-3xl p-8 relative overflow-hidden h-96">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <FileAudio2 className="h-32 w-32 text-blue-600 opacity-20" />
-                </div>
-                <div className="relative z-10 h-full flex items-center justify-center">
-                  <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                      <div className="text-sm font-medium text-gray-900">Transcrivint...</div>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="h-2 bg-blue-200 rounded w-full"></div>
-                      <div className="h-2 bg-blue-200 rounded w-3/4"></div>
-                      <div className="h-2 bg-gray-200 rounded w-1/2"></div>
-                    </div>
-                    <div className="mt-4 text-xs text-gray-500">98% precisió</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Feature 2: Edit & Annotate - Text Right, Image Left */}
-            <div className="grid md:grid-cols-2 gap-12 items-stretch">
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-3xl p-8 relative overflow-hidden h-96 order-2 md:order-1">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <PenTool className="h-32 w-32 text-blue-600 opacity-20" />
-                </div>
-                <div className="relative z-10 h-full flex items-center justify-center">
-                  <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                        <PenTool className="h-4 w-4 text-blue-600" />
-                      </div>
-                      <div className="text-sm font-medium text-gray-900">Editor Actiu</div>
-                    </div>
-                    <div className="space-y-3">
-                      <div className="flex gap-2">
-                        <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                        <div className="text-xs text-gray-600">Objectiu terapèutic</div>
-                      </div>
-                      <div className="flex gap-2">
-                        <div className="w-2 h-2 bg-green-600 rounded-full"></div>
-                        <div className="text-xs text-gray-600">Progrés observat</div>
-                      </div>
-                      <div className="flex gap-2">
-                        <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                        <div className="text-xs text-gray-600">Nota clínica</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100 space-y-6 flex flex-col justify-center h-96 order-1 md:order-2">
-                <h3 className="text-3xl font-bold text-gray-900">
-                  Editor intel·ligent amb anotacions
-                </h3>
-                <p className="text-lg text-gray-600 leading-relaxed">
-                  Edita les transcripcions i afegeix anotacions clíniques directament al text. Marca objectius terapèutics, 
-                  observacions i progressos amb etiquetes de colors per crear informes estructurats i professionals.
-                </p>
-                <Button className="bg-blue-600 hover:bg-blue-700 w-fit">
-                  Prova l'editor
-                </Button>
-              </div>
-            </div>
-
-            {/* Feature 3: Library & ID Profiling - Text Left, Image Right */}
-            <div className="grid md:grid-cols-2 gap-12 items-stretch">
-              <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100 space-y-6 flex flex-col justify-center h-96">
-                <h3 className="text-3xl font-bold text-gray-900">
-                  Gestió de pacients i historials
-                </h3>
-                <p className="text-lg text-gray-600 leading-relaxed">
-                  Organitza tots els teus pacients amb perfils detallats i historials complets. Accedeix ràpidament a sessions anteriors, 
-                  segueix l'evolució terapèutica i genera informes de progrés per a famílies i altres professionals.
-                </p>
-                <Button className="bg-green-600 hover:bg-green-700 w-fit">
-                  Explora la biblioteca
-                </Button>
-              </div>
-              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-3xl p-8 relative overflow-hidden h-96">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <BookOpen className="h-32 w-32 text-green-600 opacity-20" />
-                </div>
-                <div className="relative z-10 h-full flex items-center justify-center">
-                  <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm">
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                        <BookOpen className="h-4 w-4 text-green-600" />
-                      </div>
-                      <span className="text-sm font-medium text-gray-900">Perfils de Pacients</span>
-                    </div>
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs text-gray-600">Sessions totals</span>
-                        <span className="text-xs font-medium text-green-600">24</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs text-gray-600">Progrés</span>
-                        <span className="text-xs font-medium text-green-600">85%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div className="bg-green-600 h-2 rounded-full w-[85%]"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* All-in-One Toolkit Section */}
-        <section className="py-20">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Kit d'Eines Tot-en-Un per a Transcripció
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Tot el que necessites per gestionar les teves sessions de logopèdia de manera eficient
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <FileAudio2 className="h-8 w-8 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Llistes i Segments</h3>
-              <p className="text-gray-600">
-                Crea llistes i segments per organitzar les teves sessions i fer seguiment del progrés dels teus pacients.
-              </p>
-            </div>
-            
-            <div className="text-center">
-              <div className="bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <PenTool className="h-8 w-8 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Constructor de Formularis</h3>
-              <p className="text-gray-600">
-                El nostre constructor de formularis facilita la creació de formularis d'avaluació personalitzats per capturar dades específiques.
-              </p>
-            </div>
-            
-            <div className="text-center">
-              <div className="bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <BrainCircuit className="h-8 w-8 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Domini d'Enviament Gratuït</h3>
-              <p className="text-gray-600">
-                No tens un domini? Cap problema! Oferim un subdomini gratuït perquè puguis començar a enviar informes immediatament.
-              </p>
-            </div>
-          </div>
-        </section>
-
+        <Features />
+        
         {/* Pricing Section */}
         <section id="pricing" className="py-20">
           <div className="text-center mb-16">
@@ -582,7 +254,7 @@ Informació de la sol·licitud:
                 key={plan.key}
                 className={`rounded-3xl p-8 relative flex flex-col h-full ${
                   plan.highlighted
-                    ? "bg-white text-gray-900 shadow-2xl shadow-blue-500/25 scale-105 border-2 border-blue-400"
+                    ? "bg-white text-gray-900 shadow-2xl shadow-blue-500/25 border-2 border-blue-400"
                     : "bg-white border-2 border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300"
                 }`}
               >
@@ -594,21 +266,68 @@ Informació de la sol·licitud:
                   </div>
                 )}
                 
-                <div className="text-center">
+                <div className="text-left">
                   <h3 className={`text-2xl font-bold mb-2 ${plan.highlighted ? "text-gray-900" : "text-gray-900"}`}>
                     {plan.name}
                   </h3>
                   <div className="mb-4">
-                    <span className={`text-5xl font-bold ${plan.highlighted ? "text-gray-900" : "text-gray-900"}`}>
-                      {plan.price}
-                    </span>
-                    {plan.price !== "Personalitzat" && (
-                      <span className={`text-lg ${plan.highlighted ? "text-gray-600" : "text-gray-600"}`}>
-                        /mes
-                      </span>
+                    {plan.key === "org" ? (
+                      <div className="space-y-3">
+                        <div>
+                          <span className="text-5xl font-bold text-gray-900">
+                            {Math.floor(calculatePricePerUser(numberOfUsers))}.00€
+                          </span>
+                          <span className="text-md text-gray-600"> /mes/usuari</span>
+                        </div>
+                        <div className="pt-2">
+                           <div className="relative">
+                             <input
+                               id="users-slider"
+                               type="range"
+                               min="5"
+                               max="100"
+                               step="5"
+                               value={numberOfUsers}
+                               onChange={(e) => setNumberOfUsers(parseInt(e.target.value))}
+                               onMouseDown={() => setShowTooltip(true)}
+                               onMouseUp={() => setShowTooltip(false)}
+                               onTouchStart={() => setShowTooltip(true)}
+                               onTouchEnd={() => setShowTooltip(false)}
+                               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                             />
+                             {/* Tooltip */}
+                             {showTooltip && (
+                               <div 
+                                 className="absolute -top-6 bg-blue-500 text-white px-2 py-1 rounded text-sm font-bold pointer-events-none transform -translate-x-1/2"
+                                 style={{
+                                   left: `${((numberOfUsers - 5) / (100 - 5)) * 100}%`
+                                 }}
+                               >
+                                 {numberOfUsers} usuaris
+                                 <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-2 border-r-2 border-t-2 border-transparent border-t-gray-800"></div>
+                               </div>
+                             )}
+                           </div>
+                           <div className="flex justify-between text-md text-gray-500 mt-1">
+                             <span>Usuaris</span>
+                             <span className="font-bold text-md text-gray-800">{numberOfUsers}</span>
+                           </div>
+                         </div>
+                      </div>
+                    ) : (
+                      <>
+                        <span className={`text-5xl font-bold ${plan.highlighted ? "text-gray-900" : "text-gray-900"}`}>
+                          {plan.price}
+                        </span>
+                        {plan.price !== "Personalitzat" && (
+                          <span className={`text-md ${plan.highlighted ? "text-gray-600" : "text-gray-600"}`}>
+                            /mes
+                          </span>
+                        )}
+                      </>
                     )}
                   </div>
-                  <p className={`mb-8 text-lg ${plan.highlighted ? "text-gray-600" : "text-gray-600"}`}>
+                  <p className={`mb-8 text-md text-left ${plan.highlighted ? "text-gray-600" : "text-gray-600"}`}>
                     {plan.description}
                   </p>
                 </div>
@@ -762,6 +481,9 @@ Informació de la sol·licitud:
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }
