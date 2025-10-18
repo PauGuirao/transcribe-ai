@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase"; // 👈 Import your Supabase client
 import { createAudioStatusSubscription, realtimeManager } from "@/lib/supabase-realtime";
 import { Audio, Transcription, TranscriptionSegment, Speaker } from "@/types";
@@ -24,6 +24,8 @@ export function useTranscriptionData(audioId?: string) {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  // Guard against duplicate subscription setup (e.g., React Strict Mode)
+  const subscriptionAudioIdRef = useRef<string | null>(null);
 
   // The fetchData function remains exactly the same
   const fetchData = useCallback(async () => {
@@ -90,7 +92,15 @@ export function useTranscriptionData(audioId?: string) {
   useEffect(() => {
     if (!audioId) return;
 
+    // Prevent duplicate setup for the same audioId
+    if (subscriptionAudioIdRef.current === audioId) {
+      console.log(`[REALTIME] Subscription already active for audioId: ${audioId}, skipping duplicate setup`);
+      return;
+    }
+
     console.log(`[REALTIME] Setting up optimized subscription for audioId: ${audioId}`);
+
+    subscriptionAudioIdRef.current = audioId;
 
     // Use the optimized realtime subscription
     const channel = createAudioStatusSubscription(
@@ -108,7 +118,11 @@ export function useTranscriptionData(audioId?: string) {
     // Cleanup function
     return () => {
       console.log(`[REALTIME] Cleaning up optimized subscription for audioId: ${audioId}`);
-      realtimeManager.unsubscribe(`audios:${audioId}`);
+      // Ensure we unsubscribe the correct channel name
+      realtimeManager.unsubscribe(`audio-status-${audioId}`);
+      if (subscriptionAudioIdRef.current === audioId) {
+        subscriptionAudioIdRef.current = null;
+      }
     };
   }, [audioId, fetchData]);
 

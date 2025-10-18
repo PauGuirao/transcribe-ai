@@ -54,27 +54,78 @@ const ProfilesPage = React.memo(function ProfilesPage() {
   const [nameError, setNameError] = useState<string | null>(null)
   const [ageError, setAgeError] = useState<string | null>(null)
 
-  // State for selected student and transcriptions
-  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null)
-  const [transcriptions, setTranscriptions] = useState<TranscriptionSummary[]>([])
-  const [transcriptionsLoading, setTranscriptionsLoading] = useState(false)
-  const [transcriptionsError, setTranscriptionsError] = useState<string | null>(null)
+  // Simple client cache for profiles
+  const CACHE_KEY = 'profiles_cache_v1'
+  const CACHE_TTL_MS = 15 * 1000 // match server max-age
 
-  const router = useRouter()
-
-  const fetchProfiles = async () => {
-    setRefreshing(true)
+  const readCache = () => {
     try {
-      const res = await fetch('/api/alumne')
+      const raw = sessionStorage.getItem(CACHE_KEY)
+      if (!raw) return null
+      const parsed = JSON.parse(raw)
+      if (!parsed || typeof parsed !== 'object') return null
+      const { etag, timestamp, data } = parsed
+      if (!etag || !timestamp || !data) return null
+      const isFresh = Date.now() - timestamp < CACHE_TTL_MS
+      return { etag, timestamp, data, isFresh }
+    } catch {
+      return null
+    }
+  }
+
+  const writeCache = (etag: string, data: any) => {
+    try {
+      const payload = { etag, timestamp: Date.now(), data }
+      sessionStorage.setItem(CACHE_KEY, JSON.stringify(payload))
+    } catch {}
+  }
+
+  const clearCache = () => {
+    try { sessionStorage.removeItem(CACHE_KEY) } catch {}
+  }
+
+  const fetchProfiles = async (opts?: { force?: boolean }) => {
+    const force = !!opts?.force
+    setRefreshing(true)
+    setListError(null)
+
+    const cached = readCache()
+    if (cached?.isFresh && !force) {
+      // Render immediately while revalidating in background
+      setProfiles(cached.data.profiles || [])
+      setLoading(false)
+    }
+
+    try {
+      const res = await fetch('/api/alumne', {
+        headers: cached?.etag && !force ? { 'If-None-Match': cached.etag } : {},
+        cache: 'no-store',
+      })
+
+      if (res.status === 304 && cached) {
+        // Use cached data
+        setProfiles(cached.data.profiles || [])
+        setLoading(false)
+        return
+      }
+
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
         throw new Error(data?.error || 'No s\'han pogut carregar els perfils')
       }
+
       const data = await res.json()
       setProfiles(data.profiles || [])
       setListError(null)
+
+      const etag = res.headers.get('ETag') || undefined
+      if (etag) {
+        writeCache(etag, data)
+      }
     } catch (err) {
-      setListError(err instanceof Error ? err.message : 'No s\'han pogut carregar els perfils')
+      if (!cached) {
+        setListError(err instanceof Error ? err.message : 'No s\'han pogut carregar els perfils')
+      }
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -134,32 +185,71 @@ const ProfilesPage = React.memo(function ProfilesPage() {
     validateAge(value)
   }
 
+  // State for selected student and transcriptions
+  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null)
+  const [transcriptions, setTranscriptions] = useState<TranscriptionSummary[]>([])
+  const [transcriptionsLoading, setTranscriptionsLoading] = useState(false)
+  const [transcriptionsError, setTranscriptionsError] = useState<string | null>(null)
+
+  const router = useRouter()
+
   const fetchTranscriptions = async (alumneId: string, forceRefresh = false) => {
     setTranscriptionsLoading(true)
     setTranscriptionsError(null)
+
+    const CACHE_KEY_T = `transcriptions_cache_${alumneId}_v1`
+    const TTL = 15 * 1000
+
+    let cached: { etag: string; timestamp: number; data: any } | null = null
     try {
-      // Add cache-busting parameter when forcing refresh
-      const url = forceRefresh 
-        ? `/api/transcription?alumneId=${alumneId}&_t=${Date.now()}`
-        : `/api/transcription?alumneId=${alumneId}`
-      
-      const res = await fetch(url, {
-        // Disable browser cache for fresh data
-        cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache'
+      const raw = sessionStorage.getItem(CACHE_KEY_T)
+      if (raw) {
+        const parsed = JSON.parse(raw)
+        if (parsed && parsed.etag && parsed.timestamp && parsed.data) {
+          cached = parsed
+          const isFresh = Date.now() - parsed.timestamp < TTL
+          if (isFresh && !forceRefresh) {
+            setTranscriptions(parsed.data.transcriptions || [])
+            setTranscriptionsLoading(false)
+          }
         }
+      }
+    } catch {}
+
+    try {
+      const url = `/api/transcription?alumneId=${alumneId}`
+      const res = await fetch(url, {
+        headers: cached?.etag && !forceRefresh ? { 'If-None-Match': cached.etag } : {},
+        cache: 'no-store',
       })
+
+      if (res.status === 304 && cached) {
+        setTranscriptions(cached.data.transcriptions || [])
+        setTranscriptionsLoading(false)
+        return
+      }
+
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
         throw new Error(data?.error || 'No s\'han pogut carregar les transcripcions')
       }
+
       const data = await res.json()
-      setTranscriptions(data.data.transcriptions || [])
+      setTranscriptions(data.transcriptions || [])
+      const etag = res.headers.get('ETag') || undefined
+      if (etag) {
+        try {
+          sessionStorage.setItem(
+            CACHE_KEY_T,
+            JSON.stringify({ etag, timestamp: Date.now(), data })
+          )
+        } catch {}
+      }
     } catch (err) {
-      setTranscriptionsError(err instanceof Error ? err.message : 'No s\'han pogut carregar les transcripcions')
-      setTranscriptions([])
+      if (!cached) {
+        setTranscriptionsError(err instanceof Error ? err.message : 'No s\'han pogut carregar les transcripcions')
+        setTranscriptions([])
+      }
     } finally {
       setTranscriptionsLoading(false)
     }
@@ -203,9 +293,12 @@ const ProfilesPage = React.memo(function ProfilesPage() {
         throw new Error(data?.error || 'No s\'ha pogut crear el perfil')
       }
 
+      // Invalidate cache upon successful creation
+      clearCache()
+
       resetForm()
       setSheetOpen(false)
-      await fetchProfiles()
+      await fetchProfiles({ force: true })
     } catch (err) {
       setCreateError(err instanceof Error ? err.message : 'No s\'ha pogut crear el perfil')
     } finally {

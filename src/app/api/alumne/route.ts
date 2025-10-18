@@ -31,6 +31,29 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
+  // Compute weak ETag from latest updated_at for this user's profiles
+  const { data: latest, error: latestErr } = await supabase
+    .from('alumne')
+    .select('updated_at')
+    .eq('user_id', user.id)
+    .order('updated_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  const latestUpdatedAt = latest?.updated_at || '0'
+  const weakEtag = `W/"alumne-${user.id}-${latestUpdatedAt}"`
+
+  const ifNoneMatch = request.headers.get('if-none-match')
+  if (ifNoneMatch && ifNoneMatch === weakEtag) {
+    return new NextResponse(null, {
+      status: 304,
+      headers: {
+        ETag: weakEtag,
+        'Cache-Control': 'private, max-age=15',
+      },
+    })
+  }
+
   const { data, error } = await supabase
     .from('alumne')
     .select('*')
@@ -42,7 +65,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unable to fetch profiles' }, { status: 500 })
   }
 
-  return NextResponse.json({ profiles: data ?? [] })
+  return NextResponse.json({ profiles: data ?? [] }, {
+    headers: {
+      ETag: weakEtag,
+      'Cache-Control': 'private, max-age=15',
+    },
+  })
 }
 
 export async function POST(request: NextRequest) {

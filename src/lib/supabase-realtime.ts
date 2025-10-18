@@ -14,7 +14,7 @@ export const realtimeConfig = {
   heartbeatIntervalMs: 15000,
   reconnectDelayMs: 1000,
   maxReconnectAttempts: 5,
-  enablePresence: true,
+  enablePresence: false,
   reconnectAfterMs: (tries: number) => {
     return Math.min(1000 * Math.pow(2, tries), 30000);
   },
@@ -100,6 +100,7 @@ const performanceTracker = new RealtimePerformanceTracker();
 export class OptimizedRealtimeManager {
   private static instance: OptimizedRealtimeManager;
   private subscriptions: Map<string, RealtimeChannel> = new Map();
+  private pendingChannels: Map<string, RealtimeChannel> = new Map();
   private reconnectAttempts: Map<string, number> = new Map();
   private maxReconnectAttempts = realtimeConfig.maxReconnectAttempts;
 
@@ -137,6 +138,18 @@ export class OptimizedRealtimeManager {
       onClosed,
     } = options;
 
+    // Prevent duplicate channels: reuse existing or pending
+    const existing = this.subscriptions.get(channelName);
+    if (existing) {
+      realtimeConfig.logger?.log?.(`[REALTIME] Reusing existing subscription for ${channelName}`);
+      return existing;
+    }
+    const pendingExisting = this.pendingChannels.get(channelName);
+    if (pendingExisting) {
+      realtimeConfig.logger?.log?.(`[REALTIME] Reusing pending subscription for ${channelName}`);
+      return pendingExisting;
+    }
+
     // Start performance tracking
     performanceTracker.startTracking(channelName);
 
@@ -146,50 +159,73 @@ export class OptimizedRealtimeManager {
       }
     });
 
+    // Track as pending until subscribed
+    this.pendingChannels.set(channelName, channel);
+
     // Set up postgres changes listener with error handling
-     channel
-       .on(
-         'postgres_changes' as any,
-         {
-           event,
-           schema,
-           table,
-           filter,
-         },
-         (payload: T) => {
-           try {
-             performanceTracker.recordMessage(channelName);
-             onMessage(payload);
-           } catch (error) {
-             performanceTracker.recordError(channelName);
-             handleMessageError(error, channelName, payload);
-             onError?.(error);
-           }
-         }
-       )
-       .subscribe((status, err) => {
-         if (status === 'SUBSCRIBED') {
-           console.log(`[REALTIME] Successfully subscribed to ${channelName}`);
-           this.subscriptions.set(channelName, channel);
-           this.reconnectAttempts.delete(channelName);
-           onSubscribed?.();
-         } else if (status === 'CHANNEL_ERROR') {
-           console.error(`[REALTIME] Channel error for ${channelName}:`, err);
-           performanceTracker.recordError(channelName);
-           this.handleReconnection(supabase, channelName, options);
-           onError?.(err);
-         } else if (status === 'TIMED_OUT') {
-           console.error(`[REALTIME] Subscription timed out for ${channelName}`);
-           handleTimeoutError(channelName, realtimeConfig.timeout);
-           this.handleReconnection(supabase, channelName, options);
-           onError?.(new Error('Subscription timed out'));
-         } else if (status === 'CLOSED') {
-           console.log(`[REALTIME] Channel closed for ${channelName}`);
-           this.subscriptions.delete(channelName);
-           performanceTracker.cleanup(channelName);
-           onClosed?.();
-         }
-       });
+    channel
+      .on(
+        'postgres_changes' as any,
+        {
+          event,
+          schema,
+          table,
+          filter,
+        },
+        (payload: T) => {
+          try {
+            performanceTracker.recordMessage(channelName);
+            onMessage(payload);
+          } catch (error) {
+            performanceTracker.recordError(channelName);
+            handleMessageError(error, channelName, payload);
+            onError?.(error);
+          }
+        }
+      )
+      .subscribe((status, err) => {
+        if (status === 'SUBSCRIBED') {
+          console.log(`[REALTIME] Successfully subscribed to ${channelName}`);
+          this.subscriptions.set(channelName, channel);
+          this.pendingChannels.delete(channelName);
+          this.reconnectAttempts.delete(channelName);
+          onSubscribed?.();
+        } else if (status === 'CHANNEL_ERROR') {
+          console.error(`[REALTIME] Channel error for ${channelName}:`, err);
+          performanceTracker.recordError(channelName);
+          // Special handling for binding mismatch: recreate with a fresh channel name to avoid stale server bindings
+          const isBindingMismatch = !!err && (
+            (typeof (err as any).message === 'string' && (err as any).message.includes('mismatch between server and client bindings')) ||
+            String(err).includes('mismatch between server and client bindings')
+          );
+          if (isBindingMismatch) {
+            try { channel.unsubscribe(); } catch {}
+            this.subscriptions.delete(channelName);
+            this.pendingChannels.delete(channelName);
+            const newChannelName = `${channelName}-r${Math.floor(Math.random() * 10000)}`;
+            const newOptions = { ...options, channelName: newChannelName };
+            console.warn(`[REALTIME] Recovering from binding mismatch. Recreating channel as ${newChannelName}`);
+            this.createOptimizedSubscription(supabase, newOptions);
+            onError?.(err);
+            return;
+          }
+          this.pendingChannels.delete(channelName);
+          this.handleReconnection(supabase, channelName, options);
+          onError?.(err);
+        } else if (status === 'TIMED_OUT') {
+          console.error(`[REALTIME] Subscription timed out for ${channelName}`);
+          handleTimeoutError(channelName, realtimeConfig.timeout);
+          this.pendingChannels.delete(channelName);
+          this.handleReconnection(supabase, channelName, options);
+          onError?.(new Error('Subscription timed out'));
+        } else if (status === 'CLOSED') {
+          console.log(`[REALTIME] Channel closed for ${channelName}`);
+          this.subscriptions.delete(channelName);
+          this.pendingChannels.delete(channelName);
+          performanceTracker.cleanup(channelName);
+          onClosed?.();
+        }
+      });
 
     return channel;
   }
@@ -213,10 +249,11 @@ export class OptimizedRealtimeManager {
 
     setTimeout(() => {
       // Clean up old subscription
-      const oldChannel = this.subscriptions.get(channelName);
+      const oldChannel = this.subscriptions.get(channelName) || this.pendingChannels.get(channelName);
       if (oldChannel) {
         oldChannel.unsubscribe();
         this.subscriptions.delete(channelName);
+        this.pendingChannels.delete(channelName);
       }
 
       // Create new subscription
@@ -225,10 +262,11 @@ export class OptimizedRealtimeManager {
   }
 
   unsubscribe(channelName: string) {
-    const channel = this.subscriptions.get(channelName);
+    const channel = this.subscriptions.get(channelName) || this.pendingChannels.get(channelName);
     if (channel) {
       channel.unsubscribe();
       this.subscriptions.delete(channelName);
+      this.pendingChannels.delete(channelName);
       this.reconnectAttempts.delete(channelName);
       performanceTracker.cleanup(channelName);
       console.log(`[REALTIME] Unsubscribed from ${channelName}`);
@@ -336,7 +374,7 @@ export const createOrganizationSubscription = (
   return realtimeManager.createOptimizedSubscription(supabase, {
     channelName: `organization-${orgId}`,
     table: 'organizations',
-    event: '*',
+    event: 'UPDATE',
     filter: `id=eq.${orgId}`,
     onMessage: onOrgChange,
     onError,
@@ -352,7 +390,7 @@ export const createOrganizationMembersSubscription = (
   return realtimeManager.createOptimizedSubscription(supabase, {
     channelName: `organization-members-${orgId}`,
     table: 'organization_members',
-    event: '*',
+    event: 'INSERT',
     filter: `organization_id=eq.${orgId}`,
     onMessage: onMembersChange,
     onError,

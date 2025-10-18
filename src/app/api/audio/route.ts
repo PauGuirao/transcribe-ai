@@ -22,6 +22,30 @@ export async function GET(request: NextRequest) {
       return jsonError("Authentication required. Please sign in.", { status: 401 });
     }
 
+    // Compute a simple cache key based on latest updated_at of user audios
+    // This allows fast 304 when nothing changed
+    const latestUpdatedRes = await supabase
+      .from("audios")
+      .select("updated_at")
+      .eq("user_id", user.id)
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const latestUpdatedAt = latestUpdatedRes.data?.updated_at || "0";
+    const weakEtag = `W/"audios-${user.id}-${latestUpdatedAt}-${page}-${limit}-${search}-${orderBy}-${orderDirection}"`;
+
+    const ifNoneMatch = request.headers.get("if-none-match");
+    if (ifNoneMatch && ifNoneMatch === weakEtag) {
+      return new NextResponse(null, {
+        status: 304,
+        headers: {
+          ETag: weakEtag,
+          "Cache-Control": "private, max-age=15",
+        },
+      });
+    }
+
     // Use smart pagination with search capabilities
     const startTime = Date.now();
 
@@ -43,7 +67,6 @@ export async function GET(request: NextRequest) {
               id,
               original_text,
               edited_text,
-              segments,
               status,
               created_at,
               updated_at,
@@ -68,7 +91,6 @@ export async function GET(request: NextRequest) {
             id,
             original_text,
             edited_text,
-            segments,
             status,
             created_at,
             updated_at,
@@ -100,7 +122,7 @@ export async function GET(request: NextRequest) {
             audioId: audioFile.id,
             originalText: audioFile.transcriptions[0].original_text,
             editedText: audioFile.transcriptions[0].edited_text,
-            segments: audioFile.transcriptions[0].segments,
+            // segments intentionally omitted on list endpoint for payload efficiency
             createdAt: audioFile.transcriptions[0].created_at,
             updatedAt: audioFile.transcriptions[0].updated_at,
             alumneId: audioFile.transcriptions[0].alumne_id,
@@ -108,15 +130,23 @@ export async function GET(request: NextRequest) {
         : null,
     }));
 
-    return NextResponse.json({
-      success: true,
-      audioFiles: transformedAudioFiles,
-      pagination: result.pagination,
-      meta: {
-        ...result.meta,
-        search: search || undefined,
+    return NextResponse.json(
+      {
+        success: true,
+        audioFiles: transformedAudioFiles,
+        pagination: result.pagination,
+        meta: {
+          ...result.meta,
+          search: search || undefined,
+        },
       },
-    });
+      {
+        headers: {
+          ETag: weakEtag,
+          "Cache-Control": "private, max-age=15",
+        },
+      }
+    );
   } catch (error) {
     console.error("Error fetching audio files:", error);
     return jsonError("Failed to fetch audio files", { status: 500 });

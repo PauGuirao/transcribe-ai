@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
 import { apiCache, CACHE_HEADERS, createCachedResponse } from "@/lib/cache"
@@ -44,6 +44,34 @@ export async function GET(request: NextRequest) {
       return jsonError("Authentication required", { status: 401, headers: CACHE_HEADERS.NO_CACHE })
     }
 
+    // Compute weak ETag from latest updated_at for this alumne's transcriptions
+    let weakEtag = ''
+    try {
+      const { data: latest, error: latestErr } = await supabase
+        .from("transcriptions")
+        .select("updated_at")
+        .eq("alumne_id", alumneId)
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      const latestUpdatedAt = latest?.updated_at || '0'
+      weakEtag = `W/"transcriptions-${user.id}-${alumneId}-${latestUpdatedAt}"`
+    } catch (e) {
+      weakEtag = `W/"transcriptions-${user.id}-${alumneId}-0"`
+    }
+
+    const ifNoneMatch = request.headers.get('if-none-match')
+    if (ifNoneMatch && weakEtag && ifNoneMatch === weakEtag) {
+      return new NextResponse(null, {
+        status: 304,
+        headers: {
+          ETag: weakEtag,
+          'Cache-Control': 'private, max-age=15',
+        },
+      })
+    }
+
     const queryTracker = QueryPerformanceTracker.getInstance()
     const batchQuery = new BatchQueryBuilder(supabase)
 
@@ -81,7 +109,7 @@ export async function GET(request: NextRequest) {
       },
     }
 
-    return jsonOk(responseData, { status: 200, headers: CACHE_HEADERS.SHORT })
+    return jsonOk(responseData, { status: 200, headers: { ETag: weakEtag, 'Cache-Control': 'private, max-age=15' } })
   } catch (error) {
     console.error("Error in transcription route:", error)
     return jsonError("Internal server error", { status: 500, headers: CACHE_HEADERS.NO_CACHE })

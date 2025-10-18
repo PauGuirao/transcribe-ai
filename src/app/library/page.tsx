@@ -105,9 +105,37 @@ const LibraryPage = React.memo(function LibraryPage() {
 
   const fetchFiles = async () => {
     try {
-      setLoading(true);
+      // setLoading(true); // Avoid flicker: only set loading if cache is stale/missing
       setError(null);
-      const response = await fetch("/api/audio");
+
+      // Read cached data (ETag + payload) from sessionStorage with short TTL
+      const cacheKey = "library_audio_cache";
+      const cachedRaw = typeof window !== "undefined" ? sessionStorage.getItem(cacheKey) : null;
+      let cached: { etag: string; data: AudioFile[]; ts: number } | null = null;
+      if (cachedRaw) {
+        try {
+          cached = JSON.parse(cachedRaw);
+        } catch {}
+      }
+
+      // If cached and fresh (<30s), show immediately while we validate in background
+      if (cached && Date.now() - cached.ts < 30_000) {
+        setFiles(cached.data);
+        setLoading(false);
+      } else {
+        setLoading(true);
+      }
+
+      const response = await fetch("/api/audio", {
+        headers: cached?.etag ? { "If-None-Match": cached.etag } : undefined,
+      });
+
+      // If nothing changed on the server, reuse cached data without re-downloading JSON
+      if (response.status === 304 && cached) {
+        console.log("Library: 304 Not Modified, using cached audio list");
+        setFiles(cached.data);
+        return;
+      }
 
       if (!response.ok) {
         throw new Error("Failed to fetch audio files");
@@ -116,8 +144,16 @@ const LibraryPage = React.memo(function LibraryPage() {
       const data = await response.json();
 
       if (data.success) {
-        console.log("Fetched files:", data.audioFiles || []);
-        setFiles(data.audioFiles || []);
+        const etag = response.headers.get("ETag") || "";
+        const audioFiles: AudioFile[] = data.audioFiles || [];
+        // Persist cache for quick subsequent entries
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem(
+            cacheKey,
+            JSON.stringify({ etag, data: audioFiles, ts: Date.now() })
+          );
+        }
+        setFiles(audioFiles);
       } else {
         throw new Error(data.error || "Failed to fetch files");
       }
@@ -322,6 +358,10 @@ const LibraryPage = React.memo(function LibraryPage() {
       if (result.success) {
         // Remove the file from local state after successful deletion
         setFiles(files.filter((file) => file.id !== fileId));
+        // Invalidate library cache so next entry revalidates
+        if (typeof window !== "undefined") {
+          sessionStorage.removeItem("library_audio_cache");
+        }
       } else {
         throw new Error(result.error || "Failed to delete file");
       }
@@ -434,6 +474,10 @@ const LibraryPage = React.memo(function LibraryPage() {
         setIsEditModalOpen(false);
         setEditingFile(null);
         setNewFileName("");
+        // Invalidate cache since metadata changed
+        if (typeof window !== "undefined") {
+          sessionStorage.removeItem("library_audio_cache");
+        }
       } else {
         throw new Error(result.error || "Failed to update filename");
       }

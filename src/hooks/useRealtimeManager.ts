@@ -100,7 +100,11 @@ export function useRealtimePerformance() {
   };
 }
 
-// Hook for audio status subscriptions (specialized)
+// Hook for audio status subscriptions (deprecated; use useTranscriptionData instead)
+/**
+ * @deprecated This hook is deprecated. Use useTranscriptionData for audio status updates.
+ * It is now a no-op to avoid creating competing subscriptions.
+ */
 export function useAudioStatusSubscription(
   supabase: SupabaseClient,
   audioId: string | undefined,
@@ -111,45 +115,11 @@ export function useAudioStatusSubscription(
     onClosed?: () => void;
   }
 ) {
-  const { subscribe, unsubscribe, getStats } = useRealtimeManager(supabase);
-
-  useEffect(() => {
-    if (!audioId) return;
-
-    const channelName = `audios:${audioId}`;
-    
-    console.log(`[AUDIO SUBSCRIPTION] Setting up for audioId: ${audioId}`);
-
-    subscribe(channelName, {
-      table: 'audios',
-      event: 'UPDATE',
-      filter: `id=eq.${audioId}`,
-      onMessage: (payload) => {
-        const newStatus = payload.new?.status;
-        if (newStatus === 'completed' || newStatus === 'error') {
-          console.log(`[AUDIO SUBSCRIPTION] Status changed to: ${newStatus}`);
-          onStatusChange(payload);
-        }
-      },
-      onError: options?.onError,
-      onSubscribed: () => {
-        console.log(`[AUDIO SUBSCRIPTION] Successfully subscribed: ${audioId}`);
-        options?.onSubscribed?.();
-      },
-      onClosed: () => {
-        console.log(`[AUDIO SUBSCRIPTION] Subscription closed: ${audioId}`);
-        options?.onClosed?.();
-      },
-    });
-
-    return () => {
-      console.log(`[AUDIO SUBSCRIPTION] Cleaning up: ${audioId}`);
-      unsubscribe(channelName);
-    };
-  }, [audioId, subscribe, unsubscribe, onStatusChange, options]);
-
+  if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
+    console.warn('[DEPRECATED] useAudioStatusSubscription has been deprecated. Please use useTranscriptionData instead.');
+  }
   return {
-    getStats: () => audioId ? getStats(`audios:${audioId}`) : null,
+    getStats: () => null,
   };
 }
 
