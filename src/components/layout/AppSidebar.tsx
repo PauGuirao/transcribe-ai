@@ -1,29 +1,14 @@
 "use client";
 
+// Dedupe token fetch under React Strict Mode to avoid double requests on mount
+let tokensFetchInFlight = false;
+
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import {
-  BookOpen,
-  Home,
-  Mic,
-  Clock,
-  Loader2,
-  CheckCircle,
-  AlertCircle,
-  RefreshCw,
-  User,
-  GraduationCap,
-} from "lucide-react";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar";
+import { BookOpen, Home, Mic, Clock, Loader2, CheckCircle, AlertCircle, User, GraduationCap } from "lucide-react";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { Badge } from "@/components/ui/badge";
-import { Audio, AudioUploadResult } from "@/types";
+import { AudioUploadResult } from "@/types";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
@@ -34,44 +19,9 @@ interface AppSidebarProps {
   onUploadComplete: (result: AudioUploadResult) => void;
 }
 
-const getStatusIcon = (status: Audio["status"]) => {
-  switch (status) {
-    case "pending":
-      return <Clock className="h-4 w-4 text-yellow-500" />;
-    case "processing":
-      return <Loader2 className="h-4 w-4 text-blue-500 animate-spin" />;
-    case "completed":
-      return <CheckCircle className="h-4 w-4 text-green-500" />;
-    case "error":
-      return <AlertCircle className="h-4 w-4 text-red-500" />;
-    default:
-      return <Clock className="h-4 w-4 text-gray-500" />;
-  }
-};
-
-const getStatusColor = (status: Audio["status"]) => {
-  switch (status) {
-    case "pending":
-      return "bg-yellow-100 text-yellow-800";
-    case "processing":
-      return "bg-blue-100 text-blue-800";
-    case "completed":
-      return "bg-green-100 text-green-800";
-    case "error":
-      return "bg-red-100 text-red-800";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
-};
-
-export default function AppSidebar({
-  selectedAudioId,
-  onAudioSelect,
-  onUploadComplete,
-}: AppSidebarProps) {
+export default function AppSidebar({ selectedAudioId, onAudioSelect, onUploadComplete }: AppSidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const [audioFiles, setAudioFiles] = useState<Audio[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tokens, setTokens] = useState<number | null>(null);
@@ -79,65 +29,41 @@ export default function AppSidebar({
   const [tokensError, setTokensError] = useState<string | null>(null);
   const { user, planType } = useAuth();
 
-  const isTranscribePage = pathname === "/transcribe";
-
   const menuItems = [
-    {
-      title: "Inici",
-      icon: Home,
-      path: "/dashboard",
-    },
-    {
-      title: "Transcriure",
-      icon: Mic,
-      path: "/transcribe",
-    },
-    {
-      title: "Biblioteca",
-      icon: BookOpen,
-      path: "/library",
-    },
-    {
-      title: "Alumnes",
-      icon: User,
-      path: "/profiles",
-    },
-    {
-      title: "Tutorials",
-      icon: GraduationCap,
-      path: "/tutorials",
-    },
+    { title: "Inici", icon: Home, path: "/dashboard" },
+    { title: "Transcriure", icon: Mic, path: "/transcribe" },
+    { title: "Biblioteca", icon: BookOpen, path: "/library" },
+    { title: "Alumnes", icon: User, path: "/profiles" },
+    { title: "Tutorials", icon: GraduationCap, path: "/tutorials" },
   ];
 
-  const fetchAudioFiles = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch("/api/audio");
-      if (!response.ok) {
-        throw new Error("Failed to fetch audio files");
-      }
-      const data = await response.json();
-      setAudioFiles(data.audioFiles || []);
-      setError(null);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to load audio files"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (isTranscribePage) {
-      fetchAudioFiles();
-    }
-  }, [isTranscribePage]);
-
   const fetchUserTokens = useCallback(async () => {
-    if (!user?.id) {
+    const userId = user?.id;
+    if (!userId) {
       setTokens(null);
       setTokensError(null);
+      return;
+    }
+
+    if (tokensFetchInFlight) {
+      return;
+    }
+    tokensFetchInFlight = true;
+
+    const cacheKey = `tokens_cache_${userId}`;
+    const cachedRaw = typeof window !== "undefined" ? sessionStorage.getItem(cacheKey) : null;
+    let cached: { tokens: number; ts: number } | null = null;
+    if (cachedRaw) {
+      try {
+        cached = JSON.parse(cachedRaw);
+      } catch {}
+    }
+
+    if (cached && Date.now() - cached.ts < 120_000) {
+      setTokens(cached.tokens);
+      setTokensError(null);
+      setTokensLoading(false);
+      tokensFetchInFlight = false;
       return;
     }
 
@@ -146,24 +72,32 @@ export default function AppSidebar({
       const { data, error } = await supabase
         .from("profiles")
         .select("tokens")
-        .eq("id", user.id)
+        .eq("id", userId)
         .single();
 
       if (error) {
         if (error.code === "PGRST116") {
           setTokens(0);
           setTokensError(null);
+          if (typeof window !== "undefined") {
+            sessionStorage.setItem(cacheKey, JSON.stringify({ tokens: 0, ts: Date.now() }));
+          }
           return;
         }
         throw error;
       }
 
-      setTokens(typeof data?.tokens === "number" ? data.tokens : 0);
+      const tokensVal = typeof data?.tokens === "number" ? data.tokens : 0;
+      setTokens(tokensVal);
       setTokensError(null);
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem(cacheKey, JSON.stringify({ tokens: tokensVal, ts: Date.now() }));
+      }
     } catch (err) {
       console.error("Failed to load tokens:", err);
       setTokensError("No pudimos cargar tus tokens");
     } finally {
+      tokensFetchInFlight = false;
       setTokensLoading(false);
     }
   }, [user?.id]);
@@ -171,26 +105,6 @@ export default function AppSidebar({
   useEffect(() => {
     fetchUserTokens();
   }, [fetchUserTokens]);
-
-  const handleUploadComplete = (result: AudioUploadResult) => {
-    onUploadComplete(result);
-    fetchAudioFiles(); // Refresh the list
-  };
-
-  const handleUploadError = (error: string) => {
-    setError(error);
-  };
-
-  const formatDate = (date: Date | string) => {
-    const d = new Date(date);
-    return d.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
   return (
     <Sidebar className="h-[calc(100vh)] flex flex-col">
       <SidebarContent className="flex-1 overflow-y-auto pt-20 pb-24">
@@ -198,8 +112,7 @@ export default function AppSidebar({
           <SidebarMenu>
             {menuItems.map((item) => {
               const Icon = item.icon;
-              const active =
-                pathname === item.path || pathname.startsWith(item.path + "/");
+              const active = pathname === item.path || pathname.startsWith(item.path + "/");
 
               return (
                 <SidebarMenuItem key={item.path}>
@@ -217,14 +130,10 @@ export default function AppSidebar({
                     <Icon
                       className={cn(
                         "h-4 w-4 transition-colors",
-                        active
-                          ? "text-white"
-                          : "text-gray-800 group-hover:text-black"
+                        active ? "text-white" : "text-gray-800 group-hover:text-black"
                       )}
                     />
-                    <span className={cn("truncate", active && "font-semibold")}>
-                      {item.title}
-                    </span>
+                    <span className={cn("truncate", active && "font-semibold")}>{item.title}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               );
@@ -235,9 +144,7 @@ export default function AppSidebar({
       <div className="mt-auto px-2 pb-4 flex flex-col gap-3">
         <div className="rounded-lg border bg-white p-3">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-bold uppercase tracking-wide text-foreground">
-              Pla actual
-            </p>
+            <p className="text-xs font-bold uppercase tracking-wide text-foreground">Pla actual</p>
             <div className="mt-1">
               <Badge variant="secondary" className="text-sm uppercase bg-blue-500 text-white">
                 {planType || "Gratuït"}
@@ -247,9 +154,7 @@ export default function AppSidebar({
         </div>
         <div className="rounded-lg border bg-white p-3">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wide text-foreground">
-              Transcripcions disponibles
-            </p>
+            <p className="text-xs font-bold uppercase tracking-wide text-foreground">Transcripcions disponibles</p>
             <div className="mt-1 text-2xl font-semibold">
               {tokensLoading ? (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -261,9 +166,7 @@ export default function AppSidebar({
               )}
             </div>
           </div>
-          {tokensError && (
-            <p className="mt-2 text-xs text-destructive">{tokensError}</p>
-          )}
+          {tokensError && <p className="mt-2 text-xs text-destructive">{tokensError}</p>}
         </div>
       </div>
     </Sidebar>

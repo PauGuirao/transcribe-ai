@@ -42,8 +42,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [checkingSubscription, setCheckingSubscription] = useState(true);
 
   // Request deduplication
-  const pendingMembersRequest = useRef<Promise<any> | null>(null);
-  const lastMembersFetch = useRef<number>(0);
+  const pendingMembersRequests = useRef<Map<string, Promise<any>>>(new Map());
+  const membersCache = useRef<Map<string, { members: any[]; role: string | null; timestamp: number }>>(new Map());
   const CACHE_TTL = 30000; // 30 seconds cache
 
   useEffect(() => {
@@ -54,6 +54,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      // Clear user+org-scoped caches on auth state changes
+      membersCache.current.clear();
+      pendingMembersRequests.current.clear();
+      setOrganizationMembers(null);
+      setCurrentUserRole(null);
     });
 
     // Set the initial session on component mount
@@ -69,26 +74,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Optimized function to fetch organization members with deduplication
   const fetchOrganizationMembers = useCallback(async (organizationId: string) => {
-    // Check cache TTL
     const now = Date.now();
-    if (now - lastMembersFetch.current < CACHE_TTL && organizationMembers) {
-      return { members: organizationMembers, currentUserRole };
+    const key = `${user?.id ?? 'anon'}:${organizationId}`;
+
+    // Try user+org-scoped cache first
+    const cached = membersCache.current.get(key);
+    if (cached && now - cached.timestamp < CACHE_TTL) {
+      setOrganizationMembers(cached.members);
+      setCurrentUserRole(cached.role);
+      return { members: cached.members, currentUserRole: cached.role };
     }
 
-    // Return existing promise if one is pending
-    if (pendingMembersRequest.current) {
-      return pendingMembersRequest.current;
+    // Return existing promise if one is pending for this key
+    const pending = pendingMembersRequests.current.get(key);
+    if (pending) {
+      return pending;
     }
 
-    // Create new request
-    pendingMembersRequest.current = (async () => {
+    const reqPromise = (async () => {
       try {
         const membersResponse = await fetch("/api/organization/members");
         if (membersResponse.ok) {
           const membersData = await membersResponse.json();
           setOrganizationMembers(membersData.members);
           setCurrentUserRole(membersData.currentUserRole);
-          lastMembersFetch.current = now;
+          membersCache.current.set(key, {
+            members: membersData.members,
+            role: membersData.currentUserRole,
+            timestamp: Date.now(),
+          });
           return membersData;
         }
         throw new Error('Failed to fetch members');
@@ -96,12 +110,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.error("Error fetching organization members:", error);
         throw error;
       } finally {
-        pendingMembersRequest.current = null;
+        pendingMembersRequests.current.delete(key);
       }
     })();
 
-    return pendingMembersRequest.current;
-  }, [organizationMembers, currentUserRole]);
+    pendingMembersRequests.current.set(key, reqPromise);
+    return reqPromise;
+  }, [user?.id]);
 
   // Function to fetch subscription status
   const fetchSubscriptionStatus = useCallback(async (userId: string) => {

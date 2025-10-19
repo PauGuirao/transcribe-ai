@@ -1,5 +1,8 @@
 "use client";
 
+// Dedupe token fetch under React Strict Mode to avoid double requests on mount
+let mobileTokensFetchInFlight = false;
+
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import {
@@ -43,31 +46,69 @@ export default function MobileSidebar() {
   ];
 
   const fetchUserTokens = useCallback(async () => {
-    if (!user?.id) return;
+    const userId = user?.id;
+    if (!userId) {
+      setTokens(null);
+      setTokensError(null);
+      return;
+    }
+
+    // Prevent duplicate requests under Strict Mode double-mount
+    if (mobileTokensFetchInFlight) {
+      return;
+    }
+    mobileTokensFetchInFlight = true;
+
+    // Shared cache key (same as desktop sidebar) so both sidebars reuse the cached value
+    const cacheKey = `tokens_cache_${userId}`;
+    const cachedRaw = typeof window !== "undefined" ? sessionStorage.getItem(cacheKey) : null;
+    let cached: { tokens: number; ts: number } | null = null;
+    if (cachedRaw) {
+      try {
+        cached = JSON.parse(cachedRaw);
+      } catch {}
+    }
+
+    // TTL: 120s
+    if (cached && Date.now() - cached.ts < 120_000) {
+      setTokens(cached.tokens);
+      setTokensError(null);
+      setTokensLoading(false);
+      mobileTokensFetchInFlight = false;
+      return;
+    }
 
     try {
       setTokensLoading(true);
       const { data, error } = await supabase
         .from("profiles")
         .select("tokens")
-        .eq("id", user.id)
+        .eq("id", userId)
         .single();
 
       if (error) {
         if (error.code === "PGRST116") {
           setTokens(0);
           setTokensError(null);
+          if (typeof window !== "undefined") {
+            sessionStorage.setItem(cacheKey, JSON.stringify({ tokens: 0, ts: Date.now() }));
+          }
           return;
         }
         throw error;
       }
 
-      setTokens(typeof data?.tokens === "number" ? data.tokens : 0);
+      const tokensVal = typeof data?.tokens === "number" ? data.tokens : 0;
+      setTokens(tokensVal);
       setTokensError(null);
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem(cacheKey, JSON.stringify({ tokens: tokensVal, ts: Date.now() }));
+      }
     } catch (err) {
       console.error("Failed to load tokens:", err);
       setTokensError("No pudimos cargar tus tokens");
     } finally {
+      mobileTokensFetchInFlight = false;
       setTokensLoading(false);
     }
   }, [user?.id]);

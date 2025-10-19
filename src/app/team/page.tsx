@@ -372,7 +372,7 @@ const TeamPage = React.memo(function TeamPage() {
                 </p>
               </div>
               {/* Only show invite button for admin/owner roles */}
-              {data.currentUserRole && (data.currentUserRole === 'admin' || data.currentUserRole === 'owner') && (
+              {data.currentUserRole && (data.currentUserRole === 'admin' || data.currentUserRole === 'owner') ? (
                 <Button 
                   onClick={handleInviteClick}
                   className="flex items-center gap-2"
@@ -380,6 +380,8 @@ const TeamPage = React.memo(function TeamPage() {
                   <UserPlus className="h-4 w-4" />
                   Convidar
                 </Button>
+              ) : (
+              <div className="h-10" />
               )}
             </div>
 
