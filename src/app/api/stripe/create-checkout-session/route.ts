@@ -48,12 +48,11 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { plan, invitationEmail, organizationName, organizationSettings } = await request.json();
+  const { plan, invitationEmail, organizationName, organizationSettings, users } = await request.json();
 
   if (!plan || typeof plan !== "string") {
     return NextResponse.json({ error: "Plan inválido." }, { status: 400 });
   }
-
   const priceId = priceMap[plan];
 
   if (!priceId) {
@@ -61,6 +60,16 @@ export async function POST(request: NextRequest) {
       { error: "El plan seleccionado no está disponible." },
       { status: 400 }
     );
+  }
+
+  // Determine quantity based on plan and provided users
+  let quantity = 1;
+  if (plan === "group") {
+    const parsedUsers = Number(users);
+    if (!parsedUsers || parsedUsers < 1 || !Number.isFinite(parsedUsers)) {
+      return NextResponse.json({ error: "Número de usuarios inválido para el plan grupal." }, { status: 400 });
+    }
+    quantity = Math.floor(parsedUsers);
   }
 
   const origin =
@@ -85,7 +94,7 @@ export async function POST(request: NextRequest) {
       line_items: [
         {
           price: priceId,
-          quantity: 1,
+          quantity,
         },
       ],
       success_url: `${origin}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
@@ -94,6 +103,7 @@ export async function POST(request: NextRequest) {
       metadata: {
         userId: user.id,
         plan,
+        ...(plan === "group" ? { numberOfUsers: String(quantity) } : {}),
       },
     };
 

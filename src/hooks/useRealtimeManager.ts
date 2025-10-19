@@ -139,13 +139,13 @@ export function useProfileSubscription(
   useEffect(() => {
     if (!userId) return;
 
-    const channelName = `profiles:${userId}`;
+    const channelName = `profile-${userId}`;
     
     console.log(`[PROFILE SUBSCRIPTION] Setting up for userId: ${userId}`);
 
     subscribe(channelName, {
       table: 'profiles',
-      event: '*',
+      event: 'UPDATE',
       filter: `id=eq.${userId}`,
       onMessage: onProfileChange,
       onError: options?.onError,
@@ -166,7 +166,7 @@ export function useProfileSubscription(
   }, [userId, subscribe, unsubscribe, onProfileChange, options]);
 
   return {
-    getStats: () => userId ? getStats(`profiles:${userId}`) : null,
+    getStats: () => userId ? getStats(`profile-${userId}`) : null,
   };
 }
 
@@ -186,13 +186,13 @@ export function useOrganizationSubscription(
   useEffect(() => {
     if (!orgId) return;
 
-    const channelName = `organizations:${orgId}`;
+    const channelName = `organization-${orgId}`;
     
     console.log(`[ORG SUBSCRIPTION] Setting up for orgId: ${orgId}`);
 
     subscribe(channelName, {
       table: 'organizations',
-      event: '*',
+      event: 'UPDATE',
       filter: `id=eq.${orgId}`,
       onMessage: onOrgChange,
       onError: options?.onError,
@@ -213,6 +213,6 @@ export function useOrganizationSubscription(
   }, [orgId, subscribe, unsubscribe, onOrgChange, options]);
 
   return {
-    getStats: () => orgId ? getStats(`organizations:${orgId}`) : null,
+    getStats: () => orgId ? getStats(`organization-${orgId}`) : null,
   };
 }

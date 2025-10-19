@@ -207,7 +207,7 @@ export function EmptyState({
                       {pendingUpload.originalName}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Archivo listo. Inicia la transcripción cuando quieras.
+                      Arxiu carregat. Inicia la transcripció quan vulguis.
                     </p>
                   </div>
                   <div className="flex flex-col gap-2 md:flex-row md:gap-2">

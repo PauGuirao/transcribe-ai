@@ -1,62 +1,63 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Check } from 'lucide-react'
+import { PricingCard, type PricingPlan } from '@/components/PricingCard'
 
-type PlanKey = 'free' | 'paid'
+type PlanKey = 'free' | 'paid' | 'group'
 
-const plans: Array<{
-  key: PlanKey
-  name: string
-  price: string
-  originalPrice?: string
-  description: string
-  features: string[]
-  highlighted?: boolean
-  isFree?: boolean
-}> = [
+const plans: PricingPlan[] = [
   {
     key: 'free',
     name: 'Gratuït',
     price: '0€',
     description: 'Perfecte per començar amb Transcriu.',
     features: [
-      '5 transcripcions gratuïtes',
-      'Models base d\'IA optimitzats per a català i espanyol',
-      'Editor bàsic',
-      'Suport per email',
+      "5 transcripcions gratuïtes",
+      "Models base d'IA optimitzats per a català i espanyol",
+      "Editor bàsic",
+      "Suport per email",
     ],
     highlighted: false,
-    isFree: true,
   },
   {
     key: 'paid',
     name: 'Pro',
     price: '10€',
-    description: 'Transcripcions il·limitades per a professionals.',
+    description: "Transcripcions il·limitades per a professionals.",
     features: [
-      'Transcripcions il·limitades',
-      'Models avançats amb diarització',
-      'Exportacions il·limitades (PDF, DOCX, TXT)',
-      'Editor col·laboratiu avançat',
-      'Suport prioritari',
+      "Transcripcions il·limitades",
+      "Models avançats amb diarització",
+      "Exportacions il·limitades (PDF, DOCX, TXT)",
+      "Editor col·laboratiu avançat",
+      "Suport prioritari",
     ],
     highlighted: true,
+  },
+  {
+    key: 'group',
+    name: 'Grupal',
+    price: 'Personalitzat',
+    description: "Solucions escalables per a equips",
+    features: [
+      "Usuaris il·limitats per a l'equip",
+      "Gestió centralitzada d'usuaris i permisos",
+      "Suport dedicat",
+      "Descomptes per volum",
+    ],
+    highlighted: false,
   },
 ]
 
 export default function PaymentPage() {
   const [loadingPlan, setLoadingPlan] = useState<PlanKey | null>(null)
 
-  const handleSelectPlan = async (plan: PlanKey) => {
+  const handleSelectPlan = async (plan: PlanKey, users?: number) => {
     try {
       setLoadingPlan(plan)
       const response = await fetch('/api/stripe/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan }),
+        body: JSON.stringify({ plan, users }),
       })
 
       if (!response.ok) {
@@ -85,55 +86,23 @@ export default function PaymentPage() {
           <h1 className="text-4xl font-bold tracking-tight text-balance sm:text-5xl">
             Preus simples i transparents
           </h1>
+
           <p className="mx-auto max-w-3xl text-lg text-muted-foreground">
             Comença amb minuts gratuïts i escala quan el teu equip ho necessiti. Els nostres plans inclouen processament segur i eines col·laboratives per accelerar la documentació de les teves sessions.
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 justify-items-center max-w-4xl mx-auto">
+        <div className="grid gap-6 md:grid-cols-3 justify-items-center max-w-6xl mx-auto">
           {plans.map((plan) => (
-            <Card
-              key={plan.name}
-              className={`w-full max-w-sm ${plan.highlighted ? 'border-primary shadow-xl shadow-primary/20' : ''}`}
-            >
-              <CardHeader className="space-y-1">
-                <CardTitle className="flex items-center justify-between text-left text-2xl font-semibold">
-                  {plan.name}
-                  {plan.highlighted && (
-                    <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
-                      Popular
-                    </span>
-                  )}
-                </CardTitle>
-                <div className="flex items-baseline gap-2 text-left">
-                  <span className="text-4xl font-bold">{plan.price}</span>
-                  {plan.originalPrice && (
-                    <span className="text-sm text-muted-foreground line-through">{plan.originalPrice}</span>
-                  )}
-                  {!plan.isFree && <span className="text-sm text-muted-foreground">/ mes</span>}
-                </div>
-                <p className="text-left text-sm text-muted-foreground">{plan.description}</p>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <ul className="space-y-3 text-left text-sm">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2">
-                      <Check className="mt-0.5 h-4 w-4 text-primary" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Button
-                  size="lg"
-                  className="w-full rounded-xl"
-                  disabled={loadingPlan !== null && loadingPlan !== plan.key}
-                  onClick={() => handleSelectPlan(plan.key)}
-                  variant={plan.isFree ? "outline" : "default"}
-                >
-                  {loadingPlan === plan.key ? 'Redirigint...' : (plan.isFree ? 'Començar gratis' : 'Començar')}
-                </Button>
-              </CardContent>
-            </Card>
+            <PricingCard
+              key={plan.key}
+              plan={plan}
+              authLoading={false}
+              loading={loadingPlan === (plan.key === 'group' ? 'group' : plan.key)}
+              onPrimaryAction={(opts) => handleSelectPlan(plan.key === 'group' ? 'group' : (plan.key as PlanKey), opts?.users)}
+              onContactClick={() => { /* not used in payment */ }}
+              orgCallsPrimaryAction={plan.key === 'group'}
+            />
           ))}
         </div>
       </div>
