@@ -13,7 +13,7 @@ const plans: PricingPlan[] = [
     description: 'Perfecte per començar amb Transcriu.',
     features: [
       "5 transcripcions gratuïtes",
-      "Models base d'IA optimitzats per a català i espanyol",
+      "Models optimitzats per català",
       "Editor bàsic",
       "Suport per email",
     ],

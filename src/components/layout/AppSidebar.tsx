@@ -147,12 +147,12 @@ export default function AppSidebar({ selectedAudioId, onAudioSelect, onUploadCom
             <p className="text-xs font-bold uppercase tracking-wide text-foreground">Pla actual</p>
             <div className="mt-1">
               <Badge variant="secondary" className="text-sm uppercase bg-blue-500 text-white">
-                {planType || "Gratuït"}
+                {planType === 'group' ? 'Grupal' : planType === 'pro' ? 'Individual' : 'gratis'}
               </Badge>
             </div>
           </div>
         </div>
-        <div className="rounded-lg border bg-white p-3">
+        <div className="rounded-lg border bg-white p-3 hidden">
           <div>
             <p className="text-xs font-bold uppercase tracking-wide text-foreground">Transcripcions disponibles</p>
             <div className="mt-1 text-2xl font-semibold">

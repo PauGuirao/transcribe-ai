@@ -20,10 +20,13 @@ type PricingCardProps = {
   onPrimaryAction: (opts?: { users?: number }) => void;
   onContactClick: () => void;
   orgCallsPrimaryAction?: boolean; // when true, org button will call onPrimaryAction instead of contact
+  // NEW: allow parent to control/observe users selection
+  initialUsers?: number;
+  onUsersChange?: (users: number) => void;
 };
 
-export function PricingCard({ plan, authLoading, loading, onPrimaryAction, onContactClick, orgCallsPrimaryAction = false }: PricingCardProps) {
-  const [numberOfUsers, setNumberOfUsers] = useState(10);
+export function PricingCard({ plan, authLoading, loading, onPrimaryAction, onContactClick, orgCallsPrimaryAction = false, initialUsers, onUsersChange }: PricingCardProps) {
+  const [numberOfUsers, setNumberOfUsers] = useState(initialUsers ?? 10);
   const [showTooltip, setShowTooltip] = useState(false);
 
   const calculatePricePerUser = (N: number) => {
@@ -51,11 +54,11 @@ export function PricingCard({ plan, authLoading, loading, onPrimaryAction, onCon
         </div>
       )}
 
-      <div className="text-left">
+      <div className="text-left flex flex-col h-full">
         <h3 className={`text-2xl font-bold mb-2 ${plan.highlighted ? "text-gray-900" : "text-gray-900"}`}>
           {plan.name}
         </h3>
-        <div className="mb-4">
+        <div className="mb-4 flex-1">
           {plan.key === "group" ? (
             <div className="space-y-3">
               <div>
@@ -73,7 +76,11 @@ export function PricingCard({ plan, authLoading, loading, onPrimaryAction, onCon
                     max="100"
                     step="5"
                     value={numberOfUsers}
-                    onChange={(e) => setNumberOfUsers(parseInt(e.target.value))}
+                    onChange={(e) => {
+                      const n = parseInt(e.target.value);
+                      setNumberOfUsers(n);
+                      onUsersChange?.(n);
+                    }}
                     onMouseDown={() => setShowTooltip(true)}
                     onMouseUp={() => setShowTooltip(false)}
                     onTouchStart={() => setShowTooltip(true)}
@@ -92,70 +99,62 @@ export function PricingCard({ plan, authLoading, loading, onPrimaryAction, onCon
                     </div>
                   )}
                 </div>
-                <div className="flex justify-between text-md text-gray-500 mt-1">
+                <div className="flex items-center justify-between mt-2 text-md text-gray-600">
                   <span>Usuaris</span>
-                  <span className="font-bold text-md text-gray-800">{numberOfUsers}</span>
+                  <span className="font-bold">{numberOfUsers}</span>
                 </div>
+              </div>
+
+              {/* Features list */}
+              <ul className="mt-4 space-y-2">
+                {plan.features.map((feature, idx) => (
+                  <li key={idx} className="flex items-center gap-2 text-gray-700">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+
+              {/* Actions */}
+              <div className="mt-6 flex gap-3">
+                <Button
+                  disabled={authLoading || loading}
+                  onClick={() => onPrimaryAction?.({ users: numberOfUsers })}
+                  className="flex-1"
+                >
+                  {loading ? "Carregant..." : "Continuar"}
+                </Button>
+                {!orgCallsPrimaryAction && (
+                  <Button variant="outline" onClick={onContactClick}>
+                    Contactar
+                  </Button>
+                )}
               </div>
             </div>
           ) : (
-            <>
-              <span className={`text-5xl font-bold ${plan.highlighted ? "text-gray-900" : "text-gray-900"}`}>
-                {plan.price}
-              </span>
-              {plan.price !== "Personalitzat" && (
-                <span className={`text-md ${plan.highlighted ? "text-gray-600" : "text-gray-600"}`}>
-                  /mes
-                </span>
-              )}
-            </>
+            // Non-group pricing UI (unchanged)
+            <div className="space-y-3 flex flex-col h-full">
+              <div>
+                <span className="text-5xl font-bold text-gray-900">{plan.price}</span>
+                <span className="text-md text-gray-600"> /mes</span>
+                <p className="text-sm mt-4 text-gray-600">{plan.description}</p>
+              </div>
+              <ul className="mt-4 space-y-3">
+                {plan.features.map((feature, idx) => (
+                  <li key={idx} className="flex items-center gap-2 text-gray-700">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-6 flex gap-3 mt-auto">
+                <Button disabled={authLoading || loading} onClick={() => onPrimaryAction?.()} className="flex-1">
+                  {loading ? "Carregant..." : "Continuar"}
+                </Button>
+              </div>
+            </div>
           )}
         </div>
-        <p className={`mb-8 text-md text-left ${plan.highlighted ? "text-gray-600" : "text-gray-600"}`}>
-          {plan.description}
-        </p>
-      </div>
-
-      <ul className="space-y-4 mb-8 flex-grow">
-        {plan.features.map((feature, index) => (
-          <li key={index} className="flex items-start gap-3">
-            <CheckCircle2 className={`h-5 w-5 mt-0.5 flex-shrink-0 ${plan.highlighted ? "text-blue-500" : "text-blue-500"}`} />
-            <span className={`text-sm leading-relaxed ${plan.highlighted ? "text-gray-700" : "text-gray-700"}`}>
-              {feature}
-            </span>
-          </li>
-        ))}
-      </ul>
-
-      <div className="mt-auto">
-        {plan.key === "group" && !orgCallsPrimaryAction ? (
-          <Button
-            onClick={onContactClick}
-            className={`w-full py-6 rounded-lg font-semibold text-lg transition-all duration-200 ${
-              plan.highlighted
-                ? "bg-blue-500 text-white hover:bg-blue-600 shadow-lg hover:shadow-xl"
-                : "bg-blue-500 text-white hover:bg-blue-600 shadow-lg hover:shadow-xl"
-            }`}
-          >
-            Contacta amb vendes
-          </Button>
-        ) : (
-          <Button
-            onClick={() =>
-              orgCallsPrimaryAction && plan.key === "group"
-                ? onPrimaryAction({ users: numberOfUsers })
-                : onPrimaryAction()
-            }
-            disabled={authLoading || loading}
-            className={`w-full py-6 rounded-lg font-semibold text-lg transition-all duration-200 ${
-              plan.highlighted
-                ? "bg-blue-500 text-white hover:bg-blue-600 shadow-lg hover:shadow-xl"
-                : "bg-blue-500 text-white hover:bg-blue-600 shadow-lg hover:shadow-xl"
-            }`}
-          >
-            {plan.key === "free" ? "Comença gratis" : "Començar"}
-          </Button>
-        )}
       </div>
     </div>
   );

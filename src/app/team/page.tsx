@@ -34,6 +34,7 @@ import AppLayout from "@/components/layout/AppLayout";
 import { InviteModal } from "@/components/team/InviteModal";
 import UpgradeModal from "@/components/UpgradeModal";
 import { WelcomePopup } from "@/components/WelcomePopup";
+import { PricingCard, type PricingPlan } from "@/components/PricingCard";
 
 interface OrganizationMember {
   id: string;
@@ -50,6 +51,7 @@ interface ApiResponse {
   organization: {
     id: string;
     name: string;
+    max_members?: number;
   };
   members: OrganizationMember[];
   currentUserRole: string | null;
@@ -70,19 +72,75 @@ const TeamPage = React.memo(function TeamPage() {
   const [error, setError] = useState<string | null>(null);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+  const [isLimitDialogOpen, setIsLimitDialogOpen] = useState(false);
   const [lastFetchTime, setLastFetchTime] = useState<number>(0);
   const [hasInitialized, setHasInitialized] = useState(false);
   const [memberToRemove, setMemberToRemove] = useState<OrganizationMember | null>(null);
   const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
+  const [isGroupPricingOpen, setIsGroupPricingOpen] = useState(false);
+  const [isGroupUpgradeLoading, setIsGroupUpgradeLoading] = useState(false);
+  const [selectedGroupUsers, setSelectedGroupUsers] = useState(10);
 
   const handleInviteClick = () => {
     // Check if user has free plan
     if (planType === 'free') {
       setIsUpgradeModalOpen(true);
-    } else {
-      setIsInviteModalOpen(true);
+      return;
+    }
+
+    // Check capacity limit
+    const maxMembers = data?.organization?.max_members ?? organization?.max_members;
+    const currentMembers = data?.members?.length ?? organizationMembers?.length ?? 0;
+
+    if (typeof maxMembers === 'number' && currentMembers >= maxMembers) {
+      setIsLimitDialogOpen(true);
+      return;
+    }
+
+    setIsInviteModalOpen(true);
+  };
+
+  // Pricing helper: approximate price per user with volume discount
+  const calculatePricePerUser = (N: number) => {
+    if (N <= 0) return 10;
+    const base = 10; // €
+    const minFraction = 0.65; // minimum = 6.5 €
+    const discountFraction = 1 - minFraction; // 0.35
+    const rate = 0.02; // speed of discount curve
+    return base * (minFraction + discountFraction * Math.exp(-rate * (N - 1)));
+  };
+
+  const handleAddMembersClick = () => {
+    const currentMembers = data?.members?.length ?? organizationMembers?.length ?? 0;
+    setSelectedGroupUsers(Math.max(currentMembers || 10, 5));
+    setIsGroupPricingOpen(true);
+  };
+
+  const handleSelectGroupUsers = async (users?: number) => {
+    try {
+      setIsGroupUpgradeLoading(true);
+      const response = await fetch('/api/stripe/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan: 'group', users }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data?.error || "No s'ha pogut iniciar el checkout");
+      }
+
+      const { url } = await response.json();
+      if (url) {
+        window.location.href = url;
+      }
+    } catch (error) {
+      console.error('Stripe checkout error:', error);
+      alert('Hi ha hagut un problema en redirigir a Stripe. Torna-ho a provar.');
+    } finally {
+      setIsGroupUpgradeLoading(false);
     }
   };
 
@@ -367,8 +425,8 @@ const TeamPage = React.memo(function TeamPage() {
                 <h1 className="text-2xl font-bold text-foreground mb-1">
                   {data.organization.name}
                 </h1>
-                <p className="text-sm text-muted-foreground">
-                  Membres del equip • {data.members.length} membres
+                <p className="text-md text-muted-foreground">
+                  Membres del equip • {data.members.length} / {data.organization.max_members ?? '—'} membres
                 </p>
               </div>
               {/* Only show invite button for admin/owner roles */}
@@ -555,7 +613,16 @@ const TeamPage = React.memo(function TeamPage() {
                 </div>
               </>
             )}
+            {(data.currentUserRole && (data.currentUserRole === 'admin' || data.currentUserRole === 'owner')) && (
+              <div className="mt-2 flex items-center gap-3 text-sm">
+                <span className="text-muted-foreground text-md">Vols més membres? Incrementa el teu pla</span>
+                <Button variant="outline" size="sm" onClick={handleAddMembersClick}>
+                  Afegeix més membres
+                </Button>
+              </div>
+            )}
           </div>
+          
         )}
       </div>
       
@@ -568,6 +635,120 @@ const TeamPage = React.memo(function TeamPage() {
         isOpen={isUpgradeModalOpen}
         onClose={() => setIsUpgradeModalOpen(false)}
       />
+
+      <Dialog open={isGroupPricingOpen} onOpenChange={setIsGroupPricingOpen}>
+        <DialogContent className="sm:max-w-4xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">Incrementa el teu pla</DialogTitle>
+            <DialogDescription className="text-lg">
+              Configura el teu equip i afegeix més membres amb el pla Grupal.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              {(() => {
+                const maxMembers = data?.organization?.max_members ?? organization?.max_members;
+                const currentMembers = data?.members?.length ?? organizationMembers?.length ?? 0;
+                const seatsAvailable = typeof maxMembers === 'number' ? Math.max(maxMembers - currentMembers, 0) : 0;
+                //const pricePerUser = Math.floor(calculatePricePerUser(Math.max(currentMembers || 1, 5)));
+                const pricePerUser = Math.floor(calculatePricePerUser(maxMembers));
+                const estimatedAdditional = maxMembers * pricePerUser;
+                return (
+                  <>
+                    <div className="mb-4 rounded-lg border bg-muted/30 p-4 text-sm text-muted-foreground">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-lg font-bold">
+                          El teu pla actual:
+                        </span>
+                        <span className="text-lg">
+                          Tens <span className="font-semibold text-foreground">{maxMembers}</span> membres disponibles.
+                        </span>
+                        <span className="text-lg">
+                          Preu per usuari: <span className="font-semibold text-foreground">{pricePerUser}.00€</span> /mes.
+                        </span>
+                        <span className="text-lg">
+                          Cost: <span className="font-semibold text-foreground">{estimatedAdditional}.00€</span> /mes.
+                        </span>
+                      </div>
+                    </div>
+                    {/* NEW: If you change the plan */}
+                    {(() => {
+                      const n = selectedGroupUsers;
+                      const perUser = Math.floor(calculatePricePerUser(n));
+                      const total = n * perUser;
+                      return (
+                        <div className="rounded-lg border bg-muted/30 p-4 text-sm text-muted-foreground">
+                          <div className="flex flex-col gap-1">
+                            <span className="text-lg font-bold">Si canvies el pla:</span>
+                            <span className="text-lg">
+                              Usuaris seleccionats: <span className="font-semibold text-foreground">{n}</span>
+                            </span>
+                            <span className="text-lg">
+                              Preu per usuari: <span className="font-semibold text-foreground">{perUser}.00€</span> /mes.
+                            </span>
+                            <span className="text-lg">
+                              Cost total: <span className="font-semibold text-foreground">{total}.00€</span> /mes.
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </>
+                );
+              })()}
+            </div>
+
+            <div>
+              {(() => {
+                const groupPlan: PricingPlan = {
+                  key: 'group',
+                  name: 'Grupal',
+                  price: 'Personalitzat',
+                  description: 'Escala el teu equip i gestiona fàcilment els permisos.',
+                  features: [
+                    "Usuaris a mida per al teu equip",
+                    "Gestió centralitzada d'usuaris i permisos",
+                    "Descomptes per volum",
+                    "Suport dedicat",
+                  ],
+                  highlighted: false,
+                };
+                return (
+                  <PricingCard
+                    plan={groupPlan}
+                    authLoading={false}
+                    loading={isGroupUpgradeLoading}
+                    onPrimaryAction={(opts) => handleSelectGroupUsers(opts?.users)}
+                    onContactClick={() => {}}
+                    orgCallsPrimaryAction={true}
+                    initialUsers={selectedGroupUsers}
+                    onUsersChange={setSelectedGroupUsers}
+                  />
+                );
+              })()}
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsGroupPricingOpen(false)}>Tancar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      <Dialog open={isLimitDialogOpen} onOpenChange={setIsLimitDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Límit assolit</DialogTitle>
+            <DialogDescription>
+              Heu arribat al limit de persones del grup
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => setIsLimitDialogOpen(false)}>D'acord</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={isRemoveDialogOpen} onOpenChange={setIsRemoveDialogOpen}>
         <DialogContent>
