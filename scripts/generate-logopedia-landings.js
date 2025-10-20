@@ -13,7 +13,7 @@ const catalanData = {
   ]
 };
 
-// Specialties with richer content
+// Specialties - EXPANDED with more variations
 const logopediaSpecialties = [
   { 
     slug: 'logopedia-infantil', 
@@ -78,10 +78,27 @@ const logopediaSpecialties = [
     description: 'especialitzada en Trastorn de l\'Espectre Autista',
     benefit: 'Documenta el desenvolupament comunicatiu en TEA',
     useCases: ['Comunicació funcional', 'Pragmàtica', 'Llenguatge verbal']
+  },
+  // NEW SPECIALTIES
+  { 
+    slug: 'dislexia', 
+    name: 'Dislèxia',
+    searchTerm: 'tractament dislèxia',
+    description: 'per a trastorns de lectoescriptura',
+    benefit: 'Segueix l\'evolució dels trastorns de lectura i escriptura',
+    useCases: ['Dislèxia evolutiva', 'Disgràfia', 'Discalcúlia']
+  },
+  { 
+    slug: 'parkinson', 
+    name: 'Parkinson',
+    searchTerm: 'logopèdia parkinson',
+    description: 'per a malalties neurodegeneratives',
+    benefit: 'Documenta teràpies de veu i deglució en Parkinson',
+    useCases: ['Disàrtria', 'Hipofonia', 'Problemes de deglució']
   }
 ];
 
-// Service types with enhanced content
+// Service types - EXPANDED
 const serviceTypes = [
   { 
     slug: 'sessions', 
@@ -114,16 +131,50 @@ const serviceTypes = [
     description: 'seguiment de pacients',
     verb: 'Registra',
     benefit: 'Mantén un historial complet de l\'evolució dels teus pacients.'
+  },
+  // NEW SERVICES
+  { 
+    slug: 'teràpia', 
+    name: 'Teràpia',
+    searchTerm: 'teràpia logopèdica',
+    description: 'sessions de teràpia',
+    verb: 'Documenta',
+    benefit: 'Registra cada sessió terapèutica amb detall professional.'
+  },
+  { 
+    slug: 'consultes', 
+    name: 'Consultes',
+    searchTerm: 'consultes logopèdia',
+    description: 'consultes logopèdiques',
+    verb: 'Registra',
+    benefit: 'Mantén un registre complet de totes les consultes.'
   }
 ];
 
-function generateSlug(city, province, specialty = null, service = null) {
-  let parts = [];
-  
-  if (specialty) parts.push(specialty.slug);
-  if (service) parts.push(service.slug);
-  
-  parts.push(city.toLowerCase()
+// NEW: Additional modifiers for more variations
+const modifiers = [
+  { slug: 'online', name: 'Online', desc: 'en línia' },
+  { slug: 'domicili', name: 'a Domicili', desc: 'amb desplaçament' },
+  { slug: 'centre', name: 'al Centre', desc: 'al consultori' },
+  { slug: 'urgent', name: 'Urgent', desc: 'prioritària' },
+  { slug: 'privat', name: 'Privat', desc: 'privada' }
+];
+
+// NEW: Patient types for more targeting
+const patientTypes = [
+  { slug: 'nens', name: 'Nens', age: 'infantil' },
+  { slug: 'bebes', name: 'Bebès', age: '0-3 anys' },
+  { slug: 'adolescents', name: 'Adolescents', age: '12-18 anys' },
+  { slug: 'adults', name: 'Adults', age: '+18 anys' },
+  { slug: 'gent-gran', name: 'Gent Gran', age: '+65 anys' }
+];
+
+function generateSlug(...parts) {
+  return parts
+    .filter(Boolean)
+    .map(part => typeof part === 'string' ? part : part.slug)
+    .join('-')
+    .toLowerCase()
     .replace(/\s+/g, '-')
     .replace(/'/g, '')
     .replace(/à/g, 'a')
@@ -135,243 +186,209 @@ function generateSlug(city, province, specialty = null, service = null) {
     .replace(/ú/g, 'u')
     .replace(/ü/g, 'u')
     .replace(/ç/g, 'c')
-    .replace(/ñ/g, 'n'));
-    
-  return parts.join('-');
+    .replace(/ñ/g, 'n');
 }
 
-function generateLandingContent(city, province, specialty = null, service = null) {
+function generateLandingContent(city, province, options = {}) {
+  const { specialty, service, modifier, patientType } = options;
   const isCapital = city === province;
   const cityVariant = isCapital ? `la ciutat de ${city}` : city;
   
   let content = {};
+  let titleParts = [];
+  let keywordParts = [];
   
-  if (specialty && service) {
-    // Combined: Specialty + Service + City
-    content = {
-      title: `${service.name} de ${specialty.name} ${city} | Transcriu.com`,
-      metaDescription: `${service.verb} ${service.description} de ${specialty.name} a ${city}. Plataforma professional per a logopedes amb transcripció automàtica en català. Prova gratuïta.`,
-      heroTitle: `${service.verb} ${service.name} de ${specialty.name} a ${city}`,
-      heroDescription: `Plataforma de transcripció per a logopedes de ${cityVariant}. ${specialty.benefit}. Transcripció automàtica en català amb alta precisió.`,
-      description: `Servei de transcripció especialitzat en ${service.description} de ${specialty.name} per a professionals de ${city}, ${province}. ${service.benefit}`,
-      keywords: [
-        `${specialty.searchTerm} ${city.toLowerCase()}`,
-        `${service.searchTerm} ${city.toLowerCase()}`,
-        `logopeda ${city.toLowerCase()}`,
-        'transcripció logopèdia',
-        `${specialty.slug} ${province.toLowerCase()}`
-      ],
-      h2Sections: [
-        {
-          title: `Per què triar Transcriu.com per a ${specialty.name} a ${city}?`,
-          content: `Els logopedes de ${city} confien en Transcriu.com per documentar les seves ${service.description}. ${service.benefit} La nostra plataforma està optimitzada per comprendre el vocabulari tècnic de ${specialty.name}.`
-        },
-        {
-          title: 'Beneficis per a logopedes',
-          points: [
-            'Transcripció en català amb precisió superior al 95%',
-            'Privacitat total: les teves dades no surten mai del servidor',
-            'Exporta a Word, PDF o text pla',
-            'Vocabulari especialitzat en logopèdia'
-          ]
-        },
-        {
-          title: `Casos d'ús a ${city}`,
-          useCases: specialty.useCases
-        }
-      ]
-    };
-  } else if (specialty) {
-    // Specialty + City
-    content = {
-      title: `Transcripció ${specialty.name} ${city} | Logopèdia Professional`,
-      metaDescription: `Transcriu sessions de ${specialty.name} a ${city}. Eina professional per a logopedes amb transcripció automàtica en català. Alta precisió i seguretat garantida.`,
-      heroTitle: `Transcripció de ${specialty.name} a ${city}`,
-      heroDescription: `Plataforma de transcripció dissenyada per a logopedes ${specialty.description} a ${cityVariant}, ${province}. ${specialty.benefit}.`,
-      description: `Servei de transcripció especialitzat en ${specialty.name} per a professionals de la logopèdia a ${city}. Documenta sessions, avaluacions i informes amb transcripció automàtica en català.`,
-      keywords: [
-        `${specialty.searchTerm} ${city.toLowerCase()}`,
-        `logopeda ${specialty.slug} ${city.toLowerCase()}`,
-        'transcripció logopèdia català',
-        `${specialty.name.toLowerCase()} ${province.toLowerCase()}`
-      ],
-      h2Sections: [
-        {
-          title: `Transcripció professional per a ${specialty.name}`,
-          content: `A ${city} trobaràs logopedes especialitzats en ${specialty.name}. Transcriu.com t'ajuda a documentar les teves sessions amb la màxima precisió.`
-        },
-        {
-          title: 'Característiques clau',
-          points: [
-            'Motors de IA entrenats en català',
-            'Reconeixement de terminologia mèdica',
-            'Gestió segura de dades sensibles',
-            'Formats d\'exportació professionals'
-          ]
-        }
-      ]
-    };
-  } else if (service) {
-    // Service + City
-    content = {
-      title: `${service.name} de Logopèdia ${city} | Transcripció Automàtica`,
-      metaDescription: `${service.verb} ${service.description} a ${city} amb transcripció automàtica. ${service.benefit} Prova gratuïta per a logopedes.`,
-      heroTitle: `${service.verb} ${service.name} de Logopèdia a ${city}`,
-      heroDescription: `Eina professional per a logopedes de ${cityVariant}. ${service.benefit} Transcripció automàtica en català amb alta precisió.`,
-      description: `Servei de transcripció per a ${service.description} a ${city}, ${province}. Ideal per a professionals de la logopèdia que volen optimitzar el seu temps.`,
-      keywords: [
-        `${service.searchTerm} ${city.toLowerCase()}`,
-        `logopeda ${city.toLowerCase()}`,
-        'transcripció automàtica català',
-        `${service.slug} ${province.toLowerCase()}`
-      ],
-      h2Sections: [
-        {
-          title: `Optimitza les teves ${service.name} a ${city}`,
-          content: `${service.benefit} Transcriu.com permet als logopedes de ${city} centrar-se en el que importa: els seus pacients.`
-        },
-        {
-          title: 'Com funciona',
-          points: [
-            'Grava les teves sessions o puja fitxers d\'àudio',
-            'La IA transcriu automàticament en minuts',
-            'Revisa i edita si cal',
-            'Exporta a Word, PDF o comparteix en línia'
-          ]
-        }
-      ]
-    };
-  } else {
-    // Basic City
-    content = {
-      title: `Transcripció Logopèdia ${city} | Transcriu.com`,
-      metaDescription: `Transcriu sessions de logopèdia a ${city} amb precisió professional. Plataforma en català per a logopedes. Privada, segura i ràpida. Prova gratuïta disponible.`,
-      heroTitle: `Transcripció de Logopèdia a ${city}`,
-      heroDescription: `Plataforma professional per a logopedes de ${cityVariant}, ${province}. Transcriu sessions, avaluacions i informes amb transcripció automàtica en català.`,
-      description: `Servei de transcripció especialitzat per a logopedes de ${city}. Documenta les teves sessions de forma segura i eficient amb la nostra eina de transcripció en català.`,
-      keywords: [
-        `logopeda ${city.toLowerCase()}`,
-        `logopèdia ${city.toLowerCase()}`,
-        'transcripció logopèdia català',
-        `sessions logopèdia ${province.toLowerCase()}`
-      ],
-      h2Sections: [
-        {
-          title: `Per què els logopedes de ${city} trien Transcriu.com`,
-          content: `A ${city} hi ha una comunitat creixent de logopedes que utilitzen Transcriu.com per documentar les seves sessions. La nostra plataforma ofereix transcripció automàtica en català amb alta precisió.`
-        },
-        {
-          title: 'Avantatges per a professionals',
-          points: [
-            'Estalvia hores de documentació manual',
-            'Millora la qualitat dels teus informes',
-            'Compliment amb RGPD i protecció de dades',
-            'Suport tècnic en català'
-          ]
-        },
-        {
-          title: `Logopèdia a ${city}`,
-          content: `Els professionals de la logopèdia a ${city} poden beneficiar-se d'una eina que entén el context local i el vocabulari específic del català de ${province}.`
-        }
-      ]
-    };
+  // Build title components
+  if (service) titleParts.push(service.name);
+  if (specialty) titleParts.push(specialty.name);
+  if (patientType) titleParts.push(`per a ${patientType.name}`);
+  if (modifier) titleParts.push(modifier.name);
+  titleParts.push(city);
+  
+  // Build hero title
+  let heroPrefix = service ? service.verb : 'Transcriu';
+  let heroSubject = [];
+  if (service) heroSubject.push(service.description);
+  if (specialty) heroSubject.push(`de ${specialty.name}`);
+  if (patientType) heroSubject.push(`per a ${patientType.name.toLowerCase()}`);
+  if (modifier) heroSubject.push(modifier.desc);
+  
+  // Keywords
+  keywordParts.push(city.toLowerCase());
+  if (specialty) keywordParts.push(specialty.searchTerm);
+  if (service) keywordParts.push(service.searchTerm);
+  if (patientType) keywordParts.push(patientType.slug);
+  if (modifier) keywordParts.push(modifier.slug);
+  
+  content = {
+    title: `${titleParts.join(' ')} | Transcriu.com`,
+    metaDescription: `${heroPrefix} ${heroSubject.join(' ')} a ${city}. Plataforma professional per a logopedes amb transcripció automàtica en català. Prova gratuïta.`,
+    heroTitle: `${heroPrefix} ${heroSubject.join(' ')} a ${city}`,
+    heroDescription: `Plataforma de transcripció per a logopedes de ${cityVariant}, ${province}. ${specialty ? specialty.benefit : 'Transcripció professional amb alta precisió'}. Eina dissenyada per a professionals.`,
+    description: `Servei de transcripció ${specialty ? `especialitzat en ${specialty.name}` : 'professional'} per a logopedes de ${city}. ${service ? service.benefit : 'Documenta les teves sessions amb facilitat'}.`,
+    keywords: keywordParts.concat(['logopèdia', 'transcripció', province.toLowerCase()]),
+    h2Sections: [
+      {
+        title: `Per què triar Transcriu.com a ${city}?`,
+        content: `Els logopedes de ${city} confien en Transcriu.com per documentar les seves sessions. ${service ? service.benefit : 'La nostra plataforma ofereix transcripció automàtica en català amb alta precisió.'}`
+      },
+      {
+        title: 'Característiques principals',
+        points: [
+          'Transcripció en català amb precisió superior al 95%',
+          'Privacitat total: dades protegides amb xifratge',
+          'Exporta a Word, PDF o text pla',
+          `Vocabulari especialitzat ${specialty ? `en ${specialty.name.toLowerCase()}` : 'en logopèdia'}`
+        ]
+      }
+    ]
+  };
+  
+  if (specialty && specialty.useCases) {
+    content.h2Sections.push({
+      title: `Casos d'ús a ${city}`,
+      useCases: specialty.useCases
+    });
   }
   
   return content;
 }
 
-function generateAllLandings() {
-  const landings = {};
-  let count = 0;
+function generateAllLandings(mode = 'incremental') {
+  let landings = {};
+  
+  // Load existing if incremental mode
+  const existingPath = path.join(__dirname, '../src/app/landings/landings.json');
+  if (mode === 'incremental' && fs.existsSync(existingPath)) {
+    landings = JSON.parse(fs.readFileSync(existingPath, 'utf8'));
+    console.log(`📂 Loaded ${Object.keys(landings).length} existing landings`);
+  }
+  
+  let newCount = 0;
+  let skippedCount = 0;
+  
+  function addLanding(slug, content) {
+    if (!landings[slug]) {
+      landings[slug] = content;
+      newCount++;
+      return true;
+    }
+    skippedCount++;
+    return false;
+  }
   
   catalanData.provinces.forEach(province => {
     province.cities.forEach((city, cityIndex) => {
-      // 1. Basic city landing (ALL cities)
-      const basicSlug = generateSlug(city, province.name);
-      landings[basicSlug] = generateLandingContent(city, province.name);
-      count++;
       
-      // 2. Service landings (top 8 cities per province)
-      if (cityIndex < 8) {
+      // LEVEL 1: Basic city landings (ALL cities)
+      const basicSlug = generateSlug(city);
+      addLanding(basicSlug, generateLandingContent(city, province.name));
+      
+      // LEVEL 2: Service landings (top 10 cities)
+      if (cityIndex < 10) {
         serviceTypes.forEach(service => {
-          const serviceSlug = generateSlug(city, province.name, null, service);
-          landings[serviceSlug] = generateLandingContent(city, province.name, null, service);
-          count++;
+          const slug = generateSlug(service.slug, city);
+          addLanding(slug, generateLandingContent(city, province.name, { service }));
         });
       }
       
-      // 3. Specialty landings (top 5 cities per province)
+      // LEVEL 3: Specialty landings (top 8 cities)
+      if (cityIndex < 8) {
+        logopediaSpecialties.forEach(specialty => {
+          const slug = generateSlug(specialty.slug, city);
+          addLanding(slug, generateLandingContent(city, province.name, { specialty }));
+        });
+      }
+      
+      // LEVEL 4: Specialty + Service (top 5 cities)
       if (cityIndex < 5) {
         logopediaSpecialties.forEach(specialty => {
-          const specialtySlug = generateSlug(city, province.name, specialty);
-          landings[specialtySlug] = generateLandingContent(city, province.name, specialty);
-          count++;
+          serviceTypes.slice(0, 3).forEach(service => {
+            const slug = generateSlug(specialty.slug, service.slug, city);
+            addLanding(slug, generateLandingContent(city, province.name, { specialty, service }));
+          });
         });
       }
       
-      // 4. Combined specialty + service (top 3 cities per province)
+      // LEVEL 5: Patient Type variations (top 3 cities)
       if (cityIndex < 3) {
-        logopediaSpecialties.slice(0, 4).forEach(specialty => { // Top 4 specialties
-          serviceTypes.slice(0, 2).forEach(service => { // Top 2 services
-            const combinedSlug = generateSlug(city, province.name, specialty, service);
-            landings[combinedSlug] = generateLandingContent(city, province.name, specialty, service);
-            count++;
+        patientTypes.forEach(patientType => {
+          // Patient + City
+          const slug1 = generateSlug(patientType.slug, city);
+          addLanding(slug1, generateLandingContent(city, province.name, { patientType }));
+          
+          // Patient + Specialty + City
+          logopediaSpecialties.slice(0, 3).forEach(specialty => {
+            const slug2 = generateSlug(specialty.slug, patientType.slug, city);
+            addLanding(slug2, generateLandingContent(city, province.name, { specialty, patientType }));
+          });
+        });
+      }
+      
+      // LEVEL 6: Modifier variations (capital cities only)
+      if (cityIndex === 0) {
+        modifiers.forEach(modifier => {
+          // Modifier + City
+          const slug1 = generateSlug(modifier.slug, city);
+          addLanding(slug1, generateLandingContent(city, province.name, { modifier }));
+          
+          // Modifier + Specialty + City
+          logopediaSpecialties.slice(0, 4).forEach(specialty => {
+            const slug2 = generateSlug(specialty.slug, modifier.slug, city);
+            addLanding(slug2, generateLandingContent(city, province.name, { specialty, modifier }));
+          });
+          
+          // Modifier + Service + City
+          serviceTypes.slice(0, 2).forEach(service => {
+            const slug3 = generateSlug(service.slug, modifier.slug, city);
+            addLanding(slug3, generateLandingContent(city, province.name, { service, modifier }));
           });
         });
       }
     });
   });
   
-  console.log(`✅ Generated ${count} landing pages`);
-  return landings;
+  return { landings, newCount, skippedCount };
 }
 
-// Generate and save
-const allLandings = generateAllLandings();
-const outputPath = path.join(__dirname, '../src/app/landings/landings.json');
+// Parse command line arguments
+const args = process.argv.slice(2);
+const mode = args.includes('--force') ? 'force' : 'incremental';
 
-// Ensure directory exists
+console.log(`\n🚀 Running in ${mode.toUpperCase()} mode...\n`);
+
+const { landings, newCount, skippedCount } = generateAllLandings(mode);
+
+const outputPath = path.join(__dirname, '../src/app/landings/landings.json');
 const dir = path.dirname(outputPath);
 if (!fs.existsSync(dir)) {
   fs.mkdirSync(dir, { recursive: true });
 }
 
-// Write formatted JSON
-fs.writeFileSync(outputPath, JSON.stringify(allLandings, null, 2), 'utf8');
+fs.writeFileSync(outputPath, JSON.stringify(landings, null, 2), 'utf8');
 
-console.log(`\n📁 File saved: ${outputPath}`);
-console.log(`📊 Total pages: ${Object.keys(allLandings).length}`);
+console.log(`✅ Landing generation complete!`);
+console.log(`📁 File saved: ${outputPath}`);
+console.log(`\n📊 Statistics:`);
+console.log(`  ✨ New pages generated: ${newCount}`);
+console.log(`  ⏭️  Existing pages skipped: ${skippedCount}`);
+console.log(`  📄 Total pages: ${Object.keys(landings).length}`);
 
-// Statistics
-const stats = {
-  basic: 0,
-  service: 0,
-  specialty: 0,
-  combined: 0
-};
+// Show samples of new pages
+if (newCount > 0) {
+  console.log('\n🆕 Sample new pages:');
+  const newPages = Object.keys(landings).slice(-Math.min(10, newCount));
+  newPages.forEach(slug => {
+    console.log(`  - /landings/${slug}`);
+  });
+}
 
-Object.keys(allLandings).forEach(slug => {
-  const parts = slug.split('-');
-  if (parts.length === 1) stats.basic++;
-  else if (parts.length === 2) stats.service++;
-  else if (parts.length === 3) stats.specialty++;
-  else stats.combined++;
-});
+console.log('\n💡 Usage:');
+console.log('  npm run generate-landings          (incremental - skip existing)');
+console.log('  npm run generate-landings --force  (regenerate all)');
 
-console.log('\n📈 Distribution:');
-console.log(`  Basic city pages: ${stats.basic}`);
-console.log(`  Service pages: ${stats.service}`);
-console.log(`  Specialty pages: ${stats.specialty}`);
-console.log(`  Combined pages: ${stats.combined}`);
-
-console.log('\n🔍 Sample URLs:');
-console.log('  https://transcriu.com/landings/barcelona');
-console.log('  https://transcriu.com/landings/sessions-girona');
-console.log('  https://transcriu.com/landings/logopedia-infantil-lleida');
-console.log('  https://transcriu.com/landings/logopedia-infantil-sessions-tarragona');
-
-console.log('\n💡 Next steps:');
-console.log('  1. Create dynamic routes in Next.js: /landings/[slug]');
-console.log('  2. Generate sitemap.xml with all landing URLs');
-console.log('  3. Add schema.org LocalBusiness markup');
-console.log('  4. Submit sitemap to Google Search Console');
+console.log('\n📈 Next steps:');
+console.log('  1. Review the generated content');
+console.log('  2. Generate sitemap.xml');
+console.log('  3. Submit to Google Search Console');
+console.log('  4. Monitor indexing progress');
