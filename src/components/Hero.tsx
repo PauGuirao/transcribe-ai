@@ -67,7 +67,7 @@ export function Hero() {
                     className="rounded-full"
                     unoptimized
                   />
-                      Entra amb Google
+                      Entra amb el teu correu
                     </>
                   )}
                 </Button>
