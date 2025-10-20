@@ -162,47 +162,9 @@ export function Footer() {
                 className="text-gray-600 hover:text-gray-900 transition-colors text-sm flex items-center"
               >
                 <Mail className="h-4 w-4 mr-1" />
-                hola@transcriu.app
+                ajuda@transcriu.com
               </a>
             </div>
-
-            {/* Social Media Links */}
-            <div className="flex items-center space-x-4 mt-4 md:mt-0">
-              <a 
-                href="https://instagram.com/transcriu" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                <Instagram className="h-5 w-5" />
-              </a>
-              <a 
-                href="https://twitter.com/transcriu" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                <Twitter className="h-5 w-5" />
-              </a>
-              <a 
-                href="https://youtube.com/transcriu" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                <Youtube className="h-5 w-5" />
-              </a>
-              <a 
-                href="https://linkedin.com/company/transcriu" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                <Linkedin className="h-5 w-5" />
-              </a>
-            </div>
-          </div>
-
           {/* Rating/Review Section */}
           <div className="flex justify-center mt-6">
             <div className="flex items-center space-x-2 text-sm text-gray-600">
@@ -216,6 +178,8 @@ export function Footer() {
               <span>Valorat per professionals de la logopèdia</span>
             </div>
           </div>
+          </div>
+
         </div>
       </div>
     </footer>

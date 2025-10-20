@@ -426,7 +426,7 @@ const TeamPage = React.memo(function TeamPage() {
                   {data.organization.name}
                 </h1>
                 <p className="text-md text-muted-foreground">
-                  Membres del equip • {data.members.length} / {data.organization.max_members ?? '—'} membres
+                  Membres del equip • <span className="font-bold">{data.members.length} / {data.organization.max_members ?? '—'}</span> membres
                 </p>
               </div>
               {/* Only show invite button for admin/owner roles */}
@@ -615,7 +615,7 @@ const TeamPage = React.memo(function TeamPage() {
             )}
             {(data.currentUserRole && (data.currentUserRole === 'admin' || data.currentUserRole === 'owner')) && (
               <div className="mt-2 flex items-center gap-3 text-sm">
-                <span className="text-muted-foreground text-md">Vols més membres? Incrementa el teu pla</span>
+                <span className="text-muted-foreground text-lg">Vols més membres? Incrementa el teu pla</span>
                 <Button variant="outline" size="sm" onClick={handleAddMembersClick}>
                   Afegeix més membres
                 </Button>
