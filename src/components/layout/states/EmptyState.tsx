@@ -99,7 +99,7 @@ export function EmptyState({
             No et queden tokens
           </h2>
           <p className="text-muted-foreground text-lg mb-8 max-w-2xl">
-            Has esgotat les transcripciones gratuites. Suscriute per continuar transcribint audios 
+            Has esgotat les transcripciones gratuites. Suscriute per continuar transcrivint audios 
           </p>
 
           {/* Pricing Card */}
@@ -219,7 +219,7 @@ export function EmptyState({
                       {manualTranscribeLoading ? (
                         <>
                           <Loader2 className="h-4 w-4 animate-spin" />
-                          Transcribint...
+                          Transcrivint...
                         </>
                       ) : (
                         <>

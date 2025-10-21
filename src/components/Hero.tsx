@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 export function Hero({
-  title = "Transcriu sessions de logopèdia amb facilitat",
+  title = "Transcriu sessions de logopèdia en segons",
   description = "Utilitza una plataforma dissenyada per a alta precisió. Confiada per professionals de totes les mides per gestionar milions de paraules cada mes.",
 }: { title?: string; description?: string }) {
   const { user, loading: authLoading } = useAuth();
