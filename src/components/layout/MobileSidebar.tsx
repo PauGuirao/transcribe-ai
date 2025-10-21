@@ -14,6 +14,7 @@ import {
   Users,
   HelpCircle,
   Loader2,
+  FileText,
 } from "lucide-react";
 import {
   Sheet,
@@ -41,6 +42,7 @@ export default function MobileSidebar() {
     { title: "Home", href: "/dashboard", icon: Home },
     { title: "Biblioteca", href: "/library", icon: BookOpen },
     { title: "Transcripció", href: "/transcribe", icon: Mic },
+    { title: "Blog", href: "/blog", icon: FileText },
     { title: "Equip", href: "/team", icon: Users },
     { title: "Ajuda", href: "/help", icon: HelpCircle },
   ];

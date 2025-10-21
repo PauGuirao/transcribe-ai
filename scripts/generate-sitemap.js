@@ -7,6 +7,20 @@ const path = require('path');
 const landingsPath = path.join(__dirname, '../src/app/logopedia/landings.json');
 const landingsData = JSON.parse(fs.readFileSync(landingsPath, 'utf8'));
 
+// Load blog posts
+const contentDirectory = path.join(__dirname, '../content/blog');
+const getBlogSlugs = () => {
+  try {
+    const fileNames = fs.readdirSync(contentDirectory);
+    return fileNames
+      .filter((fileName) => fileName.endsWith('.mdx'))
+      .map((fileName) => fileName.replace(/\.mdx$/, ''));
+  } catch (error) {
+    console.error('Error reading blog posts:', error);
+    return [];
+  }
+};
+
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://transcriu.com';
 
 // Static pages
@@ -23,11 +37,13 @@ const staticPages = [
   { url: '/settings', priority: '0.6', changefreq: 'monthly' },
   { url: '/team', priority: '0.6', changefreq: 'monthly' },
   { url: '/annotate', priority: '0.7', changefreq: 'monthly' },
-  { url: '/library', priority: '0.7', changefreq: 'monthly' }
+  { url: '/library', priority: '0.7', changefreq: 'monthly' },
+  { url: '/blog', priority: '0.8', changefreq: 'weekly' }
 ];
 
-// Get all landing page slugs
+// Get all landing page slugs and blog slugs
 const landingSlugs = Object.keys(landingsData);
+const blogSlugs = getBlogSlugs();
 
 // Generate sitemap XML
 const currentDate = new Date().toISOString();
@@ -46,6 +62,12 @@ ${landingSlugs.map(slug => `  <url>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>`).join('\n')}
+${blogSlugs.map(slug => `  <url>
+    <loc>${baseUrl}/blog/${slug}</loc>
+    <lastmod>${currentDate}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`).join('\n')}
 </urlset>`;
 
 // Write sitemap to public directory
@@ -54,9 +76,10 @@ fs.writeFileSync(outputPath, sitemap, 'utf8');
 
 console.log(`✅ Sitemap generated successfully!`);
 console.log(`📁 File: ${outputPath}`);
-console.log(`📊 Total URLs: ${staticPages.length + landingSlugs.length}`);
+console.log(`📊 Total URLs: ${staticPages.length + landingSlugs.length + blogSlugs.length}`);
 console.log(`   - Static pages: ${staticPages.length}`);
 console.log(`   - Landing pages: ${landingSlugs.length}`);
+console.log(`   - Blog posts: ${blogSlugs.length}`);
 
 // Generate robots.txt as well
 const robotsTxt = `User-agent: *

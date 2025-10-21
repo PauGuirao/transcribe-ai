@@ -5,7 +5,7 @@ let tokensFetchInFlight = false;
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { BookOpen, Home, Mic, Clock, Loader2, CheckCircle, AlertCircle, User, GraduationCap } from "lucide-react";
+import { BookOpen, Home, Mic, Clock, Loader2, CheckCircle, AlertCircle, User, GraduationCap, FileText } from "lucide-react";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { Badge } from "@/components/ui/badge";
 import { AudioUploadResult } from "@/types";
@@ -33,6 +33,7 @@ export default function AppSidebar({ selectedAudioId, onAudioSelect, onUploadCom
     { title: "Inici", icon: Home, path: "/dashboard" },
     { title: "Transcriure", icon: Mic, path: "/transcribe" },
     { title: "Biblioteca", icon: BookOpen, path: "/library" },
+    { title: "Blog", icon: FileText, path: "/blog" },
     { title: "Alumnes", icon: User, path: "/profiles" },
     { title: "Tutorials", icon: GraduationCap, path: "/tutorials" },
   ];
@@ -144,7 +145,7 @@ export default function AppSidebar({ selectedAudioId, onAudioSelect, onUploadCom
       <div className="mt-auto px-2 pb-4 flex flex-col gap-3">
         <div className="rounded-lg border bg-white p-3">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-bold uppercase tracking-wide text-foreground">Pla actual</p>
+            <p className="text-sm font-bold uppercase tracking-wide text-foreground">Pla actual</p>
             <div className="mt-1">
               <Badge variant="secondary" className="text-sm uppercase bg-blue-500 text-white">
                 {planType === 'group' ? 'Grupal' : planType === 'pro' ? 'Individual' : 'gratis'}

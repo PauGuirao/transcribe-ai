@@ -76,6 +76,12 @@ export function Navbar({ onContactClick }: NavbarProps) {
           
           {/* Desktop Navigation - Centered */}
           <nav className="hidden md:flex items-center space-x-8 absolute left-1/2 transform -translate-x-1/2">
+            <Link 
+              href="/blog"
+              className="text-md text-gray-600 hover:text-gray-900 transition-all duration-300 cursor-pointer px-4 py-2 rounded-lg hover:bg-gray-50 hover:scale-105 transform"
+            >
+              Blog
+            </Link>
             <button 
               onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
               className="text-md text-gray-600 hover:text-gray-900 transition-all duration-300 cursor-pointer px-4 py-2 rounded-lg hover:bg-gray-50 hover:scale-105 transform"
@@ -138,6 +144,13 @@ export function Navbar({ onContactClick }: NavbarProps) {
         <div className="border-b md:hidden bg-white/95 backdrop-blur-sm border-gray-200 shadow-sm">
           <div className="mx-auto max-w-7xl px-6 py-4">
             <nav className="flex flex-col space-y-3">
+              <Link
+                href="/blog"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-gray-600 hover:text-gray-900 text-left py-2 px-2 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Blog
+              </Link>
               <button
                 onClick={() => {
                   document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });

@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+# Disallow admin and API routes
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /settings/
+Disallow: /team/
+Disallow: /organization/
+Disallow: /auth/
+Disallow: /invite/
+Disallow: /group-invite/
+
+# Allow logopedia landing pages for SEO
+Allow: /logopedia/
+
+# Sitemap
+Sitemap: https://transcriu.com/sitemap.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
