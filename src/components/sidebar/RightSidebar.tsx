@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-import { Download, Settings, Info, Users, GraduationCap, Loader2, Copy } from 'lucide-react';
+import { Download, Settings, Info, Users, GraduationCap, Loader2, Copy, Check } from 'lucide-react';
 import { FaGoogleDrive, FaFilePdf, FaFileWord } from 'react-icons/fa';
 import { SiGmail } from 'react-icons/si';
 import { Audio, Transcription, Speaker } from '@/types';
@@ -53,6 +53,7 @@ export function RightSidebar({
   const [selectedAlumne, setSelectedAlumne] = useState<string>('none')
   const [assigningAlumne, setAssigningAlumne] = useState(false)
   const [isDriveExporting, setIsDriveExporting] = useState(false)
+  const [isCopied, setIsCopied] = useState(false)
 
   // Helper function to format time in MM:SS format
   const formatTime = (time: number) => {
@@ -97,7 +98,11 @@ export function RightSidebar({
 
       if (textToCopy) {
         await navigator.clipboard.writeText(textToCopy);
-        // You could add a toast notification here if you have a toast system
+        
+        // Show success animation
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+        
         console.log('Transcription copied to clipboard');
       }
     } catch (error) {
@@ -110,6 +115,11 @@ export function RightSidebar({
         textArea.select();
         document.execCommand('copy');
         document.body.removeChild(textArea);
+        
+        // Show success animation even for fallback
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+        
         console.log('Transcription copied to clipboard (fallback)');
       } catch (fallbackError) {
         console.error('Fallback copy also failed:', fallbackError);
@@ -335,7 +345,7 @@ export function RightSidebar({
   }
 
   return (
-    <div className="fixed top-[73px] right-0 bottom-0 w-80 bg-background border-l flex flex-col z-40">
+    <div className="fixed top-[73px] right-0 bottom-0 w-80 bg-background border-l flex flex-col z-40 max-md:relative max-md:top-0 max-md:w-full max-md:border-l-0 max-md:border-t">
       {/* Header */}
       <div className="p-4 border-b">
         <h2 className="text-lg font-semibold">Opcions</h2>
@@ -373,13 +383,21 @@ export function RightSidebar({
             <div className="flex gap-2">
               <Button 
                 onClick={handleCopyTranscription} 
-                className="flex-1 justify-center bg-gray-100 hover:bg-gray-200 border-gray-300"
+                className={`flex-1 justify-center border-gray-300 transition-all duration-300 ${
+                  isCopied 
+                    ? 'bg-green-100 hover:bg-green-200 border-green-300 text-green-700' 
+                    : 'bg-gray-100 hover:bg-gray-200'
+                }`}
                 variant="outline"
                 disabled={!transcription}
                 size="sm"
               >
-                Copiar
-                <Copy className="h-4 w-4" />
+                {isCopied ? 'Copiat!' : 'Copiar'}
+                {isCopied ? (
+                  <Check className="h-4 w-4 text-green-600 animate-pulse" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
               </Button>
               <Button 
                 onClick={handleEmailShare} 

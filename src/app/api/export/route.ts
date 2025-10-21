@@ -78,14 +78,11 @@ export async function POST(request: Request) {
     }
 
     // Build Worker download URL for transcription JSON
-    let workerDownloadUrl: string;
-    if (transcriptionRow?.json_path) {
-      const fname = transcriptionRow.json_path.split('/').pop()!;
-      workerDownloadUrl = `${workerUrl}/download/transcriptions/${user.id}/${audioFile.id}/${fname}`;
-    } else {
-      // Legacy filename fallback
-      workerDownloadUrl = `${workerUrl}/download/transcriptions/${user.id}/${audioFile.id}.json`;
-    }
+    // Use the resolveLatestTranscriptionPath helper to get the most recent file
+    const { resolveLatestTranscriptionPath } = await import("@/helpers/resolveLatestTranscriptionPath");
+    const latestJsonPath = await resolveLatestTranscriptionPath(supabase, user.id, audioFile.id);
+    const fname = latestJsonPath.split('/').pop()!;
+    const workerDownloadUrl = `${workerUrl}/download/transcriptions/${user.id}/${audioFile.id}/${fname}`;
 
     console.log("[EXPORT] Fetching transcription JSON from worker:", workerDownloadUrl)
     const workerResponse = await fetch(workerDownloadUrl, {

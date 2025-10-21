@@ -73,104 +73,79 @@ export async function PATCH(
       return jsonError("Edited text is required", { status: 400, headers: CACHE_HEADERS.NO_CACHE })
     }
 
-    const supabaseAdmin = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
-
-    const legacyPath = `${user.id}/${transcription.audio_id}.json`
-    const oldPath = transcription.json_path || legacyPath
-
-    let existingData: TranscriptionJsonData = {
-      text: "",
-      segments: [],
-      speakers: [],
-    }
-    const { data: existingBlob } = await supabaseAdmin.storage
-      .from("transcriptions")
-      .download(oldPath)
-    if (existingBlob) {
-      try {
-        existingData = JSON.parse(
-          await existingBlob.text()
-        ) as TranscriptionJsonData
-      } catch {
-        existingData = {
-          text: "",
-          segments: [],
-          speakers: [],
-        }
-      }
+    // Use Cloudflare Worker to save to R2 instead of Supabase Storage
+    const workerUrl = process.env.NEXT_PUBLIC_CLOUDFLARE_WORKER_URL || 'https://transcribe-worker.guiraocastells.workers.dev'
+    const { data: { session } } = await supabase.auth.getSession()
+    
+    if (!session?.access_token) {
+      return jsonError("Authentication session required", { status: 401, headers: CACHE_HEADERS.NO_CACHE })
     }
 
-    const updatedJsonData = {
-      ...existingData,
-      segments: editedSegments ?? existingData.segments,
-      text: editedText ?? existingData.text,
-      speakers: speakers ?? existingData.speakers,
-      updated_at: new Date().toISOString(),
-    }
-
-    const newPath = buildVersionedPath(user.id, transcription.audio_id)
-    const { error: uploadError } = await supabaseAdmin.storage
-      .from("transcriptions")
-      .upload(newPath, JSON.stringify(updatedJsonData, null, 2), {
-        contentType: "application/json",
-        upsert: false,
-        cacheControl: "no-store, no-cache, must-revalidate, max-age=0, s-maxage=0",
+    try {
+      const workerResponse = await fetch(`${workerUrl}/update-transcription`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          audioId: transcription.audio_id,
+          editedText,
+          editedSegments,
+          speakers,
+        }),
       })
-    if (uploadError) {
-      console.error("Upload error:", uploadError)
-      return jsonError("Could not save transcription file.", { status: 500, headers: CACHE_HEADERS.NO_CACHE })
-    }
 
-    const updatePayload: { json_path: string; updated_at: string; alumne_id?: string | null } = {
-      json_path: newPath,
-      updated_at: updatedJsonData.updated_at,
-    }
-    if (alumneId !== undefined) {
-      updatePayload.alumne_id = alumneId || null
-    }
+      if (!workerResponse.ok) {
+        const errorText = await workerResponse.text()
+        console.error('Worker update failed:', errorText)
+        return jsonError("Failed to save transcription to R2", { status: 500, headers: CACHE_HEADERS.NO_CACHE })
+      }
 
-    const { data: updatedRow, error: updateErr } = await supabase
-      .from("transcriptions")
-      .update(updatePayload)
-      .eq("id", id)
-      .eq("user_id", user.id)
-      .select("id, audio_id, json_path, updated_at, alumne_id")
-      .single()
+      const workerResult = await workerResponse.json()
+      
+      // Update the local database record with alumne_id if provided
+      const updatePayload: { updated_at: string; alumne_id?: string | null } = {
+        updated_at: workerResult.updatedAt,
+      }
+      if (alumneId !== undefined) {
+        updatePayload.alumne_id = alumneId || null
+      }
 
-    if (updateErr) {
-      console.error("DB pointer update error:", updateErr)
-      await supabaseAdmin.storage
+      const { data: updatedRow, error: updateErr } = await supabase
         .from("transcriptions")
-        .remove([newPath])
-        .catch(() => {})
-      return jsonError("Failed to update transcription record.", { status: 500, headers: CACHE_HEADERS.NO_CACHE })
+        .update(updatePayload)
+        .eq("id", id)
+        .eq("user_id", user.id)
+        .select("id, audio_id, json_path, updated_at, alumne_id")
+        .single()
+
+      if (updateErr) {
+        console.error("DB update error:", updateErr)
+        return jsonError("Failed to update transcription record.", { status: 500, headers: CACHE_HEADERS.NO_CACHE })
+      }
+
+      return jsonOk({
+        success: true,
+        message: "Transcription updated successfully",
+        transcription: {
+          id,
+          audioId: transcription.audio_id,
+          jsonPath: workerResult.storagePath,
+          originalText: undefined,
+          editedText: editedText,
+          segments: editedSegments ?? [],
+          speakers: speakers ?? [],
+          alumneId: updatedRow.alumne_id ?? null,
+          updatedAt: workerResult.updatedAt,
+        },
+      }, { headers: CACHE_HEADERS.NO_CACHE })
+
+    } catch (error) {
+      console.error('Worker request failed:', error)
+      return jsonError("Failed to communicate with transcription service", { status: 502, headers: CACHE_HEADERS.NO_CACHE })
     }
 
-    if (oldPath && oldPath !== newPath) {
-      await supabaseAdmin.storage
-        .from("transcriptions")
-        .remove([oldPath])
-        .catch(() => {})
-    }
-
-    return jsonOk({
-      success: true,
-      message: "Transcription updated successfully",
-      transcription: {
-        id,
-        audioId: transcription.audio_id,
-        jsonPath: newPath,
-        originalText: undefined,
-        editedText: updatedJsonData.text,
-        segments: updatedJsonData.segments ?? [],
-        speakers: updatedJsonData.speakers ?? [],
-        alumneId: updatedRow.alumne_id ?? null,
-        updatedAt: updatedJsonData.updated_at,
-      },
-    }, { headers: CACHE_HEADERS.NO_CACHE })
   } catch (error) {
     console.error("[PATCH] Unexpected error:", error)
     return jsonError("Failed to update transcription", { status: 500, headers: CACHE_HEADERS.NO_CACHE })
