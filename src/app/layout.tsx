@@ -24,10 +24,10 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://transcriu.app"),
   title: {
-    default: "Transcriu – Transcripció d'Àudio amb IA",
+    default: "Transcriu – Plataforma de Transcripció per a Logopedes",
     template: "%s | Transcriu",
   },
-  description: "Transcriu àudios i sessions de logopèdia de forma ràpida i precisa amb IA. Comparteix amb el teu equip i estalvia temps.",
+  description: "Plataforma professional de transcripció per a logopedes. Documenta sessions de teràpia del llenguatge amb alta precisió en català. Comparteix amb el teu equip i estalvia temps.",
   keywords: [
     "transcripció",
     "àudio",
@@ -48,8 +48,8 @@ export const metadata: Metadata = {
     shortcut: "/logo.png",
   },
   openGraph: {
-    title: "Transcriu – Transcripció d'Àudio amb IA",
-    description: "Transcriu àudios i sessions de logopèdia de forma ràpida i precisa. Pla individual i grupal.",
+    title: "Transcriu – Plataforma de Transcripció per a Logopedes",
+    description: "Plataforma professional per a logopedes. Documenta sessions de teràpia del llenguatge amb alta precisió en català.",
     url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://transcriu.com",
     siteName: "Transcriu",
     locale: "ca_ES",
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
         url: "/window.svg",
         width: 1200,
         height: 630,
-        alt: "Transcriu – Transcripció d'Àudio",
+        alt: "Transcriu – Plataforma per a Logopedes",
       },
     ],
   },
