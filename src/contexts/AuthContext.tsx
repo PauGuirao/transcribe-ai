@@ -93,7 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const reqPromise = (async () => {
       try {
-        const membersResponse = await fetch("/api/organization/members");
+        const membersResponse = await fetch("/api/organization/members", { cache: 'no-store' });
         if (membersResponse.ok) {
           const membersData = await membersResponse.json();
           setOrganizationMembers(membersData.members);

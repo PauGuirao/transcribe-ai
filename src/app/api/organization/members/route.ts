@@ -40,7 +40,16 @@ export async function GET(request: NextRequest) {
       currentUserRole: userOrgData.memberRole
     };
 
-    return createCachedResponse(responseData, 'SHORT');
+    // Return a strictly private, non-cacheable response to avoid cross-user CDN caching
+    return NextResponse.json(responseData, {
+      status: 200,
+      headers: {
+        'Cache-Control': 'private, no-store, no-cache, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        'Vary': 'Cookie, Authorization'
+      }
+    });
   } catch (error) {
     console.error('Error fetching organization members:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
