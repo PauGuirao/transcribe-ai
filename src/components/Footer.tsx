@@ -162,7 +162,7 @@ export function Footer() {
                 className="text-gray-600 hover:text-gray-900 transition-colors text-sm flex items-center"
               >
                 <Mail className="h-4 w-4 mr-1" />
-                ajuda@transcriu.com
+                guiraocastells@gmail.com
               </a>
             </div>
           {/* Rating/Review Section */}

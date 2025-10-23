@@ -26,8 +26,8 @@ interface BlogClientProps {
 export default function BlogClient({ blogPosts }: BlogClientProps) {
   const handleSubmitArticle = () => {
     const subject = encodeURIComponent("Proposta d'article per al blog");
-    const body = encodeURIComponent("Hola,\n\nVoldria proposar un article per al vostre blog. Aquí teniu els detalls:\n\nTítol: [Títol del vostre article]\nResum: [Breu descripció del contingut]\n\nGràcies!");
-    window.location.href = `mailto:info@transcriu.com?subject=${subject}&body=${body}`;
+    const body = encodeURIComponent("Hola,\n\nVoldria proposar un article per al vostre blog. Aquí teniu els detalls:\n\nTítol: [Títol del vostre article]\nArticle: [descripció del contingut]\n\nGràcies!");
+    window.location.href = `mailto:guiraocastells@gmail.com?subject=${subject}&body=${body}`;
   };
 
   return (
