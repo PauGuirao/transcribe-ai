@@ -946,7 +946,7 @@ const LibraryPage = React.memo(function LibraryPage() {
 
       {/* Enhanced Edit Panel Modal */}
       <Sheet open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <SheetContent className="sm:max-w-md">
+        <SheetContent className="sm:max-w-md overflow-y-auto">
           <SheetHeader className="space-y-4 pt-6 pb-1 px-5">
             <div className="flex items-center gap-3">
               <div>
