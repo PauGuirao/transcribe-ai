@@ -224,18 +224,20 @@ const ProfilesPage = React.memo(function ProfilesPage() {
       })
 
       if (res.status === 304 && cached) {
+        console.log("Using cached data");
         setTranscriptions(cached.data.transcriptions || [])
         setTranscriptionsLoading(false)
         return
       }
 
       if (!res.ok) {
+        console.log("Not ok");
         const data = await res.json().catch(() => ({}))
         throw new Error(data?.error || 'No s\'han pogut carregar les transcripcions')
       }
-
-      const data = await res.json()
-      setTranscriptions(data.transcriptions || [])
+      const data = await res.json();
+      setTranscriptions(data.data.transcriptions || []);
+      console.log("Transcriptions:", data.data.transcriptions);
       const etag = res.headers.get('ETag') || undefined
       if (etag) {
         try {
@@ -246,6 +248,7 @@ const ProfilesPage = React.memo(function ProfilesPage() {
         } catch {}
       }
     } catch (err) {
+      console.log("Error:", err);
       if (!cached) {
         setTranscriptionsError(err instanceof Error ? err.message : 'No s\'han pogut carregar les transcripcions')
         setTranscriptions([])

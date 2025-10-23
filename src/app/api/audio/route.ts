@@ -22,17 +22,28 @@ export async function GET(request: NextRequest) {
       return jsonError("Authentication required. Please sign in.", { status: 401 });
     }
 
-    // Compute a simple cache key based on latest updated_at of user audios
-    // This allows fast 304 when nothing changed
-    const latestUpdatedRes = await supabase
-      .from("audios")
-      .select("updated_at")
-      .eq("user_id", user.id)
-      .order("updated_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+    // Compute a cache key based on latest updated_at across audios and transcriptions
+    const [latestAudioRes, latestTransRes] = await Promise.all([
+      supabase
+        .from("audios")
+        .select("updated_at")
+        .eq("user_id", user.id)
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from("transcriptions")
+        .select("updated_at")
+        .eq("user_id", user.id)
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+    ]);
 
-    const latestUpdatedAt = latestUpdatedRes.data?.updated_at || "0";
+    const audioLatest = latestAudioRes.data?.updated_at || "0";
+    const transLatest = latestTransRes.data?.updated_at || "0";
+    const latestUpdatedAt =
+      new Date(transLatest) > new Date(audioLatest) ? transLatest : audioLatest;
     const weakEtag = `W/"audios-${user.id}-${latestUpdatedAt}-${page}-${limit}-${search}-${orderBy}-${orderDirection}"`;
 
     const ifNoneMatch = request.headers.get("if-none-match");

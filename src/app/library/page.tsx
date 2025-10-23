@@ -228,15 +228,6 @@ const LibraryPage = React.memo(function LibraryPage() {
                               <Download className="h-4 w-4 mr-2" />
                               Descargar Word
                             </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                router.push(`/annotate?audioId=${file.id}`);
-                              }}
-                            >
-                              <PenTool className="h-4 w-4 mr-2" />
-                              Anotar
-                            </DropdownMenuItem>
                           </>
                         )}
                         <DropdownMenuItem
@@ -436,6 +427,10 @@ const LibraryPage = React.memo(function LibraryPage() {
             }
           : file
       ));
+      // Invalidate library cache to ensure fresh data on next visit
+      if (typeof window !== "undefined") {
+        sessionStorage.removeItem("library_audio_cache");
+      }
     } catch (error) {
       setAlumnesError(error instanceof Error ? error.message : 'No se pudo asignar el alumno');
       // Revert selection on error
@@ -658,15 +653,6 @@ const LibraryPage = React.memo(function LibraryPage() {
                                 <Download className="h-4 w-4 mr-2" />
                                 Descargar Word
                               </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  router.push(`/annotate?audioId=${file.id}`);
-                                }}
-                              >
-                                <PenTool className="h-4 w-4 mr-2" />
-                                Anotar
-                              </DropdownMenuItem>
                             </>
                           )}
                           <DropdownMenuItem
@@ -791,20 +777,6 @@ const LibraryPage = React.memo(function LibraryPage() {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              {file.status === "completed" && (
-                <Button
-                  variant="ghost"
-                  className="flex-1 text-xs h-12 rounded-none gap-2 text-primary hover:bg-primary/10"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    router.push(`/annotate?audioId=${file.id}`);
-                  }}
-                  title="Abrir en modo anotación"
-                >
-                  <PenTool className="h-4 w-4" />
-                  <span>Anotar</span>
-                </Button>
-              )}
 
               <Button
                 variant="ghost"
