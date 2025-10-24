@@ -22,7 +22,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://transcriu.app"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transcriu.com"),
   title: {
     default: "Transcriu – Plataforma de Transcripció per a Logopedes",
     template: "%s | Transcriu",

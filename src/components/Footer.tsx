@@ -158,7 +158,7 @@ export function Footer() {
                 © 2025 Transcriu — Tots els drets reservats
               </p>
               <a 
-                href="mailto:hola@transcriu.app" 
+                href="mailto:guiraocastells@gmail.com" 
                 className="text-gray-600 hover:text-gray-900 transition-colors text-sm flex items-center"
               >
                 <Mail className="h-4 w-4 mr-1" />

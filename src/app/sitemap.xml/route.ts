@@ -3,7 +3,7 @@ import landingsData from '../logopedia/landings.json';
 import { getAllBlogSlugs } from '../../lib/mdx';
 
 export async function GET() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://transcriu.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.transcriu.com';
   
   // Static pages
   const staticPages = [

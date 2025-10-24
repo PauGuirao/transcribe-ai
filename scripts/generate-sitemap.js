@@ -21,7 +21,7 @@ const getBlogSlugs = () => {
   }
 };
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://transcriu.com';
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.transcriu.com';
 
 // Static pages
 const staticPages = [

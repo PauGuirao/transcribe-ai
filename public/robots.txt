@@ -15,7 +15,7 @@ Disallow: /group-invite/
 Allow: /logopedia/
 
 # Sitemap
-Sitemap: https://transcriu.com/sitemap.xml
+Sitemap: https://www.transcriu.com/sitemap.xml
 
 # Crawl-delay for respectful crawling
 Crawl-delay: 1
