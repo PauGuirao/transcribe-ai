@@ -7,22 +7,9 @@ type PlanKey = 'free' | 'paid' | 'group'
 
 const plans: PricingPlan[] = [
   {
-    key: 'free',
-    name: 'Gratuït',
-    price: '0€',
-    description: 'Perfecte per començar amb Transcriu.',
-    features: [
-      "5 transcripcions gratuïtes",
-      "Models optimitzats per català",
-      "Editor bàsic",
-      "Suport per email",
-    ],
-    highlighted: false,
-  },
-  {
     key: 'paid',
     name: 'Pro',
-    price: '10€',
+    price: '7€',
     description: "Transcripcions il·limitades per a professionals.",
     features: [
       "Transcripcions il·limitades",
@@ -92,7 +79,7 @@ export default function PaymentPage() {
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-3 justify-items-center max-w-6xl mx-auto">
+        <div className="grid gap-6 md:grid-cols-2 justify-items-center max-w-3xl mx-auto">
           {plans.map((plan) => (
             <PricingCard
               key={plan.key}

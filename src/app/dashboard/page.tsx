@@ -9,7 +9,7 @@ import { Mic, PencilLine, Library, ArrowRight } from 'lucide-react';
 const DashboardPage = React.memo(function DashboardPage() {
   const tools = [
     { title: 'Transcripció', desc: 'Converteix el teu àudio a text amb IA', href: '/transcribe', Icon: Mic },
-    { title: 'Anotació', desc: 'Edita, marca i organitza la transcripció', href: '/annotate', Icon: PencilLine },
+    { title: 'Alumnes', desc: 'Edita els perfils dels teus alumnes', href: '/profiles', Icon: PencilLine },
     { title: 'Biblioteca', desc: 'Gestiona tots els teus àudios i transcripcions', href: '/library', Icon: Library },
   ] as const;
 

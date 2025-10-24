@@ -72,7 +72,7 @@ export default function Navbar() {
           <Button
             asChild
             size="sm"
-            className="gap-2 rounded-sm bg-primary text-primary-foreground hover:bg-primary/90"
+            className="gap-2 rounded-sm bg-primary py-5 text-primary-foreground hover:bg-primary/90"
           >
             <Link href="/payment">
               <Sparkles className="h-4 w-4" />

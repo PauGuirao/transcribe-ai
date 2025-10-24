@@ -12,22 +12,9 @@ type PricingProps = {
 
 const initialPlans: PricingPlan[] = [
   {
-    key: "free",
-    name: "Gratuït",
-    price: "0€",
-    description: "Perfecte per començar amb Transcriu.",
-    features: [
-      "5 transcripcions gratuïtes",
-      "Models optimitzats per català",
-      "Editor bàsic",
-      "Suport per email",
-    ],
-    highlighted: false,
-  },
-  {
     key: "paid",
     name: "Individual",
-    price: "10€",
+    price: "7€",
     description: "Transcripcions il·limitades per a professionals.",
     features: [
       "Transcripcions il·limitades",
@@ -68,7 +55,7 @@ export function Pricing({ authLoading, loading, onPrimaryAction, onContactClick 
         </p>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
         {initialPlans.map((plan) => (
           <PricingCard
             key={plan.key}

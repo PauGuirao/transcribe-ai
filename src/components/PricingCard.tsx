@@ -30,10 +30,10 @@ export function PricingCard({ plan, authLoading, loading, onPrimaryAction, onCon
   const [showTooltip, setShowTooltip] = useState(false);
 
   const calculatePricePerUser = (N: number) => {
-    if (N <= 0) return 10;
-    const base = 10; // €
-    const minFraction = 0.65; // minimum = 6.5 €
-    const discountFraction = 1 - minFraction; // 0.35
+    if (N <= 0) return 7;
+    const base = 7; // €
+    const minFraction = 0.45; // minimum = 4.5 €
+    const discountFraction = 1 - minFraction; // 0.25
     const rate = 0.02; // speed of discount curve
     return base * (minFraction + discountFraction * Math.exp(-rate * (N - 1)));
   };

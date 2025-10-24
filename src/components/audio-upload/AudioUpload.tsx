@@ -10,6 +10,9 @@ import { Badge } from "@/components/ui/badge";
 import { UploadProgress, AudioUploadResult, AudioUploadProps } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
 import { trackFileRejections } from "@/lib/failed-upload-tracker";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import Link from "next/link";
+import UpgradePopup from "@/components/UpgradePopup";
 
 const ACCEPTED_AUDIO_TYPES = {
   "audio/mpeg": [".mp3"],
@@ -36,7 +39,8 @@ export function AudioUpload({
     null
   );
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-  const { user, session } = useAuth();
+  const [isUpgradeDialogOpen, setIsUpgradeDialogOpen] = useState(false);
+  const { user, session, planType } = useAuth();
   const uploadFile = async (file: File) => {
     try {
       setUploadProgress({ progress: 0, status: "uploading" });
@@ -134,6 +138,10 @@ export function AudioUpload({
   };
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
+    if (planType === 'free') {
+      setIsUpgradeDialogOpen(true);
+      return;
+    }
     const file = acceptedFiles[0];
     if (file) {
       // Clean previous state when starting a new upload
@@ -144,7 +152,7 @@ export function AudioUpload({
       setUploadedFiles([file]);
       uploadFile(file);
     }
-  }, []);
+  }, [planType]);
 
   const { getRootProps, getInputProps, isDragActive, fileRejections } =
     useDropzone({
@@ -225,7 +233,18 @@ export function AudioUpload({
   return (
     <div className="space-y-3">
       <div className={variant === "minimal" ? "p-0" : "p-3"}>
-        <div {...getRootProps()} className={dropzoneClassName}>
+        <div
+          {...getRootProps({
+            onClick: (e) => {
+              if (planType === 'free') {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsUpgradeDialogOpen(true);
+              }
+            },
+          })}
+          className={dropzoneClassName}
+        >
           <input {...getInputProps()} />
           <div className="flex flex-col items-center text-center">
             <div className={iconWrapperClassName}>
@@ -344,6 +363,12 @@ export function AudioUpload({
           </CardContent>
         </Card>
       )}
+
+      {/* Upgrade Popup for free plan */}
+      <UpgradePopup
+        isOpen={isUpgradeDialogOpen}
+        onClose={() => setIsUpgradeDialogOpen(false)}
+      />
     </div>
   );
 }

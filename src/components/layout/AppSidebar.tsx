@@ -12,6 +12,7 @@ import { AudioUploadResult } from "@/types";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
+import Link from "next/link";
 
 interface AppSidebarProps {
   selectedAudioId?: string;
@@ -152,7 +153,16 @@ export default function AppSidebar({ selectedAudioId, onAudioSelect, onUploadCom
               </Badge>
             </div>
           </div>
-        </div>
+          </div>
+          {/* Upgrade prompt for free plan */}
+          {planType === 'free' && (
+            <p className="mt-2 text-sm text-gray-700 text-center">
+              Vols millorar el teu pla?{' '}
+              <Link href="/payment" className="text-blue-600 hover:text-blue-700 underline">
+                Millora aquí
+              </Link>
+            </p>
+          )}
         <div className="rounded-lg border bg-white p-3 hidden">
           <div>
             <p className="text-xs font-bold uppercase tracking-wide text-foreground">Transcripcions disponibles</p>

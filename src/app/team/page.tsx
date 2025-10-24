@@ -104,12 +104,8 @@ const TeamPage = React.memo(function TeamPage() {
 
   // Pricing helper: approximate price per user with volume discount
   const calculatePricePerUser = (N: number) => {
-    if (N <= 0) return 10;
-    const base = 10; // €
-    const minFraction = 0.65; // minimum = 6.5 €
-    const discountFraction = 1 - minFraction; // 0.35
-    const rate = 0.02; // speed of discount curve
-    return base * (minFraction + discountFraction * Math.exp(-rate * (N - 1)));
+    // Start price is €7 per user (flat)
+    return 7;
   };
 
   const handleAddMembersClick = () => {
