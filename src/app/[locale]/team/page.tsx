@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { Link } from "@/i18n/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { Users, Mail, Crown, User, Loader2, AlertCircle, UserPlus, MoreHorizontal } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -58,14 +59,14 @@ interface ApiResponse {
 }
 
 const TeamPage = React.memo(function TeamPage() {
-  const { 
-    user, 
-    loading: authLoading, 
-    organization, 
-    organizationMembers, 
+  const {
+    user,
+    loading: authLoading,
+    organization,
+    organizationMembers,
     currentUserRole,
     planType,
-    refreshOrganizationData 
+    refreshOrganizationData
   } = useAuth();
   const [data, setData] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -147,7 +148,7 @@ const TeamPage = React.memo(function TeamPage() {
 
   const handleRemoveConfirm = async () => {
     if (!memberToRemove) return;
-    
+
     setIsRemoving(true);
     try {
       const response = await fetch('/api/organization/members/remove', {
@@ -178,7 +179,7 @@ const TeamPage = React.memo(function TeamPage() {
 
       // Refresh organization data in the background
       refreshOrganizationData();
-      
+
       // Close dialog and reset state
       setIsRemoveDialogOpen(false);
       setMemberToRemove(null);
@@ -200,7 +201,7 @@ const TeamPage = React.memo(function TeamPage() {
     const urlParams = new URLSearchParams(window.location.search);
     const showWelcome = urlParams.get('welcome');
     const orgName = urlParams.get('org');
-    
+
     if (showWelcome === 'true' && orgName && organization) {
       setShowWelcomePopup(true);
       // Clean up URL parameters
@@ -354,7 +355,7 @@ const TeamPage = React.memo(function TeamPage() {
               No perteneces a ninguna organización actualmente.
             </p>
             <Button asChild>
-              <a href="/organization">Configurar organización</a>
+              <Link href="/organization">Configurar organización</Link>
             </Button>
           </div>
         </div>
@@ -427,7 +428,7 @@ const TeamPage = React.memo(function TeamPage() {
               </div>
               {/* Only show invite button for admin/owner roles */}
               {data.currentUserRole && (data.currentUserRole === 'admin' || data.currentUserRole === 'owner') ? (
-                <Button 
+                <Button
                   onClick={handleInviteClick}
                   className="flex items-center gap-2"
                 >
@@ -435,7 +436,7 @@ const TeamPage = React.memo(function TeamPage() {
                   Convidar
                 </Button>
               ) : (
-              <div className="h-10" />
+                <div className="h-10" />
               )}
             </div>
 
@@ -522,7 +523,7 @@ const TeamPage = React.memo(function TeamPage() {
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                  <DropdownMenuItem 
+                                  <DropdownMenuItem
                                     className="text-destructive"
                                     onClick={() => handleRemoveClick(member)}
                                   >
@@ -593,7 +594,7 @@ const TeamPage = React.memo(function TeamPage() {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
-                                <DropdownMenuItem 
+                                <DropdownMenuItem
                                   className="text-destructive"
                                   onClick={() => handleRemoveClick(member)}
                                 >
@@ -618,16 +619,16 @@ const TeamPage = React.memo(function TeamPage() {
               </div>
             )}
           </div>
-          
+
         )}
       </div>
-      
-      <InviteModal 
+
+      <InviteModal
         isOpen={isInviteModalOpen}
         onClose={() => setIsInviteModalOpen(false)}
       />
-      
-      <UpgradeModal 
+
+      <UpgradeModal
         isOpen={isUpgradeModalOpen}
         onClose={() => setIsUpgradeModalOpen(false)}
       />
@@ -716,7 +717,7 @@ const TeamPage = React.memo(function TeamPage() {
                     authLoading={false}
                     loading={isGroupUpgradeLoading}
                     onPrimaryAction={(opts) => handleSelectGroupUsers(opts?.users)}
-                    onContactClick={() => {}}
+                    onContactClick={() => { }}
                     orgCallsPrimaryAction={true}
                     initialUsers={selectedGroupUsers}
                     onUsersChange={setSelectedGroupUsers}
@@ -731,7 +732,7 @@ const TeamPage = React.memo(function TeamPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
+
       <Dialog open={isLimitDialogOpen} onOpenChange={setIsLimitDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -751,20 +752,20 @@ const TeamPage = React.memo(function TeamPage() {
           <DialogHeader>
             <DialogTitle>Remove Team Member</DialogTitle>
             <DialogDescription>
-              Are you sure you want to remove {memberToRemove?.profiles.full_name || memberToRemove?.profiles.email} from the team? 
+              Are you sure you want to remove {memberToRemove?.profiles.full_name || memberToRemove?.profiles.email} from the team?
               They will be moved to their own free organization and will lose access to this team's resources.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={handleRemoveCancel}
               disabled={isRemoving}
             >
               Cancel
             </Button>
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               onClick={handleRemoveConfirm}
               disabled={isRemoving}
             >
@@ -780,7 +781,7 @@ const TeamPage = React.memo(function TeamPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
+
       {/* Welcome Popup */}
       <WelcomePopup
         isOpen={showWelcomePopup}

@@ -1,18 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from 'next-intl';
 import { Menu, X } from "lucide-react";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 interface NavbarProps {
   onContactClick?: () => void;
 }
 
 export function Navbar({ onContactClick }: NavbarProps) {
+  const t = useTranslations('navbar');
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -55,56 +58,56 @@ export function Navbar({ onContactClick }: NavbarProps) {
   return (
     <header className="sticky top-2 z-40 backdrop-blur-sm">
       <div className="md:px-35 px-2">
-        <div className={`mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-3 relative transition-all duration-300 ${
-          isScrolled 
-            ? 'bg-white/95 border border-gray-300 shadow-sm rounded-xl mt-2' 
-            : 'bg-transparent border-transparent'
-        }`}>
+        <div className={`mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-3 relative transition-all duration-300 ${isScrolled
+          ? 'bg-white/95 border border-gray-300 shadow-sm rounded-xl mt-2'
+          : 'bg-transparent border-transparent'
+          }`}>
           {/* Logo - Always on the left */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
-              <Image 
-                src="/logo3.png" 
-                alt="Transcriu Logo" 
-                width={32} 
-                height={32} 
+              <Image
+                src="/logo3.png"
+                alt="Transcriu Logo"
+                width={32}
+                height={32}
                 className="rounded-lg"
               />
               <h1 className="text-2xl font-bold text-gray-900">transcriu</h1>
             </Link>
           </div>
-          
+
           {/* Desktop Navigation - Centered */}
           <nav className="hidden md:flex items-center space-x-8 absolute left-1/2 transform -translate-x-1/2">
-            <Link 
+            <Link
               href="/blog"
               className="text-md text-gray-600 hover:text-gray-900 transition-all duration-300 cursor-pointer px-4 py-2 rounded-lg hover:bg-gray-50 hover:scale-105 transform"
             >
-              Blog
+              {t('blog')}
             </Link>
-            <button 
+            <button
               onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
               className="text-md text-gray-600 hover:text-gray-900 transition-all duration-300 cursor-pointer px-4 py-2 rounded-lg hover:bg-gray-50 hover:scale-105 transform"
             >
-              Preus
+              {t('pricing')}
             </button>
-            <button 
+            <button
               onClick={handleContactClick}
               className="text-md text-gray-600 hover:text-gray-900 transition-all duration-300 cursor-pointer px-4 py-2 rounded-lg hover:bg-gray-50 hover:scale-105 transform"
             >
-              Contacte
+              {t('contact')}
             </button>
           </nav>
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-3">
+            <LanguageSwitcher />
             {user ? (
               <Button variant="ghost" onClick={() => router.push("/dashboard")} className="text-sm h-9 px-4 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border border-blue-200 hover:border-blue-300">
-                Anar al panell
+                {t('goToDashboard')}
               </Button>
             ) : (
               <Button asChild variant="ghost" className="text-sm h-9 px-4 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border border-blue-200 hover:border-blue-300">
-                <Link href="/auth/signin">Inicia sessió</Link>
+                <Link href="/auth/signin">{t('signIn')}</Link>
               </Button>
             )}
             <Button
@@ -115,12 +118,12 @@ export function Navbar({ onContactClick }: NavbarProps) {
               {authLoading || loading ? (
                 <>
                   <span className="mr-2 h-4 w-4 animate-spin">⏳</span>
-                  Preparant...
+                  {t('preparing')}
                 </>
               ) : user ? (
-                "Obrir Transcriu"
+                t('openTranscriu')
               ) : (
-                "Comença"
+                t('start')
               )}
             </Button>
           </div>
@@ -144,12 +147,13 @@ export function Navbar({ onContactClick }: NavbarProps) {
         <div className="border-b md:hidden bg-white/95 backdrop-blur-sm border-gray-200 shadow-sm">
           <div className="mx-auto max-w-7xl px-6 py-4">
             <nav className="flex flex-col space-y-3">
+              <LanguageSwitcher />
               <Link
                 href="/blog"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="text-gray-600 hover:text-gray-900 text-left py-2 px-2 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                Blog
+                {t('blog')}
               </Link>
               <button
                 onClick={() => {
@@ -158,13 +162,13 @@ export function Navbar({ onContactClick }: NavbarProps) {
                 }}
                 className="text-gray-600 hover:text-gray-900 text-left py-2 px-2 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                Preus
+                {t('pricing')}
               </button>
               <button
                 onClick={handleContactClick}
                 className="text-gray-600 hover:text-gray-900 text-left py-2 px-2 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                Contacte
+                {t('contact')}
               </button>
               {!user && (
                 <div className="flex flex-col space-y-2 pt-2">
@@ -177,7 +181,7 @@ export function Navbar({ onContactClick }: NavbarProps) {
                     disabled={loading || authLoading}
                     className="justify-start text-blue-600 hover:text-blue-700 hover:bg-blue-50 h-10"
                   >
-                    Inicia sessió
+                    {t('signIn')}
                   </Button>
                   <Button
                     onClick={() => {
@@ -187,7 +191,7 @@ export function Navbar({ onContactClick }: NavbarProps) {
                     disabled={loading || authLoading}
                     className="bg-blue-500 hover:bg-blue-600 text-white justify-start h-10"
                   >
-                    Comença!
+                    {t('start')}!
                   </Button>
                 </div>
               )}

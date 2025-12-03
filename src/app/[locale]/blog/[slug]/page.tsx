@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import BlogPostClient from "./blog-post-client";
-import { getBlogPostBySlug, getAllBlogSlugs } from "../../../lib/mdx";
+import { getBlogPostBySlug, getAllBlogSlugs } from "@/lib/mdx";
 
 interface BlogPostPageProps {
   params: {
@@ -17,7 +17,7 @@ async function getBlogPost(slug: string) {
 
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
   const post = await getBlogPost(params.slug);
-  
+
   if (!post) {
     return {
       title: "Article no trobat",

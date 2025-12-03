@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import BlogClient from "./blog-client";
-import { getAllBlogPosts, type BlogPostMetadata } from "../../lib/mdx";
+import { getAllBlogPosts, type BlogPostMetadata } from "../../../lib/mdx";
 
 export const metadata = {
   title: "Blog",
@@ -23,7 +23,7 @@ interface BlogPost {
 export default function BlogPage() {
   // Fetch MDX data on the server side
   const mdxPosts = getAllBlogPosts();
-  
+
   // Convert MDX posts to BlogPost format
   const blogPosts: BlogPost[] = mdxPosts.map((post: BlogPostMetadata, index: number) => ({
     id: (index + 1).toString(),

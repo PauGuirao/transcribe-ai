@@ -1,0 +1,277 @@
+{
+  "hero": {
+    "title": "Transcribe sesiones de logopedia en segundos",
+    "description": "Utiliza una plataforma diseñada para alta precisión. Confiada por profesionales de todos los tamaños para gestionar millones de palabras cada mes.",
+    "preparing": "Preparando...",
+    "goToDashboard": "Ir al panel",
+    "signInWithEmail": "Entra con tu correo",
+    "trustSignals": {
+      "professionals": "Profesionales de confianza",
+      "accuracy": "Precisión media",
+      "timeSaved": "Ahorro por semana"
+    }
+  },
+  "transcriptionExample": {
+    "dropzone": "Arrastra tu archivo de audio aquí",
+    "processing": "Procesando audio...",
+    "filename": "Sesión Pau.mp3",
+    "duration": "Duración",
+    "words": "Palabras",
+    "accuracy": "Precisión",
+    "footer": "Transcripción automática con identificación de interlocutores",
+    "speaker1": "Logopeda",
+    "speaker2": "Paciente",
+    "lines": [
+      {
+        "speaker": "Logopeda",
+        "text": "¡Buenos días María! Hoy trabajaremos con los sonidos de la \"R\". Primero, haremos algunos ejercicios de respiración para preparar la lengua y los labios."
+      },
+      {
+        "speaker": "Paciente",
+        "text": "¡De acuerdo! Ya he estado practicando en casa como me dijiste. Creo que estoy mejorando un poco."
+      },
+      {
+        "speaker": "Logopeda",
+        "text": "¡Perfecto! Eso es muy importante. Ahora intentaremos decir estas palabras: \"rueda\", \"ratón\", \"calle\". Recuerda poner la lengua en la posición que hemos practicado."
+      },
+      {
+        "speaker": "Paciente",
+        "text": "Rueda... ratón... calle. ¿Cómo lo he hecho?"
+      },
+      {
+        "speaker": "Logopeda",
+        "text": "¡Muy bien! Has mejorado mucho. Ahora probaremos con frases más largas. Repite después de mí: \"El ratón corre por la carretera\"."
+      }
+    ]
+  },
+  "howItWorks": {
+    "title": "Transcribe sesiones en 3 pasos sencillos",
+    "description": "Proceso rápido y eficiente para convertir tus sesiones de audio en transcripciones profesionales listas para compartir",
+    "startNow": "Comienza ahora →",
+    "step1": {
+      "number": "01",
+      "title": "Sube el audio",
+      "description": "Carga los archivos de audio de tus sesiones de logopedia desde cualquier dispositivo de forma rápida y segura.",
+      "dropzone": "Arrastra tu archivo de audio aquí",
+      "processing": "Procesando audio..."
+    },
+    "step2": {
+      "number": "02",
+      "title": "Transcribe automáticamente",
+      "description": "Nuestra IA especializada en catalán convierte el audio en texto con alta precisión.",
+      "transcribing": "Transcribiendo audio...",
+      "duration": "Duración",
+      "accuracy": "Precisión"
+    },
+    "step3": {
+      "number": "03",
+      "title": "Exporta y comparte",
+      "description": "Descarga la transcripción en múltiples formatos o compártela directamente con tus colegas.",
+      "exportButton": "Exportar transcripción",
+      "exportPDF": "Exportar como PDF",
+      "exportDOCX": "Exportar como DOCX",
+      "sendGmail": "Enviar por Gmail",
+      "saveDrive": "Guardar en Drive",
+      "clickAny": "Haz clic en cualquier opción para exportar"
+    }
+  },
+  "features": {
+    "title": "Funcionalidades avanzadas para la educación",
+    "description": "Descubre una variedad de funciones avanzadas. Ilimitadas y gratuitas para individuales.",
+    "library": {
+      "title": "Biblioteca de transcripciones",
+      "description": "Organiza y gestiona todas tus transcripciones en un solo lugar. Busca, filtra y accede rápidamente al contenido que necesitas para tus clases.",
+      "label": "Biblioteca",
+      "count": "transcripciones"
+    },
+    "students": {
+      "title": "Gestión de alumnos",
+      "description": "Crea perfiles de alumnos, asigna transcripciones personalizadas y haz un seguimiento de su progreso académico de manera eficiente.",
+      "activeStudents": "Alumnos activos",
+      "count": "estudiantes"
+    },
+    "groups": {
+      "title": "Organización en grupos",
+      "description": "Crea grupos de trabajo, asigna proyectos colaborativos y facilita la comunicación entre los miembros del grupo.",
+      "activeGroups": "Grupos activos",
+      "count": "grupos",
+      "members": "miembros"
+    },
+    "annotations": {
+      "title": "Anotaciones inteligentes",
+      "description": "Añade notas, comentarios y marcas temporales a las transcripciones. Crea material de estudio personalizado y destaca los puntos clave.",
+      "recentAnnotations": "Anotaciones recientes",
+      "count": "notas",
+      "importantConcept": "Concepto importante",
+      "examQuestion": "Pregunta de examen",
+      "pendingTask": "Tarea pendiente"
+    }
+  },
+  "navbar": {
+    "blog": "Blog",
+    "pricing": "Precios",
+    "contact": "Contacto",
+    "goToDashboard": "Ir al panel",
+    "signIn": "Iniciar sesión",
+    "preparing": "Preparando...",
+    "openTranscriu": "Abrir Transcriu",
+    "start": "Comenzar"
+  },
+  "pricing": {
+    "title": "Planes para cada necesidad",
+    "subtitle": "Comienza gratis y escala según tus necesidades profesionales",
+    "mostPopular": "Más Popular",
+    "perMonth": "/mes",
+    "perMonthPerUser": "/mes/usuario",
+    "users": "Usuarios",
+    "loading": "Cargando...",
+    "continue": "Continuar",
+    "contact": "Contactar",
+    "individual": {
+      "name": "Individual",
+      "price": "7€",
+      "description": "Transcripciones ilimitadas para profesionales.",
+      "features": [
+        "Transcripciones ilimitadas",
+        "Modelos avanzados con diarización",
+        "Exportaciones ilimitadas (PDF, DOCX, TXT)",
+        "Editor colaborativo avanzado",
+        "Soporte prioritario"
+      ]
+    },
+    "group": {
+      "name": "Grupal",
+      "price": "Personalizado",
+      "description": "Soluciones escalables para equipos y necesidades personalizadas",
+      "features": [
+        "Usuarios ilimitados para el equipo",
+        "Gestión centralizada de usuarios y permisos",
+        "Soporte dedicado",
+        "Descuentos por volumen",
+        "Funcionalidades personalizadas",
+        "Formación y onboarding para el equipo"
+      ]
+    }
+  },
+  "faq": {
+    "title": "Preguntas Frecuentes",
+    "subtitle": "Todo lo que necesitas saber sobre Transcriu",
+    "questions": [
+      {
+        "question": "¿Cómo funciona la transcripción automática para sesiones de logopedia?",
+        "answer": "Transcriu utiliza inteligencia artificial avanzada especializada en catalán para convertir el audio de tus sesiones de logopedia en texto. El sistema identifica automáticamente diferentes hablantes (logopeda y paciente) y transcribe con alta precisión términos técnicos de logopedia, fonoaudiología y terapia del lenguaje."
+      },
+      {
+        "question": "¿Qué precisión tiene la transcripción en catalán?",
+        "answer": "Nuestra IA está especialmente entrenada para el catalán y consigue una precisión superior al 95% en sesiones de logopedia. El sistema reconoce vocabulario técnico específico de logopedia, variantes dialectales del catalán y adapta la transcripción al contexto clínico."
+      },
+      {
+        "question": "¿Es seguro subir sesiones con datos de pacientes?",
+        "answer": "Sí, cumplimos con el RGPD y la LOPD. Todos los datos se cifran durante la transmisión y almacenamiento. Las transcripciones se procesan en servidores seguros en Europa y puedes eliminar cualquier dato en cualquier momento. Nunca compartimos ni utilizamos tus datos para entrenar modelos."
+      },
+      {
+        "question": "¿Puedo compartir transcripciones con mi equipo u otros profesionales?",
+        "answer": "Sí, Transcriu permite colaboración en tiempo real. Puedes compartir transcripciones con otros logopedas, psicólogos, maestros o profesionales de tu equipo. Cada miembro puede añadir anotaciones, comentarios y editar colaborativamente manteniendo un historial de cambios."
+      },
+      {
+        "question": "¿Qué formatos de audio son compatibles?",
+        "answer": "Aceptamos todos los formatos de audio habituales: MP3, WAV, M4A, OGG, FLAC y más. Puedes subir audios desde tu ordenador, móvil, tablet o directamente desde grabadoras digitales. No hay límite de duración para los audios."
+      },
+      {
+        "question": "¿Cómo puedo exportar las transcripciones?",
+        "answer": "Puedes exportar las transcripciones en múltiples formatos: PDF (para imprimir o archivar), DOCX (para editar en Word), TXT (texto plano) o compartir directamente por correo electrónico. También puedes integrar con Google Drive, Dropbox y otras herramientas de productividad."
+      },
+      {
+        "question": "¿Transcriu funciona offline o necesita conexión a internet?",
+        "answer": "Necesitas conexión a internet para subir los audios y procesarlos. Una vez transcrito, puedes acceder a las transcripciones offline desde la aplicación. Estamos trabajando en una versión con capacidades offline para zonas con conectividad limitada."
+      },
+      {
+        "question": "¿Cuál es el tiempo de procesamiento de una sesión?",
+        "answer": "El tiempo de transcripción es aproximadamente el 20-30% de la duración del audio. Por ejemplo, una sesión de 60 minutos se transcribe en unos 12-18 minutos. Sesiones más cortas se procesan aún más rápido, a menudo en menos de 5 minutos."
+      },
+      {
+        "question": "¿Hay descuentos para centros educativos o clínicas?",
+        "answer": "Sí, ofrecemos planes especiales para equipos, centros educativos, clínicas y organizaciones. Los planes grupales incluyen descuentos por volumen, gestión centralizada de usuarios, facturación única y soporte dedicado. Contáctanos para obtener un presupuesto personalizado."
+      },
+      {
+        "question": "¿Puedo cancelar la suscripción en cualquier momento?",
+        "answer": "Sí, puedes cancelar tu suscripción en cualquier momento desde la configuración de tu cuenta. No hay permanencia ni penalizaciones. Si cancelas, mantendrás acceso hasta el final del período de facturación actual y podrás descargar todas tus transcripciones."
+      }
+    ]
+  },
+  "footer": {
+    "products": {
+      "title": "Productos",
+      "transcription": "Transcripción automática",
+      "editor": "Editor de anotaciones",
+      "library": "Biblioteca de sesiones",
+      "teams": "Gestión de equipos",
+      "dashboard": "Panel de control"
+    },
+    "resources": {
+      "title": "Recursos",
+      "help": "Centro de ayuda",
+      "tutorials": "Tutoriales",
+      "apiDocs": "Documentación API",
+      "blog": "Blog"
+    },
+    "learn": {
+      "title": "Aprende",
+      "gettingStarted": "Guía de inicio",
+      "bestPractices": "Mejores prácticas",
+      "speechTherapy": "Logopedia digital",
+      "webinars": "Webinars"
+    },
+    "company": {
+      "title": "Empresa",
+      "about": "Sobre nosotros",
+      "pricing": "Precios",
+      "contact": "Contacto",
+      "careers": "Trabaja con nosotros"
+    },
+    "legal": {
+      "title": "Legal",
+      "terms": "Términos del servicio",
+      "privacy": "Política de privacidad"
+    },
+    "copyright": "© 2025 Transcriu — Todos los derechos reservados",
+    "rating": "Valorado por profesionales de la logopedia"
+  },
+  "testimonials": {
+    "title": "Qué dicen los profesionales",
+    "subtitle": "Más de 500 logopedas confían en Transcriu para optimizar su documentación clínica",
+    "trustBadge": "⭐⭐⭐⭐⭐ Valoración media de 4.9/5 basada en más de 200 reseñas",
+    "items": [
+      {
+        "name": "María G.",
+        "role": "Logopeda infantil, Barcelona",
+        "text": "Transcriu me ha cambiado la vida profesional. Antes pasaba 2 horas al día escribiendo informes, ahora solo 20 minutos revisando transcripciones. Puedo atender más pacientes y tengo más tiempo para preparar materiales terapéuticos."
+      },
+      {
+        "name": "Jorge P.",
+        "role": "Centro de logopedia, Gracia",
+        "text": "En nuestro centro tenemos 5 logopedas y todos utilizan Transcriu. La calidad de las transcripciones en catalán es excelente y el soporte técnico siempre responde rápido. Totalmente recomendable."
+      },
+      {
+        "name": "Ana M.",
+        "role": "Logopeda especializada en TEA, Sarrià",
+        "text": "Trabajo con niños con TEA y las sesiones son muy dinámicas. Transcriu captura todo lo que pasa y puedo centrarme 100% en el niño sin preocuparme de tomar notas. Los informes para las familias son mucho más completos ahora."
+      },
+      {
+        "name": "David R.",
+        "role": "Logopeda en escuela de educación especial",
+        "text": "Utilizo Transcriu para documentar sesiones con adolescentes. La transcripción automática me ahorra horas de trabajo y los informes son mucho más detallados. Una herramienta imprescindible para mi día a día."
+      },
+      {
+        "name": "Laura S.",
+        "role": "Logopeda infantil, 12 años de experiencia",
+        "text": "Trabajo con niños de 2 a 8 años y Transcriu me ha facilitado mucho la documentación. Ahora me centro 100% en el niño durante la sesión y después reviso la transcripción en 10 minutos. Los padres valoran mucho la calidad de los informes."
+      },
+      {
+        "name": "Carlos M.",
+        "role": "Centro multidisciplinar, Eixample",
+        "text": "En nuestro centro tenemos logopedas, psicólogos y terapeutas ocupacionales. Transcriu facilita mucho la coordinación entre profesionales. La documentación ha mejorado significativamente y las familias lo notan."
+      }
+    ]
+  }
+}

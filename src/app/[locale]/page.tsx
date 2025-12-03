@@ -1,17 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { Hero } from "@/components/Hero";
@@ -20,22 +15,35 @@ import { Features } from "@/components/Features";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { Pricing } from "@/components/Pricing";
-import { CheckCircle2, Loader2 } from "lucide-react";
+import { Testimonials } from "@/components/Testimonials";
+import { FAQ } from "@/components/FAQ";
+import { LandingPageSchemas, defaultFAQs } from "@/components/seo/LandingPageSchemas";
+import { useParams } from "next/navigation";
+import {
+  BrainCircuit,
+  CheckCircle2,
+  Clock3,
+  FileAudio2,
+  Headphones,
+  Loader2,
+  Sparkles,
+  Mic,
+  PenTool,
+  BookOpen,
+  Menu,
+  X,
+} from "lucide-react";
 
-interface ClientLandingProps {
-  landing: {
-    heroTitle: string;
-    heroDescription: string;
-  };
-}
-
-export default function ClientLanding({ landing }: ClientLandingProps) {
+export default function Home() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const params = useParams();
+  const locale = (params?.locale as string) || 'ca';
   const [loading, setLoading] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  // Removed numberOfUsers/showTooltip states (handled inside Pricing)
   const [contactForm, setContactForm] = useState({
     company: "",
     email: "",
@@ -43,6 +51,7 @@ export default function ClientLanding({ landing }: ClientLandingProps) {
     requirements: "",
   });
 
+  // Removed calculatePricePerUser (handled inside Pricing)
   const handlePrimaryAction = async () => {
     if (user) {
       router.push("/dashboard");
@@ -67,8 +76,7 @@ export default function ClientLanding({ landing }: ClientLandingProps) {
           access_key: "d6bbba73-babe-48f3-ae25-6b49b7ada51c",
           name: "Sol·licitud d'empresa",
           email: "hola@transcribeai.app",
-          subject:
-            "[Transcriu Enterprise] Sol·licitud d'informació - Pla Organització",
+          subject: "[Transcriu Enterprise] Sol·licitud d'informació - Pla Organització",
           message: `
 Nova sol·licitud per al pla Organització:
 
@@ -76,13 +84,11 @@ Detalls de l'empresa:
 - Nom de l'empresa: ${contactForm.company}
 - Email de contacte: ${contactForm.email}
 - Nombre d'usuaris esperats: ${contactForm.users}
-- Necessitats específiques del vostre equip: ${
-            contactForm.requirements || "No especificat"
-          }
+- Necessitats específiques del vostre equip: ${contactForm.requirements || 'No especificat'}
 
 ---
 Informació de la sol·licitud:
-- Data: ${new Date().toLocaleString("ca-ES")}
+- Data: ${new Date().toLocaleString('ca-ES')}
 - Tipus: Sol·licitud pla Organització
           `,
         }),
@@ -101,9 +107,7 @@ Informació de la sol·licitud:
       }
     } catch (error) {
       console.error("Error:", error);
-      alert(
-        "Hi ha hagut un error en enviar la teva sol·licitud. Si us plau, torna-ho a intentar."
-      );
+      alert("Hi ha hagut un error en enviar la teva sol·licitud. Si us plau, torna-ho a intentar.");
     } finally {
       setIsSubmitting(false);
     }
@@ -111,16 +115,28 @@ Informació de la sol·licitud:
 
   return (
     <div className="min-h-screen bg-gray-20">
+      {/* JSON-LD Structured Data for SEO */}
+      <LandingPageSchemas faqs={defaultFAQs[locale as keyof typeof defaultFAQs] || defaultFAQs.ca} />
+
       <div id="nav-sentinel" className="h-1" />
       <Navbar onContactClick={() => setIsContactOpen(true)} />
       {/* Main Content */}
       <main className="mx-auto w-full max-w-7xl px-6 pb-24 pt-4">
         {/* Hero Section */}
-        <Hero title={landing.heroTitle} description={landing.heroDescription} />
+        <Hero />
+
         {/* How It Works Section */}
         <HowItWorks />
+
         {/* Features Section */}
         <Features />
+
+        {/* Testimonials Section */}
+        <Testimonials />
+
+        {/* FAQ Section */}
+        <FAQ />
+
         {/* Pricing Section */}
         <Pricing
           authLoading={authLoading}
@@ -129,14 +145,14 @@ Informació de la sol·licitud:
           onContactClick={() => setIsContactOpen(true)}
         />
       </main>
+
       {/* Contact Sales Dialog */}
       <Dialog open={isContactOpen} onOpenChange={setIsContactOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Contacta per a solucions d'empresa</DialogTitle>
             <DialogDescription>
-              Omple aquest formulari i ens posarem en contacte amb tu per
-              discutir les necessitats del teu equip.
+              Omple aquest formulari i ens posarem en contacte amb tu per discutir les necessitats del teu equip.
             </DialogDescription>
           </DialogHeader>
           {isSubmitted ? (
@@ -146,8 +162,7 @@ Informació de la sol·licitud:
                 Sol·licitud enviada correctament!
               </h3>
               <p className="text-gray-600 mb-4">
-                Hem rebut la teva sol·licitud i ens posarem en contacte amb tu
-                aviat per discutir les necessitats del teu equip.
+                Hem rebut la teva sol·licitud i ens posarem en contacte amb tu aviat per discutir les necessitats del teu equip.
               </p>
               <Button
                 onClick={() => {
@@ -162,99 +177,81 @@ Informació de la sol·licitud:
           ) : (
             <div className="space-y-4">
               <div>
-                <label
-                  htmlFor="company"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
+                <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-1">
                   Nom de l'empresa *
                 </label>
                 <Input
                   id="company"
-                  placeholder="Ex: Teide Educació"
                   value={contactForm.company}
-                  onChange={(e) =>
-                    setContactForm({ ...contactForm, company: e.target.value })
-                  }
+                  onChange={(e) => setContactForm({ ...contactForm, company: e.target.value })}
+                  placeholder="La teva empresa"
                   required
                 />
               </div>
               <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                   Email de contacte *
                 </label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="Ex: equip@empresa.cat"
                   value={contactForm.email}
-                  onChange={(e) =>
-                    setContactForm({ ...contactForm, email: e.target.value })
-                  }
+                  onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
+                  placeholder="el.teu.email@empresa.com"
                   required
                 />
               </div>
               <div>
-                <label
-                  htmlFor="users"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Nombre d'usuaris *
+                <label htmlFor="users" className="block text-sm font-medium text-gray-700 mb-1">
+                  Nombre d'usuaris esperats *
                 </label>
                 <Input
                   id="users"
-                  placeholder="Ex: 25"
                   value={contactForm.users}
-                  onChange={(e) =>
-                    setContactForm({ ...contactForm, users: e.target.value })
-                  }
+                  onChange={(e) => setContactForm({ ...contactForm, users: e.target.value })}
+                  placeholder="ex. 10-50 usuaris"
                   required
                 />
               </div>
               <div>
-                <label
-                  htmlFor="requirements"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Necessitats específiques
+                <label htmlFor="requirements" className="block text-sm font-medium text-gray-700 mb-1">
+                  Quines són les necessitats específiques del vostre equip?
                 </label>
                 <Textarea
                   id="requirements"
-                  placeholder="Ex: permisos per coordinadors, exportació a DOCX i signatura SSO amb Entra ID"
                   value={contactForm.requirements}
-                  onChange={(e) =>
-                    setContactForm({
-                      ...contactForm,
-                      requirements: e.target.value,
-                    })
-                  }
-                  rows={4}
+                  onChange={(e) => setContactForm({ ...contactForm, requirements: e.target.value })}
+                  placeholder="Descriu requisits especials que necessiteu..."
+                  rows={5}
                 />
               </div>
-              <DialogFooter>
-                <Button
-                  type="submit"
-                  onClick={handleContactSubmit}
-                  disabled={isSubmitting}
-                  className="bg-blue-500 hover:bg-blue-600 text-white"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Enviant...
-                    </>
-                  ) : (
-                    "Enviar sol·licitud"
-                  )}
-                </Button>
-              </DialogFooter>
             </div>
+          )}
+          {!isSubmitted && (
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsContactOpen(false)}>
+                Cancel·lar
+              </Button>
+              <Button
+                onClick={handleContactSubmit}
+                disabled={!contactForm.company || !contactForm.email || !contactForm.users || isSubmitting}
+                className="bg-blue-500 hover:bg-blue-600 text-white disabled:opacity-50"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Enviant...
+                  </>
+                ) : (
+                  "Enviar sol·licitud"
+                )}
+              </Button>
+            </DialogFooter>
           )}
         </DialogContent>
       </Dialog>
-      
+
+      {/* Footer */}
       <Footer />
     </div>
   );
