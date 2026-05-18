@@ -76,6 +76,16 @@ function AppSidebarInner(_props: AppSidebarProps) {
   const pathname = usePathname();
   const t = useTranslations("dashboard");
   const tNav = useTranslations("dashboard.navbar");
+  const tRoles = useTranslations("team.roles");
+
+  const translateRole = (role?: string) => {
+    if (!role) return "";
+    const key = role.toLowerCase();
+    if (key === "owner" || key === "admin" || key === "member") {
+      return tRoles(key);
+    }
+    return role.charAt(0).toUpperCase() + role.slice(1);
+  };
   const {
     user,
     planType,
@@ -220,9 +230,7 @@ function AppSidebarInner(_props: AppSidebarProps) {
                   <span className="text-[10px] leading-tight text-gray-500">
                     {showOrgSelector
                       ? `${userOrganizations.length} organitzacions`
-                      : currentOrgEntry?.role
-                        ? currentOrgEntry.role.charAt(0).toUpperCase() + currentOrgEntry.role.slice(1)
-                        : ""}
+                      : translateRole(currentOrgEntry?.role)}
                   </span>
                 </div>
                 <ChevronDown className="h-3 w-3 text-gray-400" />
@@ -265,7 +273,7 @@ function AppSidebarInner(_props: AppSidebarProps) {
                             {org.name}
                           </span>
                           <span className="text-[10px] uppercase tracking-wider text-gray-400">
-                            {org.role}
+                            {translateRole(org.role)}
                           </span>
                         </div>
                         {isActive && (

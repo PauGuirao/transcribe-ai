@@ -1,0 +1,53 @@
+# Transcriu
+
+> Transcriu is an AI-powered audio-to-text platform optimized for Spanish, Catalan and English. It transcribes MP3, WAV, M4A and WhatsApp voice notes with 98% accuracy and is purpose-built for speech-language pathologists (logopedes) who need fast, GDPR-compliant transcriptions of clinical sessions, evaluations and reports.
+
+The product is delivered as a multilingual Next.js web app at https://www.transcriu.com with locale prefixes `/ca`, `/es` and `/en`. Default locale for international visitors is Spanish (`/es`). Authenticated app routes (`/dashboard`, `/library`, `/transcribe`, `/settings`, `/team`, `/organization`, `/profiles`, `/transcriptions`, `/annotate`) are excluded from this index — they require a Transcriu account.
+
+## Core pages
+
+- [Home (Catalan)](https://www.transcriu.com/ca): Product landing — hero, how it works, features, testimonials, pricing, FAQ.
+- [Home (Spanish)](https://www.transcriu.com/es): Same landing in Spanish.
+- [Home (English)](https://www.transcriu.com/en): Same landing in English.
+- [Pricing](https://www.transcriu.com/ca/pricing): Plans (free, basic, pro, studio), monthly/yearly billing, per-user team pricing, FAQ.
+- [Features overview](https://www.transcriu.com/ca/features): Index of all product capabilities.
+- [Help & support](https://www.transcriu.com/ca/help): Contact form for support and feedback.
+- [Privacy policy](https://www.transcriu.com/ca/privacy): GDPR-compliant data handling, retention and user rights.
+- [Terms of service](https://www.transcriu.com/ca/terms): Service terms, acceptable use, billing terms.
+
+## Features
+
+- [Automatic transcription](https://www.transcriu.com/ca/features/transcripcion-automatica): 98% accurate AI transcription in Catalan/Spanish/English, MP3/WAV/M4A/OGG support, no length limit.
+- [Speaker diarization](https://www.transcriu.com/ca/features/diarizacion-interlocutores): Automatic speaker identification (therapist vs. patient).
+- [Smart annotations](https://www.transcriu.com/ca/features/anotaciones-inteligentes): Inline highlights, tags and clinical notes on transcripts.
+- [Transcription library](https://www.transcriu.com/ca/features/biblioteca-transcripciones): Searchable archive of all past transcriptions.
+- [Patient management](https://www.transcriu.com/ca/features/gestion-pacientes): Link transcripts to patient profiles, track progression over time.
+- [Collaborative groups](https://www.transcriu.com/ca/features/grupos-colaborativos): Shared organization workspaces for clinic teams.
+- [Export options](https://www.transcriu.com/ca/features/exportar-transcripciones): Export to PDF, DOCX or plain text; copy/share clinically formatted reports.
+
+## Tutorials
+
+- [Tutorials index](https://www.transcriu.com/ca/tutorials): Step-by-step guides for the platform.
+- [Create your first transcription](https://www.transcriu.com/ca/tutorials/ajuda-a-crear-una-transcripcio)
+- [Edit and download a transcription](https://www.transcriu.com/ca/tutorials/com-editar-i-baixar-una-transcripcio)
+- [Paste a transcription into Word](https://www.transcriu.com/ca/tutorials/copiar-la-transcripcio-a-un-word)
+- [Manage students/patients](https://www.transcriu.com/ca/tutorials/gestio-alumnes)
+
+## Blog
+
+- [Blog index](https://www.transcriu.com/ca/blog): Articles on speech therapy, AI transcription and clinical practice.
+- [Complete guide to articulation disorders](https://www.transcriu.com/ca/blog/guia-completa-trastorns-articulacio): Diagnosis, therapy and home exercises for pronunciation problems.
+- [Stuttering and fluency therapy](https://www.transcriu.com/ca/blog/terapia-beguetat-fluidesa-logopedes): Therapy approaches, fluency shaping and stuttering modification for SLPs.
+- [Speech delay in children](https://www.transcriu.com/ca/blog/retard-parla-nens-causes-terapia): Developmental milestones, causes, late talkers and evidence-based intervention.
+
+## Local landings (Catalonia)
+
+City- and specialty-specific landing pages for speech therapists across Catalonia are listed in [the logopedia sitemap](https://www.transcriu.com/sitemap-logopedia.xml). Each page targets transcription needs for a specific city (e.g. Barcelona, Girona, Tarragona, Lleida) and clinical specialty (sessions, evaluations, reports, follow-up, therapy, consultations).
+
+## Machine-readable indexes
+
+- [Sitemap index](https://www.transcriu.com/sitemap-index.xml)
+- [Main sitemap](https://www.transcriu.com/sitemap-main.xml)
+- [Blog sitemap](https://www.transcriu.com/sitemap-blog.xml)
+- [Logopedia sitemap](https://www.transcriu.com/sitemap-logopedia.xml)
+- [robots.txt](https://www.transcriu.com/robots.txt)

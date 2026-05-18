@@ -1,45 +1,43 @@
 /**
- * HreflangTags Component
- * Generates hreflang link tags for multi-language SEO
- * Helps search engines understand language/region variants of your pages
+ * Hreflang helpers
+ * Generate Next.js `alternates` metadata for multi-language SEO with a
+ * self-referencing canonical (each locale canonicalises to itself) and an
+ * `x-default` pointing at the site's primary locale.
  */
 
-export interface HreflangTag {
-  locale: string;
-  url: string;
-}
-
-export interface HreflangTagsProps {
-  tags: HreflangTag[];
-  defaultLocale?: string;
-}
+const DEFAULT_LOCALES = ['ca', 'es', 'en'] as const;
+const DEFAULT_X_DEFAULT_LOCALE = 'es';
 
 /**
- * Generates hreflang metadata for Next.js
+ * Generates hreflang metadata for Next.js with a self-referencing canonical
+ * (i.e. /es/pricing canonicalises to /es/pricing, not to /ca/pricing).
  *
  * @example
- * In your page metadata:
  * export const metadata = {
- *   alternates: generateHreflangAlternates('/pricing', ['ca', 'es', 'en'])
+ *   alternates: generateHreflangAlternates('/pricing', 'ca')
  * }
  */
 export function generateHreflangAlternates(
   path: string,
-  locales: string[],
-  baseUrl: string = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.transcriu.com'
+  currentLocale: string,
+  locales: readonly string[] = DEFAULT_LOCALES,
+  baseUrl: string = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.transcriu.com',
+  xDefaultLocale: string = DEFAULT_X_DEFAULT_LOCALE,
 ) {
-  const languages: Record<string, string> = {};
-  const canonical = locales.includes('ca') ? `${baseUrl}/ca${path}` : `${baseUrl}/${locales[0]}${path}`;
+  const canonicalLocale = locales.includes(currentLocale)
+    ? currentLocale
+    : locales[0];
 
+  const languages: Record<string, string> = {};
   locales.forEach((locale) => {
     languages[locale] = `${baseUrl}/${locale}${path}`;
   });
-
-  // Add x-default for international users
-  languages['x-default'] = canonical;
+  languages['x-default'] = `${baseUrl}/${
+    locales.includes(xDefaultLocale) ? xDefaultLocale : locales[0]
+  }${path}`;
 
   return {
-    canonical,
+    canonical: `${baseUrl}/${canonicalLocale}${path}`,
     languages,
   };
 }
@@ -54,27 +52,31 @@ export const localeMapping = {
 } as const;
 
 /**
- * Generate full hreflang config for a page
+ * Generate full hreflang config for a page.
  *
  * @example
  * export const metadata = {
- *   ...generatePageHreflang({
- *     currentLocale: 'ca',
- *     path: '/pricing',
- *     availableLocales: ['ca', 'es', 'en']
- *   })
+ *   alternates: generatePageHreflang({ currentLocale: 'ca', path: '/pricing' })
  * }
  */
 export function generatePageHreflang({
   currentLocale,
   path,
-  availableLocales,
+  availableLocales = DEFAULT_LOCALES,
   baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.transcriu.com',
+  xDefaultLocale = DEFAULT_X_DEFAULT_LOCALE,
 }: {
   currentLocale: string;
   path: string;
-  availableLocales: string[];
+  availableLocales?: readonly string[];
   baseUrl?: string;
+  xDefaultLocale?: string;
 }) {
-  return generateHreflangAlternates(path, availableLocales, baseUrl);
+  return generateHreflangAlternates(
+    path,
+    currentLocale,
+    availableLocales,
+    baseUrl,
+    xDefaultLocale,
+  );
 }

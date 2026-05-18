@@ -1,7 +1,61 @@
+import type { Metadata } from 'next'
 import AppLayout from '@/components/layout/AppLayout'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { BookOpen, Users, Settings, Play, Clock, ChevronRight, Edit, FileText } from 'lucide-react'
+import { Users, Play, Clock, ChevronRight, Edit, FileText } from 'lucide-react'
 import Link from 'next/link'
+import { generatePageHreflang, localeMapping } from '@/components/seo/HreflangTags'
+
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.transcriu.com'
+
+type LocaleCode = 'ca' | 'es' | 'en'
+
+const tutorialsSeo: Record<LocaleCode, { title: string; description: string }> = {
+  ca: {
+    title: 'Tutorials | Transcriu',
+    description:
+      'Aprèn a treure el màxim partit de Transcriu: crear transcripcions, editar-les i descarregar-les, copiar-les a Word i gestionar alumnes.',
+  },
+  es: {
+    title: 'Tutoriales | Transcriu',
+    description:
+      'Aprende a sacar el máximo partido de Transcriu: crear transcripciones, editarlas y descargarlas, copiarlas a Word y gestionar alumnos.',
+  },
+  en: {
+    title: 'Tutorials | Transcriu',
+    description:
+      'Learn how to get the most out of Transcriu: create transcriptions, edit and download them, paste them into Word and manage students.',
+  },
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  const lc: LocaleCode =
+    locale === 'ca' || locale === 'en' ? locale : 'es'
+  const seo = tutorialsSeo[lc]
+
+  return {
+    title: seo.title,
+    description: seo.description,
+    openGraph: {
+      title: seo.title,
+      description: seo.description,
+      url: `${BASE_URL}/${lc}/tutorials`,
+      siteName: 'Transcriu',
+      locale: localeMapping[lc],
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: seo.title,
+      description: seo.description,
+    },
+    alternates: generatePageHreflang({ currentLocale: lc, path: '/tutorials' }),
+  }
+}
 
   const tutorials = [
     {

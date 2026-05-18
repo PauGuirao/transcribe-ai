@@ -125,6 +125,16 @@
       "pendingTask": "Tasca pendent"
     }
   },
+  "cta": {
+    "badge": "Comença avui",
+    "title": "Estalvia hores en cada sessió",
+    "description": "Uneix-te a més de 1.200 logopedes que ja confien en Transcriu per transcriure, anotar i compartir les seves sessions en minuts.",
+    "primary": "Prova-ho gratis",
+    "secondary": "Registra't amb Google",
+    "preparing": "Preparant...",
+    "goToDashboard": "Anar al panell",
+    "caption": "Gratis per començar · sense targeta · cancel·la quan vulguis"
+  },
   "navbar": {
     "features": "Funcionalitats",
     "seeAllFeatures": "Veure totes les funcionalitats",
@@ -759,5 +769,98 @@
         "text": "Al nostre centre tenim logopedes, psicòlegs i terapeutes ocupacionals. Transcriu facilita molt la coordinació entre professionals. La documentació ha millorat significativament i les famílies ho noten."
       }
     ]
+  },
+  "featuresPage": {
+    "metaTitle": "Totes les funcionalitats",
+    "metaDescription": "Descobreix totes les funcionalitats de Transcriu: transcripció automàtica amb IA, identificació d'interlocutors, anotacions intel·ligents, gestió de pacients i col·laboració en equip.",
+    "hero": {
+      "eyebrow": "Funcionalitats",
+      "title": "Tot el que necessites per a les teves sessions de logopèdia",
+      "description": "Transcripció automàtica amb IA, gestió de pacients i col·laboració en equip — en una sola plataforma pensada per a professionals.",
+      "primaryCta": "Prova-ho gratis",
+      "secondaryCta": "Veure plans"
+    },
+    "stats": {
+      "accuracy": { "value": "98%", "label": "Precisió en català" },
+      "users": { "value": "500+", "label": "Logopedes actius" },
+      "savings": { "value": "5h", "label": "Estalviades cada setmana" },
+      "gdpr": { "value": "RGPD", "label": "Compliment garantit" }
+    },
+    "sections": {
+      "ai": {
+        "eyebrow": "IA i transcripció",
+        "title": "Captura cada sessió amb intel·ligència",
+        "description": "Transcriu, identifica i anota les teves sessions de manera automàtica."
+      },
+      "organization": {
+        "eyebrow": "Organització",
+        "title": "Tota la informació clínica a un clic",
+        "description": "Manté l'historial dels teus pacients ordenat i accessible des de qualsevol dispositiu."
+      },
+      "team": {
+        "eyebrow": "Equip i exportació",
+        "title": "Treballa en equip i comparteix sense fricció",
+        "description": "Col·labora amb el teu centre i exporta els resultats al format que necessitis."
+      }
+    },
+    "items": {
+      "transcripcion-automatica": {
+        "tag": "IA",
+        "title": "Transcripció automàtica",
+        "description": "Converteix àudio a text en segons amb un model entrenat en català, castellà i terminologia clínica.",
+        "bullets": [
+          "98% de precisió en català i castellà",
+          "Reconeix terminologia especialitzada de logopèdia",
+          "Processa hores d'àudio en pocs minuts"
+        ]
+      },
+      "diarizacion-interlocutores": {
+        "tag": "IA",
+        "title": "Identificació d'interlocutors",
+        "description": "Detecta automàticament qui parla a cada moment i organitza la transcripció per veu."
+      },
+      "anotaciones-inteligentes": {
+        "tag": "Editor",
+        "title": "Anotacions intel·ligents",
+        "description": "Afegeix notes, comentaris i marques visuals per destacar el que importa de cada sessió."
+      },
+      "biblioteca-transcripciones": {
+        "tag": "Biblioteca",
+        "title": "Biblioteca de transcripcions",
+        "description": "Totes les sessions organitzades en un sol lloc amb cerca i filtres avançats."
+      },
+      "gestion-pacientes": {
+        "tag": "Pacients",
+        "title": "Gestió de pacients",
+        "description": "Crea perfils complets, assigna sessions i fes seguiment de l'evolució al llarg del temps."
+      },
+      "grupos-colaborativos": {
+        "tag": "Equip",
+        "title": "Grups col·laboratius",
+        "description": "Treballa amb el teu equip amb permisos clars i recursos compartits de manera segura."
+      },
+      "exportar-transcripciones": {
+        "tag": "Exportació",
+        "title": "Exportació flexible",
+        "description": "Exporta a PDF, Word o Google Docs i comparteix amb famílies i col·legues sense esforç."
+      }
+    },
+    "learnMore": "Saber més",
+    "featuredBadge": "Funcionalitat estrella",
+    "proof": {
+      "title": "Confien en nosaltres centenars de logopedes",
+      "subtitle": "Una eina creada amb i per a professionals del llenguatge.",
+      "metrics": [
+        { "value": "4.9/5", "label": "Valoració mitjana" },
+        { "value": "500+", "label": "Professionals actius" },
+        { "value": "10K+", "label": "Sessions transcrites" }
+      ]
+    },
+    "cta": {
+      "title": "Comença a estalviar hores cada setmana",
+      "description": "Prova totes les funcionalitats gratuïtament. Sense targeta de crèdit.",
+      "primary": "Prova-ho gratis",
+      "secondary": "Veure plans"
+    }
   }
 }

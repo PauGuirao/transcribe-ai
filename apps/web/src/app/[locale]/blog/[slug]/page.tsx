@@ -8,6 +8,7 @@ import {
   generateArticleSchema,
   generateBreadcrumbSchema,
 } from "@/components/seo/JsonLd";
+import { generatePageHreflang } from "@/components/seo/HreflangTags";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transcriu.com";
 
@@ -25,6 +26,7 @@ async function getBlogPost(slug: string) {
 
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
   const post = await getBlogPost(params.slug);
+  const locale = params.locale || "ca";
 
   if (!post) {
     return {
@@ -40,6 +42,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       title: post.title,
       description: post.excerpt,
       type: "article",
+      url: `${BASE_URL}/${locale}/blog/${post.slug}`,
       publishedTime: post.createdAt,
       modifiedTime: post.updatedAt,
       authors: [post.author],
@@ -50,6 +53,10 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       title: post.title,
       description: post.excerpt,
     },
+    alternates: generatePageHreflang({
+      currentLocale: locale,
+      path: `/blog/${post.slug}`,
+    }),
   };
 }
 

@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/dialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import { Hero } from "@/components/Hero";
 import { HowItWorks } from "@/components/HowItWorks";
 import { Features } from "@/components/Features";
 import { Footer } from "@/components/Footer";
@@ -25,11 +24,10 @@ import { useStartCheckout } from "@/hooks/useStartCheckout";
 import {
   CheckCircle2,
   Loader2,
-  ChevronDown,
-  ChevronUp,
-  Quote,
-  Sparkles,
+  Plus,
+  Minus,
   ArrowRight,
+  Sparkles,
 } from "lucide-react";
 
 interface H2Section {
@@ -63,6 +61,15 @@ interface ClientFeatureProps {
   };
 }
 
+function SectionBadge({ label }: { label: string }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-3 py-1 text-xs font-medium text-neutral-700 shadow-sm">
+      <span className="inline-flex size-1.5 rounded-full bg-indigo-500" />
+      {label}
+    </span>
+  );
+}
+
 export default function ClientFeature({ feature }: ClientFeatureProps) {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -71,7 +78,7 @@ export default function ClientFeature({ feature }: ClientFeatureProps) {
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+  const [expandedFaq, setExpandedFaq] = useState<number | null>(0);
   const [contactForm, setContactForm] = useState({
     company: "",
     email: "",
@@ -146,278 +153,325 @@ Informació de la sol·licitud:
   };
 
   return (
-    <div className="min-h-screen bg-gray-20">
+    <div className="min-h-screen bg-white">
       <div id="nav-sentinel" className="h-1" />
       <Navbar onContactClick={() => setIsContactOpen(true)} />
 
-      {/* Main Content */}
-      <main className="mx-auto w-full max-w-7xl px-6 pb-24 pt-4">
-        {/* Hero Section with Icon */}
-        {feature.icon ? (
-          <section className="py-2">
-            <div className="max-w-7xl mx-auto md:px-6">
-              <div className="bg-white rounded-xl shadow-lg border border-gray-200 md:p-10 p-6 pb-10">
-                <div className="flex items-start gap-6 mb-8">
-                  <div className="flex-shrink-0 w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center text-4xl md:text-5xl shadow-lg">
-                    {feature.icon}
-                  </div>
-                  <div className="flex-1">
-                    <h1 className="text-3xl md:text-5xl font-semibold tracking-tight text-gray-900 leading-tight mb-4">
-                      {feature.heroTitle}
-                    </h1>
-                    <p className="text-lg text-gray-600 leading-relaxed">
-                      {feature.heroDescription}
-                    </p>
-                  </div>
-                </div>
+      <main>
+        {/* Hero */}
+        <section className="relative isolate overflow-hidden">
+          <div
+            className="pointer-events-none absolute inset-0 -z-10 bg-grid-lines bg-grid-fade"
+            aria-hidden="true"
+          />
 
-                {/* CTA Button */}
-                <div className="max-w-md">
-                  <Button
-                    onClick={handlePrimaryAction}
-                    disabled={authLoading || loading}
-                    size="lg"
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-4 rounded-lg font-semibold text-base transition-all shadow-md hover:shadow-lg"
-                  >
-                    {authLoading || loading ? (
-                      <>
-                        <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                        Preparant...
-                      </>
-                    ) : user ? (
-                      "Comença a utilitzar aquesta funcionalitat →"
-                    ) : (
-                      "Prova gratuïtament →"
-                    )}
-                  </Button>
+          <div className="mx-auto max-w-4xl px-6 pt-20 pb-16 text-center sm:pt-28">
+            {feature.icon && (
+              <div className="mb-8 flex justify-center">
+                <div className="flex size-16 items-center justify-center rounded-2xl border border-neutral-200 bg-white text-4xl shadow-sm">
+                  {feature.icon}
                 </div>
               </div>
+            )}
+            <h1 className="text-4xl font-normal tracking-tight text-neutral-900 sm:text-5xl md:text-6xl">
+              {feature.heroTitle}
+            </h1>
+            <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-neutral-600 sm:text-lg">
+              {feature.heroDescription}
+            </p>
+
+            <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <button
+                onClick={handlePrimaryAction}
+                disabled={authLoading || loading}
+                className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-neutral-900 px-6 text-sm font-medium text-white transition-colors hover:bg-neutral-800 disabled:opacity-60 sm:w-auto"
+              >
+                {authLoading || loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Preparant...
+                  </>
+                ) : user ? (
+                  "Anar al dashboard"
+                ) : (
+                  "Prova gratuïtament"
+                )}
+              </button>
+              <Link
+                href="/features"
+                className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md border border-neutral-300 bg-white px-6 text-sm font-medium text-neutral-900 transition-colors hover:bg-neutral-50 sm:w-auto"
+              >
+                Veure totes les funcionalitats
+              </Link>
             </div>
-          </section>
-        ) : (
-          <Hero
-            title={feature.heroTitle}
-            description={feature.heroDescription}
-          />
-        )}
+          </div>
+        </section>
 
         {/* Content Sections */}
         {feature.h2Sections && feature.h2Sections.length > 0 && (
-          <section className="my-16 space-y-12">
-            {feature.h2Sections.map((section, idx) => (
-              <div
-                key={idx}
-                className="bg-white rounded-xl shadow-lg border border-gray-200 p-8"
-              >
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">
-                  {section.title}
-                </h2>
+          <section className="mx-auto max-w-5xl px-6 py-24">
+            <div className="mx-auto max-w-2xl text-center">
+              <SectionBadge label="Detalls" />
+              <h2 className="mt-4 text-3xl font-normal tracking-tight text-neutral-900 sm:text-4xl">
+                Com funciona aquesta funcionalitat
+              </h2>
+              <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-neutral-600">
+                Tot el que necessites saber per aprofitar-la al màxim.
+              </p>
+            </div>
 
-                {section.content && (
-                  <p className="text-base md:text-lg text-gray-700 leading-relaxed mb-6">
-                    {section.content}
-                  </p>
-                )}
-
-                {section.points && section.points.length > 0 && (
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {section.points.map((point, i) => (
-                      <div
-                        key={i}
-                        className="flex items-start gap-3 p-4 bg-blue-50 rounded-lg border border-blue-100"
-                      >
-                        <CheckCircle2 className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                        <span className="text-gray-700 text-sm">{point}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {section.useCases && section.useCases.length > 0 && (
-                  <div className="mt-6 bg-gradient-to-br from-green-50 to-blue-50 rounded-xl p-6 border border-green-200">
-                    <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2 text-lg">
-                      <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-                        <Sparkles className="h-4 w-4 text-white" />
-                      </div>
-                      Casos d'ús
+            <div className="mt-20 flex flex-col gap-24">
+              {feature.h2Sections.map((section, idx) => (
+                <div
+                  key={idx}
+                  className="grid grid-cols-1 items-start gap-12 md:grid-cols-2"
+                >
+                  <div className={idx % 2 === 1 ? "md:order-2" : ""}>
+                    <SectionBadge label={`0${idx + 1}`} />
+                    <h3 className="mt-4 text-2xl font-normal tracking-tight text-neutral-900 sm:text-3xl">
+                      {section.title}
                     </h3>
-                    <div className="grid md:grid-cols-2 gap-3">
-                      {section.useCases.map((useCase, i) => (
-                        <div
-                          key={i}
-                          className="flex items-start gap-3 p-3 bg-white rounded-lg shadow-sm"
-                        >
-                          <ArrowRight className="h-4 w-4 text-green-600 mt-1 flex-shrink-0" />
-                          <span className="text-gray-700 text-sm">
-                            {useCase}
+                    {section.content && (
+                      <p className="mt-4 text-base leading-relaxed text-neutral-600">
+                        {section.content}
+                      </p>
+                    )}
+                    {section.points && section.points.length > 0 && (
+                      <ul className="mt-6 flex flex-col gap-3 text-sm text-neutral-700">
+                        {section.points.map((point, i) => (
+                          <li key={i} className="flex items-start gap-2">
+                            <svg
+                              className="mt-0.5 size-4 shrink-0 text-emerald-600"
+                              viewBox="0 0 20 20"
+                              fill="none"
+                              aria-hidden="true"
+                            >
+                              <path
+                                d="M5 10.5l3 3 7-7"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                            <span>{point}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+
+                  <div className={idx % 2 === 1 ? "md:order-1" : ""}>
+                    {section.useCases && section.useCases.length > 0 ? (
+                      <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+                        <div className="flex items-center gap-2 border-b border-neutral-100 pb-3">
+                          <Sparkles className="size-4 text-indigo-500" />
+                          <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-500">
+                            Casos d'ús
                           </span>
                         </div>
-                      ))}
-                    </div>
+                        <ul className="mt-4 flex flex-col gap-2.5">
+                          {section.useCases.map((useCase, i) => (
+                            <li
+                              key={i}
+                              className="flex items-start gap-2.5 rounded-lg border border-neutral-200 bg-neutral-50/50 px-3 py-2.5 text-sm text-neutral-700"
+                            >
+                              <ArrowRight className="mt-0.5 size-4 shrink-0 text-neutral-400" />
+                              <span>{useCase}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : (
+                      <div className="rounded-xl border border-neutral-200 bg-neutral-50/50 p-8">
+                        <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-wider text-neutral-500">
+                          <span className="inline-flex size-1.5 rounded-full bg-indigo-500" />
+                          {section.title}
+                        </div>
+                        <div className="mt-6 space-y-3">
+                          <div className="h-2 w-3/4 rounded-full bg-neutral-200" />
+                          <div className="h-2 w-full rounded-full bg-neutral-200" />
+                          <div className="h-2 w-2/3 rounded-full bg-neutral-200" />
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            ))}
+                </div>
+              ))}
+            </div>
           </section>
         )}
 
-        {/* Testimonials Section */}
+        {/* Testimonials */}
         {feature.testimonials && feature.testimonials.length > 0 && (
-          <section className="my-16">
-            <div className="text-center mb-10">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+          <section className="mx-auto max-w-5xl px-6 py-24">
+            <div className="mx-auto max-w-3xl text-center">
+              <SectionBadge label="Testimonials" />
+              <h2 className="mt-4 text-3xl font-normal tracking-tight text-neutral-900 sm:text-4xl">
                 Què diuen els professionals
               </h2>
-              <p className="text-lg text-gray-600">
-                Més de 1.200 logopedes confien en Transcriu
+              <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-neutral-600">
+                Més de 1.200 logopedes confien en Transcriu.
               </p>
-            </div>
-            <div className="grid md:grid-cols-3 gap-6">
-              {feature.testimonials.map((testimonial, idx) => (
-                <div
-                  key={idx}
-                  className="bg-white rounded-xl p-6 shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300 flex flex-col"
-                >
-                  <div className="mb-4">
-                    <Quote className="h-10 w-10 text-blue-500 opacity-30" />
-                  </div>
 
-                  <p className="text-gray-700 leading-relaxed mb-6 flex-grow">
-                    "{testimonial.text}"
+              <blockquote className="mx-auto mt-12 max-w-2xl text-xl leading-relaxed text-neutral-800">
+                "{feature.testimonials[0].text}"
+              </blockquote>
+
+              <div className="mt-8 flex items-center justify-center gap-3">
+                {feature.testimonials[0].image ? (
+                  <img
+                    src={feature.testimonials[0].image}
+                    alt={feature.testimonials[0].name}
+                    className="size-9 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="flex size-9 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-fuchsia-400 text-sm font-medium text-white">
+                    {feature.testimonials[0].name.charAt(0)}
+                  </div>
+                )}
+                <div className="text-left text-sm">
+                  <p className="font-medium text-neutral-900">
+                    {feature.testimonials[0].name}
                   </p>
-
-                  <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
-                    <div className="flex-shrink-0">
-                      {testimonial.image ? (
-                        <img
-                          src={testimonial.image}
-                          alt={testimonial.name}
-                          className="h-12 w-12 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center text-white font-bold text-lg shadow-md">
-                          {testimonial.name.charAt(0)}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex-grow min-w-0">
-                      <p className="font-semibold text-gray-900 truncate">
-                        {testimonial.name}
-                      </p>
-                      <p className="text-sm text-gray-600 truncate">
-                        {testimonial.role}
-                      </p>
-                    </div>
-                  </div>
+                  <p className="text-neutral-500">
+                    {feature.testimonials[0].role}
+                  </p>
                 </div>
-              ))}
-            </div>
-
-            <div className="mt-8 text-center">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 rounded-full border border-green-200">
-                <div className="flex">
-                  {[...Array(5)].map((_, i) => (
-                    <svg
-                      key={i}
-                      className="w-4 h-4 text-green-500 fill-current"
-                      viewBox="0 0 20 20"
-                    >
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-                <span className="text-sm font-medium text-gray-700">
-                  4.9/5 · 200+ ressenyes
-                </span>
               </div>
             </div>
+
+            {feature.testimonials.length > 1 && (
+              <div className="mt-20 grid grid-cols-1 gap-6 sm:grid-cols-3">
+                {feature.testimonials.slice(1, 4).map((item, i) => (
+                  <figure key={i} className="text-left">
+                    <blockquote className="text-sm leading-relaxed text-neutral-700">
+                      "{item.text}"
+                    </blockquote>
+                    <figcaption className="mt-4 flex items-center gap-3">
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="size-8 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex size-8 items-center justify-center rounded-full bg-neutral-200 text-xs font-medium text-neutral-700">
+                          {item.name.charAt(0)}
+                        </div>
+                      )}
+                      <div className="text-xs">
+                        <p className="font-medium text-neutral-900">
+                          {item.name}
+                        </p>
+                        <p className="text-neutral-500">{item.role}</p>
+                      </div>
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+            )}
+
+            <p className="mt-16 text-center text-xs text-neutral-500">
+              4.9/5 · 200+ ressenyes de logopedes professionals
+            </p>
           </section>
         )}
 
-        {/* How It Works Section */}
+        {/* How It Works */}
         <HowItWorks />
 
-        {/* Features Section */}
+        {/* Features */}
         <Features />
 
-        {/* FAQs Section */}
+        {/* FAQs */}
         {feature.faqs && feature.faqs.length > 0 && (
-          <section className="my-16">
-            <div className="text-center mb-10">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-                Preguntes Freqüents
+          <section className="mx-auto max-w-3xl px-6 py-24">
+            <div className="text-center">
+              <SectionBadge label="FAQ" />
+              <h2 className="mt-4 text-3xl font-normal tracking-tight text-neutral-900 sm:text-4xl">
+                Preguntes freqüents
               </h2>
-              <p className="text-lg text-gray-600">
-                Respostes a les preguntes més comunes
+              <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-neutral-600">
+                Respostes a les preguntes més comunes.
               </p>
             </div>
-            <div className="max-w-3xl mx-auto space-y-3">
-              {feature.faqs.map((faq, idx) => (
-                <div
-                  key={idx}
-                  className="bg-white rounded-xl border border-gray-200 shadow-md overflow-hidden hover:shadow-lg transition-shadow"
-                >
-                  <button
-                    onClick={() =>
-                      setExpandedFaq(expandedFaq === idx ? null : idx)
-                    }
-                    className="w-full px-6 py-5 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
-                  >
-                    <span className="font-semibold text-gray-900 pr-4 text-base">
-                      {faq.question}
-                    </span>
+
+            <ul className="mt-12 divide-y divide-neutral-200 border-y border-neutral-200">
+              {feature.faqs.map((faq, i) => {
+                const open = expandedFaq === i;
+                const panelId = `feature-faq-panel-${i}`;
+                const buttonId = `feature-faq-button-${i}`;
+                return (
+                  <li key={i}>
+                    <h3>
+                      <button
+                        id={buttonId}
+                        onClick={() => setExpandedFaq(open ? null : i)}
+                        aria-expanded={open}
+                        aria-controls={panelId}
+                        className="flex w-full items-start justify-between gap-6 py-5 text-left text-base font-medium text-neutral-900"
+                      >
+                        <span>{faq.question}</span>
+                        <span
+                          aria-hidden="true"
+                          className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-500"
+                        >
+                          {open ? (
+                            <Minus className="size-3.5" />
+                          ) : (
+                            <Plus className="size-3.5" />
+                          )}
+                        </span>
+                      </button>
+                    </h3>
                     <div
-                      className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
-                        expandedFaq === idx ? "bg-blue-100" : "bg-gray-100"
-                      }`}
+                      id={panelId}
+                      role="region"
+                      aria-labelledby={buttonId}
+                      hidden={!open}
+                      className="pb-6 pr-12 text-sm leading-relaxed text-neutral-600"
                     >
-                      {expandedFaq === idx ? (
-                        <ChevronUp className="h-5 w-5 text-blue-600" />
-                      ) : (
-                        <ChevronDown className="h-5 w-5 text-gray-600" />
-                      )}
+                      {faq.answer}
                     </div>
-                  </button>
-                  {expandedFaq === idx && (
-                    <div className="px-6 pb-5 text-gray-700 leading-relaxed bg-gray-50 border-t border-gray-100">
-                      <p className="pt-4">{faq.answer}</p>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
+                  </li>
+                );
+              })}
+            </ul>
           </section>
         )}
 
         {/* Related Features */}
         {feature.relatedFeatures && feature.relatedFeatures.length > 0 && (
-          <section className="my-16">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          <section className="mx-auto max-w-5xl px-6 py-24">
+            <div className="mx-auto max-w-2xl text-center">
+              <SectionBadge label="Relacionades" />
+              <h2 className="mt-4 text-3xl font-normal tracking-tight text-neutral-900 sm:text-4xl">
                 Funcionalitats relacionades
               </h2>
-              <p className="text-gray-600">
-                Descobreix més característiques de Transcriu
+              <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-neutral-600">
+                Descobreix més característiques de Transcriu.
               </p>
             </div>
-            <div className="flex flex-wrap justify-center gap-3">
+
+            <div className="mt-12 flex flex-wrap justify-center gap-2.5">
               {feature.relatedFeatures.map((relatedFeature, idx) => (
                 <Link
                   key={idx}
                   href={`/features/${relatedFeature}`}
-                  className="px-5 py-2.5 bg-white border-2 border-gray-200 rounded-lg text-gray-700 hover:bg-blue-50 hover:border-blue-500 hover:text-blue-700 transition-all font-medium shadow-sm hover:shadow-md"
+                  className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-4 py-2 text-sm font-medium text-neutral-700 shadow-sm transition-colors hover:border-neutral-300 hover:bg-neutral-50"
                 >
                   {relatedFeature
                     .replace(/-/g, " ")
                     .replace(/\b\w/g, (l) => l.toUpperCase())}
+                  <ArrowRight className="size-3.5 text-neutral-400" />
                 </Link>
               ))}
             </div>
           </section>
         )}
 
-        {/* Pricing Section */}
+        {/* Pricing */}
         <Pricing
           authLoading={authLoading}
           loading={checkoutLoading}

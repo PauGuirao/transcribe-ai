@@ -13,6 +13,7 @@ import {
   generateBreadcrumbSchema,
   generateServiceSchema,
 } from "@/components/seo/JsonLd";
+import { generatePageHreflang } from "@/components/seo/HreflangTags";
 
 const BASE_URL = "https://www.transcriu.com";
 
@@ -58,14 +59,10 @@ export async function generateMetadata({
       title: metadata.title,
       description: metadata.description,
     },
-    alternates: {
-      canonical: `${BASE_URL}/${locale}/logopedia/${slug}`,
-      languages: {
-        ca: `${BASE_URL}/ca/logopedia/${slug}`,
-        es: `${BASE_URL}/es/logopedia/${slug}`,
-        en: `${BASE_URL}/en/logopedia/${slug}`,
-      },
-    },
+    alternates: generatePageHreflang({
+      currentLocale: validLocale,
+      path: `/logopedia/${slug}`,
+    }),
   };
 }
 

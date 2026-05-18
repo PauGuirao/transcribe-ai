@@ -1,11 +1,60 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import BlogClient from "./blog-client";
 import { getAllBlogPosts, type BlogPostMetadata } from "../../../lib/mdx";
+import { generatePageHreflang, localeMapping } from "@/components/seo/HreflangTags";
 
-export const metadata = {
-  title: "Blog",
-  description: "Gestiona i publica articles del blog",
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transcriu.com";
+
+type LocaleCode = "ca" | "es" | "en";
+
+const blogSeo: Record<LocaleCode, { title: string; description: string }> = {
+  ca: {
+    title: "Blog | Transcriu",
+    description:
+      "Articles sobre logopèdia, transcripció amb IA i pràctica clínica. Guies pràctiques per a logopedes i famílies escrites per professionals.",
+  },
+  es: {
+    title: "Blog | Transcriu",
+    description:
+      "Artículos sobre logopedia, transcripción con IA y práctica clínica. Guías prácticas para logopedas y familias escritas por profesionales.",
+  },
+  en: {
+    title: "Blog | Transcriu",
+    description:
+      "Articles on speech therapy, AI transcription and clinical practice. Practical guides for SLPs and families written by professionals.",
+  },
 };
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const lc: LocaleCode =
+    locale === "ca" || locale === "en" ? locale : "es";
+  const seo = blogSeo[lc];
+
+  return {
+    title: seo.title,
+    description: seo.description,
+    openGraph: {
+      title: seo.title,
+      description: seo.description,
+      url: `${BASE_URL}/${lc}/blog`,
+      siteName: "Transcriu",
+      locale: localeMapping[lc],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: seo.title,
+      description: seo.description,
+    },
+    alternates: generatePageHreflang({ currentLocale: lc, path: "/blog" }),
+  };
+}
 
 interface BlogPost {
   id: string;

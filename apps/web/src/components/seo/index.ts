@@ -37,8 +37,6 @@ export {
   generateHreflangAlternates,
   generatePageHreflang,
   localeMapping,
-  type HreflangTag,
-  type HreflangTagsProps,
 } from './HreflangTags';
 
 // Pre-built schema collections

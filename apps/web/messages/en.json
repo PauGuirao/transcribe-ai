@@ -125,6 +125,16 @@
       "pendingTask": "Pending task"
     }
   },
+  "cta": {
+    "badge": "Get started today",
+    "title": "Save hours on every session",
+    "description": "Join over 1,200 speech therapists who already trust Transcriu to transcribe, annotate and share their sessions in minutes.",
+    "primary": "Try it free",
+    "secondary": "Sign up with Google",
+    "preparing": "Preparing...",
+    "goToDashboard": "Go to dashboard",
+    "caption": "Free to start · no credit card · cancel anytime"
+  },
   "navbar": {
     "features": "Features",
     "seeAllFeatures": "See all features",
@@ -759,5 +769,98 @@
         "text": "Our center has speech therapists, psychologists and occupational therapists. Transcriu greatly facilitates coordination between professionals. Documentation has improved significantly and families notice it."
       }
     ]
+  },
+  "featuresPage": {
+    "metaTitle": "All features",
+    "metaDescription": "Discover everything Transcriu offers: AI-powered transcription, speaker diarization, smart annotations, patient management and team collaboration.",
+    "hero": {
+      "eyebrow": "Features",
+      "title": "Everything you need for your speech therapy sessions",
+      "description": "AI-powered transcription, patient management and team collaboration — all in one platform built for professionals.",
+      "primaryCta": "Try it free",
+      "secondaryCta": "See pricing"
+    },
+    "stats": {
+      "accuracy": { "value": "98%", "label": "Accuracy in Catalan & Spanish" },
+      "users": { "value": "500+", "label": "Active therapists" },
+      "savings": { "value": "5h", "label": "Saved every week" },
+      "gdpr": { "value": "GDPR", "label": "Fully compliant" }
+    },
+    "sections": {
+      "ai": {
+        "eyebrow": "AI & transcription",
+        "title": "Capture every session intelligently",
+        "description": "Transcribe, identify speakers and annotate your sessions automatically."
+      },
+      "organization": {
+        "eyebrow": "Organization",
+        "title": "All your clinical data one click away",
+        "description": "Keep patient history organized and accessible from any device."
+      },
+      "team": {
+        "eyebrow": "Team & export",
+        "title": "Collaborate and share without friction",
+        "description": "Work with your team and export results in whichever format you need."
+      }
+    },
+    "items": {
+      "transcripcion-automatica": {
+        "tag": "AI",
+        "title": "Automatic transcription",
+        "description": "Turn audio into text in seconds with a model trained on Catalan, Spanish and clinical terminology.",
+        "bullets": [
+          "98% accuracy in Catalan and Spanish",
+          "Recognizes specialized speech therapy terminology",
+          "Processes hours of audio in just a few minutes"
+        ]
+      },
+      "diarizacion-interlocutores": {
+        "tag": "AI",
+        "title": "Speaker identification",
+        "description": "Automatically detects who is talking at each moment and organizes the transcription by speaker."
+      },
+      "anotaciones-inteligentes": {
+        "tag": "Editor",
+        "title": "Smart annotations",
+        "description": "Add notes, comments and visual highlights to surface what matters in every session."
+      },
+      "biblioteca-transcripciones": {
+        "tag": "Library",
+        "title": "Transcription library",
+        "description": "All your sessions organized in one place with powerful search and filters."
+      },
+      "gestion-pacientes": {
+        "tag": "Patients",
+        "title": "Patient management",
+        "description": "Create rich profiles, assign sessions and track progress over time."
+      },
+      "grupos-colaborativos": {
+        "tag": "Team",
+        "title": "Collaborative groups",
+        "description": "Work with your team with clear permissions and securely shared resources."
+      },
+      "exportar-transcripciones": {
+        "tag": "Export",
+        "title": "Flexible export",
+        "description": "Export to PDF, Word or Google Docs and share with families and colleagues effortlessly."
+      }
+    },
+    "learnMore": "Learn more",
+    "featuredBadge": "Flagship feature",
+    "proof": {
+      "title": "Hundreds of speech therapists trust us",
+      "subtitle": "A tool built with and for language professionals.",
+      "metrics": [
+        { "value": "4.9/5", "label": "Average rating" },
+        { "value": "500+", "label": "Active professionals" },
+        { "value": "10K+", "label": "Sessions transcribed" }
+      ]
+    },
+    "cta": {
+      "title": "Start saving hours every week",
+      "description": "Try every feature for free. No credit card required.",
+      "primary": "Try it free",
+      "secondary": "See pricing"
+    }
   }
 }

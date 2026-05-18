@@ -5,6 +5,7 @@ import { ArrowLeft, Clock, Play } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
+import { generatePageHreflang } from '@/components/seo/HreflangTags'
 
 const tutorials = {
   'ajuda-a-crear-una-transcripcio': {
@@ -231,14 +232,11 @@ export async function generateMetadata({
       description,
       images: [`${baseUrl}/og-image.png`],
     },
-    alternates: {
-      canonical: `${baseUrl}/${locale}/tutorials/${slug}`,
-      languages: {
-        ca: `${baseUrl}/ca/tutorials/${slug}`,
-        es: `${baseUrl}/es/tutorials/${slug}`,
-        en: `${baseUrl}/en/tutorials/${slug}`,
-      },
-    },
+    alternates: generatePageHreflang({
+      currentLocale: locale,
+      path: `/tutorials/${slug}`,
+      baseUrl,
+    }),
   }
 }
 

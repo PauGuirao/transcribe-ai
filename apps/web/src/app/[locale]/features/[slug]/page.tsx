@@ -7,6 +7,7 @@ import {
   generateBreadcrumbSchema,
   generateFAQSchema,
 } from "@/components/seo/JsonLd";
+import { generatePageHreflang } from "@/components/seo/HreflangTags";
 
 const BASE_URL = "https://www.transcriu.com";
 
@@ -72,14 +73,11 @@ export async function generateMetadata({
       title,
       description,
     },
-    alternates: {
-      canonical: `${baseUrl}/${locale}/features/${slug}`,
-      languages: {
-        'ca': `${baseUrl}/ca/features/${slug}`,
-        'es': `${baseUrl}/es/features/${slug}`,
-        'en': `${baseUrl}/en/features/${slug}`,
-      },
-    },
+    alternates: generatePageHreflang({
+      currentLocale: locale,
+      path: `/features/${slug}`,
+      baseUrl,
+    }),
   };
 }
 
