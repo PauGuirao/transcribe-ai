@@ -1,0 +1,492 @@
+{
+  "cost_usd": 0.2159,
+  "spanish": {
+    "total_unique": 904,
+    "top_low_kd_high_volume": [
+      {
+        "keyword": "facultad de psicología y logopedia",
+        "searchVolume": 12100,
+        "competition": 0.05,
+        "kd": 5,
+        "cpc": 0.54,
+        "opportunity": 80667
+      },
+      {
+        "keyword": "transcribir audio texto",
+        "searchVolume": 27100,
+        "competition": 0.59,
+        "kd": 59,
+        "cpc": 0.41,
+        "opportunity": 39275
+      },
+      {
+        "keyword": "transcribir audio a texto",
+        "searchVolume": 27100,
+        "competition": 0.59,
+        "kd": 59,
+        "cpc": 0.41,
+        "opportunity": 39275
+      },
+      {
+        "keyword": "transcribir un audio a texto",
+        "searchVolume": 27100,
+        "competition": 0.59,
+        "kd": 59,
+        "cpc": 0.41,
+        "opportunity": 39275
+      },
+      {
+        "keyword": "transcribir audio en texto",
+        "searchVolume": 27100,
+        "competition": 0.59,
+        "kd": 59,
+        "cpc": 0.41,
+        "opportunity": 39275
+      },
+      {
+        "keyword": "transcribe un audio a texto",
+        "searchVolume": 27100,
+        "competition": 0.59,
+        "kd": 59,
+        "cpc": 0.41,
+        "opportunity": 39275
+      },
+      {
+        "keyword": "transcripcion audio a texto",
+        "searchVolume": 27100,
+        "competition": 0.59,
+        "kd": 59,
+        "cpc": 0.41,
+        "opportunity": 39275
+      },
+      {
+        "keyword": "transcribe audio a texto",
+        "searchVolume": 27100,
+        "competition": 0.59,
+        "kd": 59,
+        "cpc": 0.41,
+        "opportunity": 39275
+      },
+      {
+        "keyword": "transcripción audio a texto",
+        "searchVolume": 27100,
+        "competition": 0.59,
+        "kd": 59,
+        "cpc": 0.41,
+        "opportunity": 39275
+      },
+      {
+        "keyword": "logopedia png",
+        "searchVolume": 1900,
+        "competition": 0.01,
+        "kd": 1,
+        "cpc": 1.57,
+        "opportunity": 17273
+      },
+      {
+        "keyword": "transcribir audio whatsapp",
+        "searchVolume": 4400,
+        "competition": 0.19,
+        "kd": 19,
+        "cpc": 0.37,
+        "opportunity": 15172
+      },
+      {
+        "keyword": "logopeda qué es",
+        "searchVolume": 1900,
+        "competition": 0.05,
+        "kd": 5,
+        "cpc": 0.26,
+        "opportunity": 12667
+      },
+      {
+        "keyword": "corporación fisiogestión diagonal rehabilitación fisioterapia y logopedia",
+        "searchVolume": 1900,
+        "competition": 0.06,
+        "kd": 6,
+        "cpc": 1.24,
+        "opportunity": 11875
+      },
+      {
+        "keyword": "tartamudez",
+        "searchVolume": 1600,
+        "competition": 0.04,
+        "kd": 4,
+        "cpc": 0.9,
+        "opportunity": 11429
+      },
+      {
+        "keyword": "logopedia cerca de mi",
+        "searchVolume": 2900,
+        "competition": 0.17,
+        "kd": 17,
+        "cpc": 1.02,
+        "opportunity": 10741
+      },
+      {
+        "keyword": "como transcribir un audio de whatsapp",
+        "searchVolume": 2900,
+        "competition": 0.26,
+        "kd": 26,
+        "cpc": 0.85,
+        "opportunity": 8056
+      },
+      {
+        "keyword": "tipos de afasia",
+        "searchVolume": 880,
+        "competition": 0.01,
+        "kd": 1,
+        "cpc": 0,
+        "opportunity": 8000
+      },
+      {
+        "keyword": "transcribir un audio",
+        "searchVolume": 5400,
+        "competition": 0.61,
+        "kd": 61,
+        "cpc": 0.5,
+        "opportunity": 7606
+      },
+      {
+        "keyword": "transcribir audio",
+        "searchVolume": 5400,
+        "competition": 0.61,
+        "kd": 61,
+        "cpc": 0.5,
+        "opportunity": 7606
+      },
+      {
+        "keyword": "afasia arq",
+        "searchVolume": 720,
+        "competition": 0,
+        "kd": 0,
+        "cpc": 1.11,
+        "opportunity": 7200
+      },
+      {
+        "keyword": "simulador afasia beca mec",
+        "searchVolume": 720,
+        "competition": 0,
+        "kd": 0,
+        "cpc": 0,
+        "opportunity": 7200
+      },
+      {
+        "keyword": "afasia arquitectura",
+        "searchVolume": 720,
+        "competition": 0,
+        "kd": 0,
+        "cpc": 1.11,
+        "opportunity": 7200
+      },
+      {
+        "keyword": "corporación fisiogestión alcobendas rehabilitación fisioterapia y logopedia",
+        "searchVolume": 1000,
+        "competition": 0.04,
+        "kd": 4,
+        "cpc": 0,
+        "opportunity": 7143
+      },
+      {
+        "keyword": "qué es logopedia",
+        "searchVolume": 880,
+        "competition": 0.04,
+        "kd": 4,
+        "cpc": 0.02,
+        "opportunity": 6286
+      },
+      {
+        "keyword": "qué es logopeda",
+        "searchVolume": 880,
+        "competition": 0.04,
+        "kd": 4,
+        "cpc": 0.02,
+        "opportunity": 6286
+      },
+      {
+        "keyword": "transcripciones de audio a texto",
+        "searchVolume": 4400,
+        "competition": 0.63,
+        "kd": 63,
+        "cpc": 0.64,
+        "opportunity": 6027
+      },
+      {
+        "keyword": "transcripción de audio a texto",
+        "searchVolume": 4400,
+        "competition": 0.63,
+        "kd": 63,
+        "cpc": 0.64,
+        "opportunity": 6027
+      },
+      {
+        "keyword": "transcripcion de audio a texto",
+        "searchVolume": 4400,
+        "competition": 0.63,
+        "kd": 63,
+        "cpc": 0.64,
+        "opportunity": 6027
+      },
+      {
+        "keyword": "prime video logopedia",
+        "searchVolume": 590,
+        "competition": 0,
+        "kd": 0,
+        "cpc": 0,
+        "opportunity": 5900
+      },
+      {
+        "keyword": "logopedia empleo",
+        "searchVolume": 590,
+        "competition": 0.01,
+        "kd": 1,
+        "cpc": 0.08,
+        "opportunity": 5364
+      },
+      {
+        "keyword": "empleo logopedia",
+        "searchVolume": 590,
+        "competition": 0.01,
+        "kd": 1,
+        "cpc": 0.08,
+        "opportunity": 5364
+      },
+      {
+        "keyword": "logopeda empleo",
+        "searchVolume": 590,
+        "competition": 0.01,
+        "kd": 1,
+        "cpc": 0.08,
+        "opportunity": 5364
+      },
+      {
+        "keyword": "empleo logopeda",
+        "searchVolume": 590,
+        "competition": 0.01,
+        "kd": 1,
+        "cpc": 0.08,
+        "opportunity": 5364
+      },
+      {
+        "keyword": "corporación fisiogestion prosperidad rehabilitación fisioterapia y logopedia",
+        "searchVolume": 880,
+        "competition": 0.07,
+        "kd": 7,
+        "cpc": 0,
+        "opportunity": 5176
+      },
+      {
+        "keyword": "audio a texto",
+        "searchVolume": 2900,
+        "competition": 0.49,
+        "kd": 49,
+        "cpc": 0.33,
+        "opportunity": 4915
+      },
+      {
+        "keyword": "afasia qué significa",
+        "searchVolume": 480,
+        "competition": 0,
+        "kd": 0,
+        "cpc": 0,
+        "opportunity": 4800
+      },
+      {
+        "keyword": "afasia significado",
+        "searchVolume": 480,
+        "competition": 0,
+        "kd": 0,
+        "cpc": 0,
+        "opportunity": 4800
+      },
+      {
+        "keyword": "afasia que significa",
+        "searchVolume": 480,
+        "competition": 0,
+        "kd": 0,
+        "cpc": 0,
+        "opportunity": 4800
+      },
+      {
+        "keyword": "texto a audio",
+        "searchVolume": 1300,
+        "competition": 0.18,
+        "kd": 18,
+        "cpc": 0.45,
+        "opportunity": 4643
+      },
+      {
+        "keyword": "corporación fisiogestión getafe rehabilitación fisioterapia y logopedia",
+        "searchVolume": 880,
+        "competition": 0.09,
+        "kd": 9,
+        "cpc": 1.11,
+        "opportunity": 4632
+      },
+      {
+        "keyword": "corporación fisiogestión l'hospitalet rehabilitación fisioterapia y logopedia",
+        "searchVolume": 720,
+        "competition": 0.06,
+        "kd": 6,
+        "cpc": 1.15,
+        "opportunity": 4500
+      },
+      {
+        "keyword": "logopedia murcia",
+        "searchVolume": 590,
+        "competition": 0.04,
+        "kd": 4,
+        "cpc": 1.09,
+        "opportunity": 4214
+      },
+      {
+        "keyword": "que es un logopedia",
+        "searchVolume": 590,
+        "competition": 0.04,
+        "kd": 4,
+        "cpc": 0.46,
+        "opportunity": 4214
+      },
+      {
+        "keyword": "qué es un logopeda",
+        "searchVolume": 590,
+        "competition": 0.04,
+        "kd": 4,
+        "cpc": 0.46,
+        "opportunity": 4214
+      },
+      {
+        "keyword": "que es un logopeda",
+        "searchVolume": 590,
+        "competition": 0.04,
+        "kd": 4,
+        "cpc": 0.46,
+        "opportunity": 4214
+      },
+      {
+        "keyword": "logopedia en ingles",
+        "searchVolume": 390,
+        "competition": 0,
+        "kd": 0,
+        "cpc": 0,
+        "opportunity": 3900
+      },
+      {
+        "keyword": "colegio de logopedia",
+        "searchVolume": 390,
+        "competition": 0,
+        "kd": 0,
+        "cpc": 0,
+        "opportunity": 3900
+      },
+      {
+        "keyword": "logopeda en ingles",
+        "searchVolume": 390,
+        "competition": 0,
+        "kd": 0,
+        "cpc": 0,
+        "opportunity": 3900
+      },
+      {
+        "keyword": "logopeda en inglés",
+        "searchVolume": 390,
+        "competition": 0,
+        "kd": 0,
+        "cpc": 0,
+        "opportunity": 3900
+      },
+      {
+        "keyword": "transcribir audio a texto whatsapp",
+        "searchVolume": 720,
+        "competition": 0.11,
+        "kd": 11,
+        "cpc": 0.21,
+        "opportunity": 3429
+      },
+      {
+        "keyword": "convertir texto a audio",
+        "searchVolume": 1300,
+        "competition": 0.3,
+        "kd": 30,
+        "cpc": 0.43,
+        "opportunity": 3250
+      },
+      {
+        "keyword": "convertidor texto a audio",
+        "searchVolume": 1300,
+        "competition": 0.3,
+        "kd": 30,
+        "cpc": 0.43,
+        "opportunity": 3250
+      },
+      {
+        "keyword": "transcribir audio a texto gratis",
+        "searchVolume": 2400,
+        "competition": 0.66,
+        "kd": 66,
+        "cpc": 0.61,
+        "opportunity": 3158
+      },
+      {
+        "keyword": "whatsapp transcribir audio",
+        "searchVolume": 390,
+        "competition": 0.03,
+        "kd": 3,
+        "cpc": 0.05,
+        "opportunity": 3000
+      },
+      {
+        "keyword": "de audio a texto",
+        "searchVolume": 1600,
+        "competition": 0.45,
+        "kd": 45,
+        "cpc": 0.27,
+        "opportunity": 2909
+      },
+      {
+        "keyword": "pasar un audio a texto",
+        "searchVolume": 1900,
+        "competition": 0.58,
+        "kd": 58,
+        "cpc": 0.46,
+        "opportunity": 2794
+      },
+      {
+        "keyword": "transcriptores de audio a texto",
+        "searchVolume": 1900,
+        "competition": 0.6,
+        "kd": 60,
+        "cpc": 0.52,
+        "opportunity": 2714
+      },
+      {
+        "keyword": "transcriptor de audio a texto",
+        "searchVolume": 1900,
+        "competition": 0.6,
+        "kd": 60,
+        "cpc": 0.52,
+        "opportunity": 2714
+      },
+      {
+        "keyword": "pasar audio a texto",
+        "searchVolume": 1900,
+        "competition": 0.61,
+        "kd": 61,
+        "cpc": 0.61,
+        "opportunity": 2676
+      },
+      {
+        "keyword": "nota de corte: logopedia",
+        "searchVolume": 320,
+        "competition": 0.02,
+        "kd": 2,
+        "cpc": 3.53,
+        "opportunity": 2667
+      }
+    ]
+  },
+  "catalan": {
+    "total_unique": 0,
+    "top_low_kd_high_volume": []
+  }
+}

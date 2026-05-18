@@ -1,0 +1,248 @@
+{
+  "speech_therapy_es": {
+    "very_low_kd": [
+      {
+        "keyword": "logopedia png",
+        "vol": 1900,
+        "kd": 1,
+        "cpc": 1.57,
+        "opp": 17273
+      },
+      {
+        "keyword": "logopeda qué es",
+        "vol": 1900,
+        "kd": 5,
+        "cpc": 0.26,
+        "opp": 12667
+      },
+      {
+        "keyword": "corporación fisiogestión diagonal rehabilitación fisioterapia y logopedia",
+        "vol": 1900,
+        "kd": 6,
+        "cpc": 1.24,
+        "opp": 11875
+      },
+      {
+        "keyword": "tartamudez",
+        "vol": 1600,
+        "kd": 4,
+        "cpc": 0.9,
+        "opp": 11429
+      },
+      {
+        "keyword": "tipos de afasia",
+        "vol": 880,
+        "kd": 1,
+        "cpc": 0,
+        "opp": 8000
+      },
+      {
+        "keyword": "afasia arq",
+        "vol": 720,
+        "kd": 0,
+        "cpc": 1.11,
+        "opp": 7200
+      },
+      {
+        "keyword": "simulador afasia beca mec",
+        "vol": 720,
+        "kd": 0,
+        "cpc": 0,
+        "opp": 7200
+      },
+      {
+        "keyword": "afasia arquitectura",
+        "vol": 720,
+        "kd": 0,
+        "cpc": 1.11,
+        "opp": 7200
+      },
+      {
+        "keyword": "corporación fisiogestión alcobendas rehabilitación fisioterapia y logopedia",
+        "vol": 1000,
+        "kd": 4,
+        "cpc": 0,
+        "opp": 7143
+      },
+      {
+        "keyword": "qué es logopedia",
+        "vol": 880,
+        "kd": 4,
+        "cpc": 0.02,
+        "opp": 6286
+      },
+      {
+        "keyword": "qué es logopeda",
+        "vol": 880,
+        "kd": 4,
+        "cpc": 0.02,
+        "opp": 6286
+      },
+      {
+        "keyword": "prime video logopedia",
+        "vol": 590,
+        "kd": 0,
+        "cpc": 0,
+        "opp": 5900
+      },
+      {
+        "keyword": "logopedia empleo",
+        "vol": 590,
+        "kd": 1,
+        "cpc": 0.08,
+        "opp": 5364
+      },
+      {
+        "keyword": "empleo logopedia",
+        "vol": 590,
+        "kd": 1,
+        "cpc": 0.08,
+        "opp": 5364
+      },
+      {
+        "keyword": "logopeda empleo",
+        "vol": 590,
+        "kd": 1,
+        "cpc": 0.08,
+        "opp": 5364
+      },
+      {
+        "keyword": "empleo logopeda",
+        "vol": 590,
+        "kd": 1,
+        "cpc": 0.08,
+        "opp": 5364
+      },
+      {
+        "keyword": "corporación fisiogestion prosperidad rehabilitación fisioterapia y logopedia",
+        "vol": 880,
+        "kd": 7,
+        "cpc": 0,
+        "opp": 5176
+      },
+      {
+        "keyword": "afasia qué significa",
+        "vol": 480,
+        "kd": 0,
+        "cpc": 0,
+        "opp": 4800
+      },
+      {
+        "keyword": "afasia significado",
+        "vol": 480,
+        "kd": 0,
+        "cpc": 0,
+        "opp": 4800
+      },
+      {
+        "keyword": "afasia que significa",
+        "vol": 480,
+        "kd": 0,
+        "cpc": 0,
+        "opp": 4800
+      },
+      {
+        "keyword": "que es un logopedia",
+        "vol": 590,
+        "kd": 4,
+        "cpc": 0.46,
+        "opp": 4214
+      },
+      {
+        "keyword": "qué es un logopeda",
+        "vol": 590,
+        "kd": 4,
+        "cpc": 0.46,
+        "opp": 4214
+      },
+      {
+        "keyword": "que es un logopeda",
+        "vol": 590,
+        "kd": 4,
+        "cpc": 0.46,
+        "opp": 4214
+      },
+      {
+        "keyword": "logopedia en ingles",
+        "vol": 390,
+        "kd": 0,
+        "cpc": 0,
+        "opp": 3900
+      },
+      {
+        "keyword": "logopeda en ingles",
+        "vol": 390,
+        "kd": 0,
+        "cpc": 0,
+        "opp": 3900
+      }
+    ],
+    "low_kd": [
+      {
+        "keyword": "logopedia cerca de mi",
+        "vol": 2900,
+        "kd": 17,
+        "cpc": 1.02,
+        "opp": 10741
+      }
+    ],
+    "medium_kd": []
+  },
+  "transcription_es": {
+    "very_low_kd": [
+      {
+        "keyword": "whatsapp transcribir audio",
+        "vol": 390,
+        "kd": 3,
+        "cpc": 0.05,
+        "opp": 3000
+      }
+    ],
+    "low_kd": [
+      {
+        "keyword": "transcribir audio whatsapp",
+        "vol": 4400,
+        "kd": 19,
+        "cpc": 0.37,
+        "opp": 15172
+      },
+      {
+        "keyword": "texto a audio",
+        "vol": 1300,
+        "kd": 18,
+        "cpc": 0.45,
+        "opp": 4643
+      },
+      {
+        "keyword": "transcribir audio a texto whatsapp",
+        "vol": 720,
+        "kd": 11,
+        "cpc": 0.21,
+        "opp": 3429
+      }
+    ],
+    "medium_kd": [
+      {
+        "keyword": "como transcribir un audio de whatsapp",
+        "vol": 2900,
+        "kd": 26,
+        "cpc": 0.85,
+        "opp": 8056
+      },
+      {
+        "keyword": "convertir texto a audio",
+        "vol": 1300,
+        "kd": 30,
+        "cpc": 0.43,
+        "opp": 3250
+      },
+      {
+        "keyword": "convertidor texto a audio",
+        "vol": 1300,
+        "kd": 30,
+        "cpc": 0.43,
+        "opp": 3250
+      }
+    ]
+  }
+}

@@ -1,0 +1,66 @@
+[
+  {
+    "keyword": "disfèmia",
+    "searchVolume": 4400,
+    "kd": 0,
+    "cpc": 0.17,
+    "lang": "ca",
+    "opportunity": 44000
+  },
+  {
+    "keyword": "dislèxia",
+    "searchVolume": 170,
+    "kd": 0,
+    "cpc": 0,
+    "lang": "ca",
+    "opportunity": 1700
+  },
+  {
+    "keyword": "disfàgia",
+    "searchVolume": 140,
+    "kd": 0,
+    "cpc": 0.03,
+    "lang": "ca",
+    "opportunity": 1400
+  },
+  {
+    "keyword": "trastorn del llenguatge",
+    "searchVolume": 140,
+    "kd": 0,
+    "cpc": 0,
+    "lang": "ca",
+    "opportunity": 1400
+  },
+  {
+    "keyword": "afàsia",
+    "searchVolume": 90,
+    "kd": 0,
+    "cpc": 0.02,
+    "lang": "ca",
+    "opportunity": 900
+  },
+  {
+    "keyword": "disàrtria",
+    "searchVolume": 70,
+    "kd": 0,
+    "cpc": 0,
+    "lang": "ca",
+    "opportunity": 700
+  },
+  {
+    "keyword": "aprendre català",
+    "searchVolume": 70,
+    "kd": 0,
+    "cpc": 0,
+    "lang": "ca",
+    "opportunity": 700
+  },
+  {
+    "keyword": "dislàlia",
+    "searchVolume": 50,
+    "kd": 0,
+    "cpc": 0,
+    "lang": "ca",
+    "opportunity": 500
+  }
+]
