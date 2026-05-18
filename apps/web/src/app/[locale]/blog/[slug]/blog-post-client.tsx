@@ -5,14 +5,32 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import {
   ArrowLeft,
+  ArrowRight,
   Calendar,
   Check,
   Clock,
+  Info,
   Link2,
+  Sparkles,
   User,
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+
+/* ------------------------- Inline formatting ------------------------------ */
+// Lightweight inline replacements applied to paragraph and list-item HTML.
+// Order matters: links first (so the < > of <a> aren't escaped), then bold.
+function applyInline(text: string): string {
+  // [label](url) → anchor, plus convert internal /paths so they keep locale-prefix later if needed
+  let out = text.replace(
+    /\[([^\]]+)\]\(([^)]+)\)/g,
+    (_m, label, url) =>
+      `<a href="${url}" class="text-indigo-600 underline decoration-indigo-200 underline-offset-2 transition-colors hover:text-indigo-700 hover:decoration-indigo-400">${label}</a>`,
+  );
+  // **bold**
+  out = out.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+  return out;
+}
 
 interface BlogPost {
   id: string;
@@ -268,9 +286,7 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
         const items: string[] = [];
         let c = i;
         while (c < lines.length && lines[c].startsWith("- ")) {
-          items.push(
-            lines[c].substring(2).replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>"),
-          );
+          items.push(applyInline(lines[c].substring(2)));
           c++;
         }
         elements.push(
@@ -288,11 +304,7 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
         const items: string[] = [];
         let c = i;
         while (c < lines.length && lines[c].match(/^\d+\.\s/)) {
-          items.push(
-            lines[c]
-              .replace(/^\d+\.\s/, "")
-              .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>"),
-          );
+          items.push(applyInline(lines[c].replace(/^\d+\.\s/, "")));
           c++;
         }
         elements.push(
@@ -306,6 +318,98 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
           </ol>,
         );
         i = c;
+      } else if (line.startsWith("> ")) {
+        // Blockquote / callout — collect consecutive `> ` lines.
+        const quoteLines: string[] = [];
+        let c = i;
+        while (c < lines.length && lines[c].startsWith("> ")) {
+          quoteLines.push(lines[c].substring(2));
+          c++;
+        }
+        const joined = applyInline(quoteLines.join(" "));
+        elements.push(
+          <blockquote
+            key={i}
+            className="my-6 flex gap-3 rounded-xl border border-indigo-100 bg-indigo-50/50 px-5 py-4"
+          >
+            <Info className="mt-0.5 size-4 shrink-0 text-indigo-500" />
+            <p
+              className="text-[15px] leading-relaxed text-neutral-800"
+              dangerouslySetInnerHTML={{ __html: joined }}
+            />
+          </blockquote>,
+        );
+        i = c;
+      } else if (line.trim() === "---") {
+        elements.push(
+          <hr key={i} className="my-10 border-neutral-100" />,
+        );
+        i++;
+      } else if (line.startsWith("@youtube[")) {
+        // @youtube[VIDEO_ID]:caption text
+        const m = /^@youtube\[([^\]]+)\](?::\s*(.*))?$/.exec(line);
+        if (m) {
+          const [, videoId, caption] = m;
+          elements.push(
+            <figure key={i} className="my-8">
+              <div className="relative w-full overflow-hidden rounded-xl border border-neutral-200 bg-neutral-100" style={{ aspectRatio: "16 / 9" }}>
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}?rel=0`}
+                  title={caption || "YouTube video"}
+                  loading="lazy"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="absolute inset-0 h-full w-full"
+                />
+              </div>
+              {caption && (
+                <figcaption className="mt-2 text-center text-xs text-neutral-500">
+                  {caption}
+                </figcaption>
+              )}
+            </figure>,
+          );
+        }
+        i++;
+      } else if (line.startsWith("@cta[")) {
+        // @cta[Button label→/url]:Headline text || Optional description
+        const m = /^@cta\[([^→]+)→([^\]]+)\](?::\s*(.*))?$/.exec(line);
+        if (m) {
+          const [, label, url, body] = m;
+          const [headline, description] = (body || "").split("||").map((s) => s.trim());
+          elements.push(
+            <aside
+              key={i}
+              className="my-10 overflow-hidden rounded-2xl border border-neutral-200 bg-gradient-to-br from-neutral-50 to-white p-6 sm:p-8"
+            >
+              <div className="flex items-start gap-4">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-neutral-200 bg-white">
+                  <Sparkles className="size-5 text-indigo-500" />
+                </div>
+                <div className="flex-1">
+                  {headline && (
+                    <h3 className="text-lg font-semibold tracking-tight text-neutral-900">
+                      {headline}
+                    </h3>
+                  )}
+                  {description && (
+                    <p className="mt-1.5 text-sm leading-relaxed text-neutral-600">
+                      {description}
+                    </p>
+                  )}
+                  <Link
+                    href={url}
+                    className="mt-4 inline-flex h-10 items-center gap-1.5 rounded-md bg-neutral-900 px-4 text-sm font-medium text-white transition-colors hover:bg-neutral-800"
+                  >
+                    {label}
+                    <ArrowRight className="size-3.5" />
+                  </Link>
+                </div>
+              </div>
+            </aside>,
+          );
+        }
+        i++;
       } else if (line.startsWith("**") && line.endsWith("**") && line.length > 4) {
         elements.push(
           <p key={i} className="mb-4 text-[15px] leading-relaxed text-neutral-900">
@@ -316,7 +420,7 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
       } else if (line.trim() === "") {
         i++;
       } else {
-        const processed = line.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+        const processed = applyInline(line);
         elements.push(
           <p
             key={i}
