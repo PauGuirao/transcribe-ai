@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import BlogClient from "./blog-client";
-import { getAllBlogPosts, type BlogPostMetadata } from "../../../lib/mdx";
+import {
+  getBlogPostsForLocale,
+  type BlogPostMetadata,
+  type BlogLanguage,
+} from "../../../lib/mdx";
 import { generatePageHreflang, localeMapping } from "@/components/seo/HreflangTags";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transcriu.com";
@@ -69,11 +73,21 @@ interface BlogPost {
   slug?: string;
 }
 
-export default function BlogPage() {
-  // Fetch MDX data on the server side
-  const mdxPosts = getAllBlogPosts();
+export default async function BlogPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const lc: BlogLanguage =
+    locale === "ca" || locale === "es" || locale === "en"
+      ? (locale as BlogLanguage)
+      : "ca";
 
-  // Convert MDX posts to BlogPost format
+  // Only show posts authored in the visitor's locale — avoids serving
+  // Catalan content from /es/blog and vice-versa.
+  const mdxPosts = getBlogPostsForLocale(lc);
+
   const blogPosts: BlogPost[] = mdxPosts.map((post: BlogPostMetadata, index: number) => ({
     id: (index + 1).toString(),
     title: post.title,

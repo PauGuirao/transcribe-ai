@@ -1,56 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://www.transcriu.com/ca/blog/text-a-audio-millors-eines</loc>
+    <lastmod>2026-05-18T23:40:27.663Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.transcriu.com/es/blog/texto-a-audio-mejores-herramientas</loc>
+    <lastmod>2026-05-18T23:40:27.663Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.transcriu.com/ca/blog/disfemia-causes-tipus-exercicis</loc>
+    <lastmod>2026-05-18T23:40:27.663Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.transcriu.com/es/blog/tartamudez-causas-tipos-ejercicios</loc>
+    <lastmod>2026-05-18T23:40:27.663Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.transcriu.com/es/blog/tipos-de-afasia</loc>
+    <lastmod>2026-05-18T23:40:27.663Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.transcriu.com/ca/blog/tipus-d-afasia</loc>
+    <lastmod>2026-05-18T23:40:27.663Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.transcriu.com/ca/blog/que-es-la-logopedia-i-que-fa-un-logopeda</loc>
+    <lastmod>2026-05-18T23:40:27.663Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.transcriu.com/es/blog/que-es-un-logopeda</loc>
+    <lastmod>2026-05-18T23:40:27.663Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.transcriu.com/ca/blog/com-transcriure-audios-whatsapp</loc>
+    <lastmod>2026-05-18T23:40:27.663Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.transcriu.com/es/blog/como-transcribir-audios-whatsapp</loc>
+    <lastmod>2026-05-18T23:40:27.663Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://www.transcriu.com/ca/blog/retard-parla-nens-causes-terapia</loc>
-    <lastmod>2026-02-01T20:07:48.182Z</lastmod>
+    <lastmod>2026-05-18T23:40:27.663Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.transcriu.com/ca/blog/terapia-beguetat-fluidesa-logopedes</loc>
-    <lastmod>2026-02-01T20:07:48.182Z</lastmod>
+    <lastmod>2026-05-18T23:40:27.663Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.transcriu.com/ca/blog/transcriure-audio-ia-eficient</loc>
-    <lastmod>2026-02-01T20:07:48.182Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.transcriu.com/es/blog/retard-parla-nens-causes-terapia</loc>
-    <lastmod>2026-02-01T20:07:48.182Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.transcriu.com/es/blog/terapia-beguetat-fluidesa-logopedes</loc>
-    <lastmod>2026-02-01T20:07:48.182Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.transcriu.com/es/blog/transcriure-audio-ia-eficient</loc>
-    <lastmod>2026-02-01T20:07:48.182Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.transcriu.com/en/blog/retard-parla-nens-causes-terapia</loc>
-    <lastmod>2026-02-01T20:07:48.182Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.transcriu.com/en/blog/terapia-beguetat-fluidesa-logopedes</loc>
-    <lastmod>2026-02-01T20:07:48.182Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.transcriu.com/en/blog/transcriure-audio-ia-eficient</loc>
-    <lastmod>2026-02-01T20:07:48.182Z</lastmod>
+    <loc>https://www.transcriu.com/ca/blog/guia-completa-trastorns-articulacio</loc>
+    <lastmod>2026-05-18T23:40:27.663Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>

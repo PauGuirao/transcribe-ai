@@ -1,0 +1,418 @@
+---
+title: "Texto a audio: las 7 mejores herramientas TTS en español (y catalán) en 2026"
+excerpt: "Comparativa honesta de las mejores herramientas para convertir texto a audio en español y catalán: ElevenLabs, Google Cloud TTS, OpenAI, Amazon Polly, Azure y más. Incluye también qué usar para el camino inverso (audio a texto)."
+author: "Equip Transcriu"
+createdAt: "2026-05-19T11:00:00Z"
+updatedAt: "2026-05-19T11:00:00Z"
+published: true
+tags: ["Herramientas", "TTS", "Text-to-Speech", "Voz Sintética", "Transcripción", "Speech-to-Text", "Accesibilidad", "IA"]
+slug: "texto-a-audio-mejores-herramientas"
+language: "es"
+seoKeywords: ["texto a audio", "convertir texto a audio", "convertidor texto a audio", "tts español", "texto a voz", "mejor tts", "elevenlabs español", "google tts", "audio a texto", "transcripción audio"]
+metaDescription: "Guía completa para convertir texto a audio (y al revés) en español y catalán: comparativa de ElevenLabs, Google Cloud TTS, OpenAI, Polly, Azure, Murf y más. Incluye tabla, casos de uso, precios y recomendaciones."
+---
+
+# Texto a audio: las 7 mejores herramientas TTS en español (y catalán) en 2026
+
+En 2024 ElevenLabs publicó muestras en las que la mayoría de oyentes nativos eran incapaces de distinguir un narrador humano de una voz sintética. No solo había mejorado la pronunciación: la **entonación, las pausas, la respiración y las microvariaciones emocionales** ya eran prácticamente indistinguibles de un actor de doblaje profesional. Dos años después, ese estándar se ha convertido en la base de cualquier herramienta seria de **texto a audio**, y el problema ha dejado de ser "¿suena natural?" para pasar a "¿cuál elijo, cuánto cuesta y soporta mi idioma?".
+
+Si has llegado hasta aquí buscando **convertir texto a audio en español** —o en catalán, que es donde se complica— esta es la guía honesta que necesitas. Hemos probado las herramientas más usadas, hemos verificado qué voces existen realmente para cada idioma, y al final del artículo te explicamos también el camino inverso: cómo hacer **audio a texto** cuando lo que tienes es una grabación y necesitas un transcrito.
+
+> **TL;DR:** Para texto a audio en español, **ElevenLabs** es la opción más natural y la única con clonación de voz seria; **Google Cloud TTS** gana en relación calidad/precio para volumen y es la mejor para **catalán** (`ca-ES`); **OpenAI** es perfecto si ya pagas la API; **Amazon Polly** y **Azure** son sólidos para producto e infraestructura. Para el camino inverso (audio a texto), [Transcriu](/transcribe) está optimizado para español y catalán con [diarización de interlocutores](/features/diarizacion-interlocutores) y [exportación a múltiples formatos](/features/exportar-transcripciones).
+
+---
+
+## ¿Para qué sirve realmente convertir texto a audio?
+
+Hace cinco años, el TTS (text-to-speech) era una tecnología de nicho: lectores de pantalla, GPS, voces robóticas de centralitas. Hoy es una de las capas de IA más transversales que existen, y los casos de uso se han multiplicado mucho más allá de la accesibilidad.
+
+**Accesibilidad y lectura asistida.** Sigue siendo el caso clásico, pero ya no se limita a personas con discapacidad visual. Cualquiera con dislexia, fatiga visual, problemas de concentración o simplemente preferencia auditiva puede consumir cualquier texto como si fuera un podcast. Aplicaciones como Speechify y NaturalReader han hecho una industria entera de esto.
+
+**Producción de podcasts y narración.** Crear un podcast diario o convertir artículos de blog en versión audio era inviable hace cinco años; hoy lo hace un creador solo desde el portátil. El flujo típico es: redactas el guion, lo pasas por ElevenLabs o Google TTS, y obtienes un MP3 publicable. La voz sintética ya no se percibe como "voz de robot" si el modelo es bueno.
+
+**Aprendizaje de idiomas.** Aquí el TTS es oro: poder escuchar cualquier frase escrita pronunciada por un nativo con entonación nativa acelera la fonética. Es especialmente útil para aprender pronunciación catalana o variantes del español (rioplatense, mexicano, andaluz, neutro).
+
+**E-learning y formación corporativa.** Producir un curso online con narración humana cuesta entre 50 y 200 euros por hora final de contenido. Con TTS, ese coste baja a céntimos. La calidad ya no es excusa: una voz neuronal moderna es indistinguible para el 95% de la audiencia.
+
+**Doblaje y localización.** Empresas como HeyGen y Synthesia ya doblan vídeos completos manteniendo la voz del orador original pero traduciendo el contenido. El TTS multilingüe con clonación de voz hace esto posible.
+
+**Pruebas de UX y prototipado de voz.** Asistentes virtuales, IVR (las voces de centralitas), wearables, coches conectados. Cualquier producto con interfaz de voz pasa por una herramienta TTS.
+
+**Screencasts, tutoriales en YouTube y vídeos cortos.** Si has visto un vídeo informativo en TikTok narrado con una voz curiosamente perfecta, casi seguro que es una voz sintética. El flujo creator + TTS es ya dominante en formatos cortos.
+
+@youtube[s83Jn4-GYZY]:Demostración del nivel actual del TTS en español de ElevenLabs
+
+---
+
+## Cómo funciona la tecnología TTS (rápido y sin tecnicismos)
+
+No necesitas entender la arquitectura interna para elegir bien, pero saber estos tres conceptos te ayuda a no comprar humo.
+
+**TTS concatenativo (la vieja escuela).** Las voces antiguas estaban hechas grabando a una persona pronunciando miles de sílabas y luego pegando esos fragmentos. Resultado: pronunciaba correctamente pero sonaba robótico, sin entonación natural. Esto es lo que oías en los GPS de hace diez años.
+
+**TTS neuronal o paramétrico.** Una red neuronal aprende a generar la onda de audio directamente a partir del texto. No pega fragmentos: genera. Esto permite entonación natural, énfasis correctos, respiraciones, e incluso emociones. Es lo que usan todas las herramientas modernas (ElevenLabs, Google WaveNet, OpenAI, Amazon Polly Neural, Azure Neural).
+
+**Clonación de voz (voice cloning).** Modelos como ElevenLabs te permiten subir 1-3 minutos de tu propia voz y obtener una réplica sintética que dice cualquier cosa. Esto abre posibilidades creativas enormes pero también riesgos éticos importantes (deepfakes de audio). Las plataformas serias incluyen marca de agua y verificación de consentimiento.
+
+Cuando una herramienta dice "voz neuronal", "voz WaveNet" o "voz HD", se refiere a esto. Cuando dice "voz estándar", suele ser TTS concatenativo más antiguo. **La diferencia de calidad es brutal y casi siempre vale la pena pagar el extra por neuronal.**
+
+---
+
+## Las 7 mejores herramientas TTS en español (2026)
+
+Vamos al grano. Esta es la tabla comparativa con las opciones que realmente merecen la pena para texto a audio en español. La columna de catalán es importante: muchas plataformas todavía no lo soportan o lo hacen mal.
+
+| Herramienta | Plan gratis | Voces en español | Voces en catalán | Calidad | Mejor para | Precio aprox. |
+|---|---|---|---|---|---|---|
+| **ElevenLabs** | 10.000 caracteres/mes | 20+ (España y LATAM) | Sí, calidad variable | Excelente | Podcasts, audiolibros, doblaje | Desde ~5 $/mes |
+| **Google Cloud TTS** | 1M caracteres/mes (estándar) | 30+ (WaveNet + Neural2) | Sí (ca-ES, varios) | Muy buena | Volumen, apps, multilingüe | ~16 $/M caracteres |
+| **OpenAI TTS** | Solo de pago | 6 voces multilingües | Sí, vía multilingüe | Muy buena | Devs con API OpenAI | ~15 $/M caracteres |
+| **Amazon Polly** | 5M caracteres/mes (12 meses) | 10+ voces neuronales | No nativamente | Buena/Muy buena | Apps en AWS, IVR | ~16 $/M caracteres |
+| **Azure AI Speech** | 0,5M caracteres/mes | 20+ voces neuronales | Sí (ca-ES) | Muy buena | Empresas Microsoft | ~16 $/M caracteres |
+| **Murf.ai** | 10 min/mes | 15+ voces | No | Buena | Vídeos corporativos, e-learning | Desde ~29 $/mes |
+| **NaturalReader** | Lectura ilimitada (voz estándar) | Sí, varias | Limitado | Buena | Lectura personal, estudio | Desde ~9 $/mes |
+
+Vamos a desglosar cada una.
+
+### 1. ElevenLabs — la referencia en naturalidad
+
+Si solo vas a probar una herramienta, prueba esta. Las voces neuronales de ElevenLabs en español son, a día de hoy, las que más se parecen a una persona real. Tienen control de estabilidad, similitud, estilo emocional, y soportan **clonación de voz** con resultados sorprendentemente buenos a partir de un minuto de muestra.
+
+**Ventajas:**
+- Calidad de voz líder del mercado
+- Clonación de voz a partir de ~1 minuto
+- Voces en español de España y de varias variantes latinoamericanas
+- API sencilla y bien documentada
+- Soporte para catalán (calidad variable según voz)
+
+**Limitaciones:**
+- Más cara que las alternativas en volumen alto
+- El plan gratis se agota rápido (10k caracteres ≈ 10-15 min de audio)
+- Algunas voces "premium" requieren plan superior
+
+**Mejor para:** podcasters, audiolibros, doblaje creativo, narración de vídeos, y cualquier caso donde la calidad de voz sea crítica.
+
+### 2. Google Cloud TTS — el rey del catalán y del volumen
+
+Google Cloud Text-to-Speech es la mejor opción si necesitas **volumen, precio competitivo y soporte multilingüe sólido**, especialmente para catalán (`ca-ES`). Tiene voces WaveNet y Neural2 que son muy buenas, no al nivel de ElevenLabs pero más que suficientes para la mayoría de casos. El plan gratis (1 millón de caracteres al mes en voces estándar, 1 millón en WaveNet) es absurdamente generoso.
+
+**Ventajas:**
+- Plan gratis enorme
+- Soporte oficial de catalán con varias voces masculinas y femeninas
+- Más de 380 voces en 50+ idiomas
+- Pago por uso (sin suscripción)
+- Integración fácil con Google Cloud
+
+**Limitaciones:**
+- Requiere cuenta de Google Cloud y tarjeta de crédito
+- Las voces no llegan al nivel emocional de ElevenLabs
+- Interfaz orientada a desarrolladores
+
+**Mejor para:** apps con TTS integrado, contenido en catalán, e-learning a escala, accesibilidad masiva.
+
+### 3. OpenAI TTS — el atajo si ya pagas la API
+
+OpenAI lanzó su modelo TTS junto con GPT-4. Tiene seis voces (alloy, echo, fable, onyx, nova, shimmer) que funcionan en muchos idiomas incluido español. La calidad es sorprendentemente buena para un producto que no es su foco principal, y la **integración con el resto del ecosistema OpenAI** lo hace ideal si ya construyes con su API.
+
+**Ventajas:**
+- Calidad de voz muy alta
+- Integración con resto de modelos OpenAI
+- Muy buena pronunciación multilingüe
+- Latencia baja con el modelo `tts-1`
+
+**Limitaciones:**
+- Solo 6 voces (no clonación, no personalización)
+- No tiene UI propia: solo API
+- Limitado para casos con muchas voces distintas
+
+**Mejor para:** desarrolladores que ya usan OpenAI, prototipos, asistentes conversacionales.
+
+### 4. Amazon Polly — sólido pero sin catalán
+
+Polly fue uno de los pioneros del TTS en cloud, y sigue siendo una opción muy sólida para aplicaciones, IVR y producto. Sus voces neuronales en español (Lupe, Mia, Pedro, Lucia, Sergio, Andrés) son buenas, especialmente para neutro latino. **No tiene voces nativas en catalán**, lo cual es un punto importante si tu audiencia es de Catalunya, Valencia o Baleares.
+
+**Ventajas:**
+- Integración nativa con AWS
+- Plan gratis de 5 millones de caracteres durante 12 meses
+- Voces de buena calidad para LATAM
+- Marcas SSML muy completas
+
+**Limitaciones:**
+- Sin catalán
+- Voces en español de España limitadas
+- Menos natural que ElevenLabs
+
+**Mejor para:** apps en AWS, IVR de empresas, lectura de notificaciones, productos B2B.
+
+### 5. Azure AI Speech — la opción enterprise
+
+Microsoft tiene un servicio TTS muy completo dentro de Azure Cognitive Services. Sus voces neuronales son comparables a las de Google, soportan catalán (`ca-ES`) y tienen un control SSML excelente. La integración con el resto de Microsoft 365 lo convierte en favorito de departamentos IT corporativos.
+
+**Ventajas:**
+- Soporte de catalán
+- Voces personalizadas con Custom Neural Voice
+- Latencia muy baja
+- Cumplimiento normativo enterprise
+
+**Limitaciones:**
+- Configuración inicial más compleja
+- Documentación dispersa
+- Más caro a volumen muy alto
+
+**Mejor para:** empresas con stack Microsoft, productos enterprise, intranets corporativas.
+
+### 6. Murf.ai — para vídeos corporativos sin código
+
+Murf no es una API; es una herramienta de producción. Subes el texto, eliges voz, ajustas pausas y entonación, y exportas MP3 o WAV. Su editor es muy intuitivo y es la opción favorita de **equipos de e-learning y marketing** que no quieren tocar código.
+
+**Ventajas:**
+- Editor visual completo
+- Stock de música de fondo
+- Buena calidad neuronal
+- Colaboración en equipo
+
+**Limitaciones:**
+- Sin catalán
+- Modelo de suscripción (no pay-per-use)
+- Plan gratis muy limitado
+
+**Mejor para:** vídeos corporativos, formación, marketing.
+
+### 7. NaturalReader — para lectura personal
+
+NaturalReader es la herramienta favorita de estudiantes y profesionales que quieren convertir documentos (PDFs, Word, web) en audio para escucharlos mientras hacen otra cosa. Tiene aplicación de escritorio, extensión de Chrome y app móvil. Las voces gratis son básicas; las premium ya son de nivel neuronal.
+
+**Mejor para:** estudio, lectura personal, productividad.
+
+@youtube[8hJflwR9y_4]:Comparativa de las mejores voces TTS en español para 2026
+
+---
+
+## Herramientas gratis vs de pago: ¿cuándo merece la pena pagar?
+
+Pregunta razonable: si hay planes gratis decentes, ¿hace falta pagar?
+
+**Quédate en gratis si:**
+- Vas a generar menos de 10-15 minutos de audio al mes
+- Es para uso personal (estudio, accesibilidad)
+- No te importa la pequeña diferencia de calidad entre voz estándar y voz neuronal
+- Solo necesitas español neutro
+
+**Paga si:**
+- Vas a publicar contenido (podcast, YouTube, audiolibros)
+- Necesitas catalán o variantes regionales con buena calidad
+- Quieres clonación de voz
+- Generas más de 30 minutos al mes
+- La calidad de voz forma parte de tu producto
+
+**Truco práctico:** muchos creadores combinan dos servicios. Por ejemplo, usan ElevenLabs para narraciones largas premium y Google TTS para notificaciones o partes secundarias. Las APIs son fáciles de combinar.
+
+Para volumen medio (1-5 horas de audio al mes), ElevenLabs Pro o Google Cloud TTS suelen ser las opciones más rentables.
+
+---
+
+## Y para catalán específicamente
+
+Aquí toca ser sincero: **el catalán está peor cubierto que el español**, aunque la situación ha mejorado mucho en 2024-2026. No todas las plataformas lo soportan, y entre las que lo hacen, la calidad varía mucho.
+
+Las que sí tienen catalán con calidad aceptable:
+
+- **Google Cloud TTS** — voces `ca-ES` masculinas y femeninas, calidad WaveNet/Neural2. Es probablemente la mejor opción para producir contenido en catalán a escala.
+- **Microsoft Azure** — voces `ca-ES-EnricNeural`, `ca-ES-JoanaNeural` y otras. Calidad muy decente.
+- **ElevenLabs** — soporte multilingüe que cubre catalán, calidad variable según la voz que elijas. Las voces clonadas funcionan bien si entrenas con voz en catalán.
+- **Acapela Group** — empresa belga con foco histórico en lenguas minorizadas, incluido catalán. Calidad clásica concatenativa, menos natural pero correcta.
+
+Las que **no soportan catalán** (o lo hacen vía workaround):
+
+- Amazon Polly — sin voces nativas
+- Murf.ai — sin catalán
+- La mayoría de herramientas comerciales orientadas a marketing
+
+**Recomendación práctica:** si tu producto es para el mercado catalán, prueba primero Google Cloud TTS. Si no hay presupuesto cero, AINA (el proyecto de la Generalitat de Catalunya) tiene modelos de voz catalanes abiertos que puedes autohospedar.
+
+---
+
+## Cómo convertir texto a audio en 30 segundos (paso a paso)
+
+Para ElevenLabs (el más rápido):
+
+1. Entra en **elevenlabs.io** y crea cuenta gratis con email o Google.
+2. En el panel, pega el texto en la caja central.
+3. En el selector de voz a la derecha, elige una voz en español (por ejemplo "Mateo" o "Bella").
+4. Ajusta los sliders de **stability** (0.5 es buen punto de partida) y **similarity** (0.75).
+5. Pulsa **Generate**.
+6. Escucha el audio. Si no te gusta, regenera —cada generación es ligeramente distinta— o ajusta los sliders.
+7. Descarga como MP3.
+
+Para Google Cloud TTS desde la consola web:
+
+1. Entra en **console.cloud.google.com/text-to-speech**.
+2. Selecciona idioma "Spanish (Spain)" o "Catalan (Spain)".
+3. Selecciona una voz tipo "Neural2" o "WaveNet".
+4. Pega el texto en SSML o texto plano.
+5. Pulsa **Speak it** para previsualizar.
+6. Para descargar el audio, llama la API desde tu código o usa Cloud Shell.
+
+Para algo más artesanal y libre: el proyecto **Coqui TTS** y **Piper** permiten autohospedar TTS open-source con modelos en español. La calidad ya no está a la altura comercial, pero para hobbies o producto on-device es una opción real.
+
+---
+
+## Y al revés: audio a texto (transcripción automática)
+
+El otro 50% del trabajo con voz y texto es el camino inverso: tienes una grabación —una reunión, una entrevista, una clase, una sesión clínica— y necesitas el transcrito. Aquí el panorama es muy distinto al TTS.
+
+| Herramienta | Plan gratis | Idiomas | Diarización | Precisión esp/cat | Mejor para |
+|---|---|---|---|---|---|
+| **Transcriu** | Sí, prueba | Español, catalán y más | Sí, automática | Optimizada | Logopedas, periodistas, estudiantes |
+| **OpenAI Whisper (API)** | No, pero open-source es gratis | 99+ idiomas | No nativa | Muy buena | Devs, autohospedaje |
+| **AssemblyAI** | Crédito inicial | 30+ idiomas | Sí | Buena | Apps SaaS |
+| **Rev.com** | No | Inglés sobre todo | Sí | Excelente (humano) | Profesional inglés |
+| **Google Speech-to-Text** | 60 min/mes | 125+ idiomas | Sí | Buena | Apps GCP |
+| **Otter.ai** | 300 min/mes | Inglés principalmente | Sí | Buena (inglés) | Reuniones en inglés |
+
+La gran pregunta aquí no es solo "¿transcribe bien?", sino "¿transcribe bien en mi idioma, con dos hablantes simultáneos, con audio de calidad media, y puedo descargarlo en el formato que necesito?".
+
+@cta[Probar Transcriu gratis→/transcribe]:Convierte audio a texto en español y catalán || Pensado para logopedas, periodistas, estudiantes y profesionales que necesitan transcripciones precisas, con diarización de interlocutores y exportación a Word, PDF, SRT y más. Sin instalar nada, directo desde el navegador.
+
+### Whisper (OpenAI): el modelo base de toda la industria
+
+Whisper es el modelo open-source de transcripción de OpenAI. Está detrás de la mayoría de productos comerciales de hoy, incluido buena parte del flujo de Transcriu en sus capas técnicas. Soporta español y catalán con muy buena precisión. Las pegas: requiere conocimientos técnicos para autohospedarlo, no tiene diarización nativa, y la API de OpenAI tiene un coste por minuto.
+
+### AssemblyAI
+
+API potente para empresas que quieren añadir transcripción a su producto. Buena calidad, soporta español, tiene diarización automática y detección de temas. No es la opción para usuarios finales.
+
+### Google Speech-to-Text
+
+Robusto, multilingüe, escalable. Buena precisión pero menos natural en el formateo (puntuación, mayúsculas) que Whisper.
+
+### Transcriu — nuestra recomendación para español y catalán
+
+**Aviso: somos parte interesada.** Dicho esto, Transcriu está construido específicamente para resolver el problema de transcripción en español y catalán para profesionales que no son desarrolladores: logopedas que necesitan transcribir sesiones, periodistas que necesitan procesar entrevistas, estudiantes que graban clases, investigadores con grupos focales.
+
+Por qué encaja en estos perfiles:
+
+- **Optimizado para español y catalán** desde el primer minuto, no como un idioma "soportado más" entre 99.
+- **[Diarización automática de interlocutores](/features/diarizacion-interlocutores)**: detecta cuándo cambia el hablante y lo etiqueta.
+- **[Exportación a múltiples formatos](/features/exportar-transcripciones)**: Word, PDF, TXT, SRT (subtítulos), VTT.
+- **[Transcripción automática](/features/transcripcion-automatica)** con edición posterior fácil en navegador.
+- Sin instalar nada, sin curva técnica.
+- Pago por uso o suscripción según volumen.
+
+Para qué **no** te recomendaríamos Transcriu: si necesitas transcribir audio en inglés con jerga muy específica (médica EE.UU., jurídica EE.UU.), Rev o AssemblyAI están más optimizados. Si lo que quieres es montar tu propio pipeline de transcripción dentro de un producto, Whisper autohospedado te dará más control.
+
+---
+
+## Cómo elegir la herramienta correcta (árbol de decisión)
+
+Para no marearte con la comparativa, este es el atajo mental.
+
+**Si tu objetivo es CONVERTIR TEXTO A AUDIO (TTS):**
+
+- ¿Necesitas la máxima calidad para podcast, audiolibro o doblaje? → **ElevenLabs.**
+- ¿Necesitas catalán de calidad? → **Google Cloud TTS** (o Azure como alternativa).
+- ¿Ya pagas la API de OpenAI? → **OpenAI TTS.**
+- ¿Volumen alto a bajo coste? → **Google Cloud TTS.**
+- ¿Vídeos corporativos sin código? → **Murf.ai.**
+- ¿Lectura personal de PDFs y artículos? → **NaturalReader** o **Speechify.**
+
+**Si tu objetivo es CONVERTIR AUDIO A TEXTO (STT):**
+
+- ¿Eres logopeda, periodista, estudiante o profesional, y necesitas español/catalán? → **[Transcriu](/transcribe).**
+- ¿Eres desarrollador y quieres autohospedar? → **Whisper open-source.**
+- ¿Quieres integrarlo en tu app? → **AssemblyAI** o **Google Speech-to-Text**.
+- ¿Necesitas transcripción humana premium en inglés? → **Rev.com.**
+
+**Si necesitas las dos cosas en el mismo flujo** —por ejemplo, transcribes una entrevista y luego generas un resumen en audio— combinar Transcriu (para STT) con ElevenLabs o Google TTS (para TTS) es lo más práctico.
+
+---
+
+## Buenas prácticas para que tu audio generado suene bien
+
+Aunque las herramientas son mejores que nunca, el resultado depende mucho del texto de entrada y de cómo lo configures. Algunos consejos rápidos.
+
+**Escribe pensando en cómo se va a leer.** El TTS no improvisa: lee lo que pones. Si escribes "Dr." la herramienta puede leer "doctor" o deletrearlo. Mejor escribe "doctor" directamente. Lo mismo con números: "1.500" puede leerse "uno coma quinientos" o "mil quinientos". Si es importante, escríbelo con palabras.
+
+**Usa puntuación generosa.** Las comas, los puntos y los puntos y coma son las señales más fuertes que la IA recibe para entonar. Una frase sin puntuación se lee atropellada.
+
+**SSML para control fino.** Las plataformas profesionales (Google, Azure, Polly) soportan SSML (Speech Synthesis Markup Language), donde puedes especificar pausas, énfasis, velocidad, tono y pronunciaciones fonéticas. Si necesitas calidad broadcast, vale la pena aprenderlo.
+
+**Divide textos largos.** Generar 10.000 palabras de golpe puede dar resultados desiguales en entonación. Divide por capítulos o secciones y procesa por bloques.
+
+**Iterar es normal.** Las voces neuronales tienen un componente probabilístico. La misma frase puede sonar ligeramente distinta en dos generaciones. Genera dos o tres veces y quédate con la mejor.
+
+**Catalán: cuidado con préstamos y nombres propios.** Las voces catalanas a veces pronuncian mal nombres en castellano o anglicismos. Si el texto tiene muchos, ajusta manualmente con fonética SSML.
+
+---
+
+## Aspectos legales y éticos del TTS en 2026
+
+No queremos cerrar sin esto, porque cada vez es más relevante.
+
+**Clonación de voz y consentimiento.** Clonar la voz de una persona sin su consentimiento explícito es ilegal en la mayoría de jurisdicciones, incluyendo la UE bajo el AI Act. ElevenLabs y demás plataformas serias requieren verificación de identidad para clonar voces. No clones la voz de un famoso, jefe o ex-pareja "para una broma": las consecuencias pueden ser serias.
+
+**Audiolibros y derechos de autor.** Convertir un libro a audio con TTS no te da derechos sobre el contenido. Si el texto no es tuyo, necesitas licencia.
+
+**Etiquetado de contenido sintético.** El AI Act europeo va a exigir etiquetar contenido generado por IA. Si publicas un podcast generado con TTS, lo más limpio es declararlo.
+
+**Privacidad.** Si transcribes contenido sensible (sesiones de logopedia, terapia, entrevistas confidenciales), elige plataformas que cifren los datos en reposo y en tránsito, y que tengan política clara sobre el uso de tus grabaciones para entrenar modelos.
+
+---
+
+## Preguntas frecuentes
+
+**¿Cuál es la mejor herramienta para convertir texto a audio en español gratis?**
+
+Para uso personal y volumen bajo, el plan gratis de **ElevenLabs** (10.000 caracteres/mes) ofrece la mejor calidad. Si necesitas más volumen gratis, el plan gratis de **Google Cloud TTS** es enorme (1 millón de caracteres/mes en voces estándar). Para lectura de PDFs y artículos largos, **NaturalReader** ofrece lectura ilimitada con voz estándar gratis.
+
+**¿Las voces sintéticas se notan?**
+
+En 2026, con un buen modelo neuronal (ElevenLabs, Google Neural2, OpenAI TTS), la voz es prácticamente indistinguible de la humana para un oyente medio. Un oído entrenado puede notar microartefactos en frases muy largas o emociones extremas, pero el 95% de la audiencia no lo distinguirá.
+
+**¿Puedo usar voces sintéticas comercialmente?**
+
+Sí, todas las plataformas mencionadas permiten uso comercial dentro de su plan correspondiente. Revisa los términos: algunas distinguen entre voces "stock" (uso libre) y voces "premium" (a veces con restricciones). Para clonación de voz, necesitas consentimiento explícito de la persona clonada.
+
+**¿Hay buenas herramientas TTS en catalán?**
+
+Sí, aunque menos que en español. Las mejores son **Google Cloud TTS** (varias voces `ca-ES` Neural2), **Microsoft Azure** (voces neuronales) y **ElevenLabs** (multilingüe con soporte catalán). Acapela también ofrece voces catalanas históricas. El proyecto **AINA** de la Generalitat tiene modelos abiertos para autohospedar.
+
+**¿Cómo convierto un PDF entero a audio?**
+
+Usa una herramienta como NaturalReader o Speechify que aceptan PDF directamente. Si quieres más control, extrae el texto con cualquier herramienta (Adobe, Smallpdf, etc.), límpialo y pásalo por ElevenLabs o Google TTS. Para PDFs muy largos, divide por capítulos.
+
+**¿Qué diferencia hay entre voz neuronal y voz estándar?**
+
+La voz estándar usa TTS concatenativo (más antiguo): pega fragmentos pregrabados. Suena correcto pero plano. La voz neuronal genera la onda de audio con una red neuronal: suena con entonación natural, respiraciones, emoción. La diferencia de calidad es enorme; el coste extra suele valer la pena.
+
+**¿Cuánto cuesta generar una hora de audio TTS?**
+
+Depende muchísimo. Una hora de narración son unas 9.000 palabras = ~50.000 caracteres. En **Google Cloud TTS Neural2** son unos 0,80 dólares. En **ElevenLabs** unos 1-3 dólares según plan. En **OpenAI TTS** unos 0,75 dólares. Comparado con un actor de doblaje (50-200 euros/hora final), la diferencia es astronómica.
+
+**¿Cómo paso de audio a texto si lo que tengo es una grabación?**
+
+Para usuarios no técnicos en español y catalán, te recomendamos **[Transcriu](/transcribe)**: subes el audio, eliges idioma, esperas unos minutos y obtienes el transcrito con diarización y opción de exportar a Word, PDF o SRT. Para desarrolladores, **Whisper** open-source o la API de **OpenAI Whisper** son las alternativas más comunes.
+
+**¿Las herramientas TTS funcionan bien con acentos regionales?**
+
+ElevenLabs, Google y Azure tienen voces específicas para variantes (mexicano, argentino, colombiano, español de España neutro, andaluz menos). Para catalán, las voces actuales son sobre todo de variante central; balear y valencià están menos representados.
+
+**¿Es legal clonar mi propia voz para usarla profesionalmente?**
+
+Sí, y de hecho es lo que hacen muchos creadores: clonan su voz una vez con ElevenLabs y la usan para narrar contenido sin tener que grabar nuevas tomas. Asegúrate de cumplir los términos de la plataforma y de verificar tu identidad correctamente.
+
+---
+
+## Conclusión: cómo decidir hoy mismo
+
+La buena noticia es que **ya no hay malas opciones**: cualquier herramienta de la lista produce resultados muy superiores a lo que era posible en 2020. La decisión correcta depende de tres preguntas:
+
+1. **¿En qué idioma trabajo?** Si es español neutro, todas funcionan. Si es catalán, te quedan Google, Azure, ElevenLabs y Acapela.
+2. **¿Qué volumen?** Bajo → planes gratis. Medio → ElevenLabs Pro o Google Cloud TTS pay-per-use. Alto → Google o Polly.
+3. **¿Para qué?** Calidad premium → ElevenLabs. Producto/app → Google, Azure, OpenAI. Personal → NaturalReader, Speechify.
+
+Y recuerda el otro 50%: si lo que necesitas es el camino inverso —convertir grabaciones a texto— hay herramientas especializadas mucho mejores que las que hacen las dos cosas a medias.
+
+@cta[Empieza a transcribir gratis→/transcribe]:Transcriu: audio a texto en español y catalán || Pensado específicamente para profesionales que trabajan con voz en estos idiomas. Diarización automática, edición fácil en navegador, exportación a Word, PDF, SRT y más. Sin instalación, prueba gratis.
+
+Si trabajas con voz —en cualquier dirección— vale la pena tener una herramienta para cada lado. Para texto a audio, prueba ElevenLabs o Google Cloud TTS. Para audio a texto en español o catalán, [prueba Transcriu gratis](/transcribe) y dinos qué te parece.

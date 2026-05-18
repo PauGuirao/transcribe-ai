@@ -4,6 +4,18 @@ import matter from 'gray-matter';
 
 const contentDirectory = path.join(process.cwd(), 'content/blog');
 
+export type BlogLanguage = 'ca' | 'es' | 'en';
+
+const VALID_LANGUAGES: readonly BlogLanguage[] = ['ca', 'es', 'en'];
+
+function normaliseLanguage(value: unknown): BlogLanguage {
+  // Defaults to 'ca' so posts without a `language:` field keep their historical
+  // routing behaviour. Always set the field explicitly when authoring.
+  return typeof value === 'string' && (VALID_LANGUAGES as readonly string[]).includes(value)
+    ? (value as BlogLanguage)
+    : 'ca';
+}
+
 export interface BlogPost {
   slug: string;
   title: string;
@@ -13,6 +25,7 @@ export interface BlogPost {
   updatedAt: string;
   published: boolean;
   tags: string[];
+  language: BlogLanguage;
   content: string;
 }
 
@@ -25,6 +38,7 @@ export interface BlogPostMetadata {
   updatedAt: string;
   published: boolean;
   tags: string[];
+  language: BlogLanguage;
 }
 
 export function getAllBlogPosts(): BlogPostMetadata[] {
@@ -47,6 +61,7 @@ export function getAllBlogPosts(): BlogPostMetadata[] {
           updatedAt: data.updatedAt || '',
           published: data.published ?? true,
           tags: data.tags || [],
+          language: normaliseLanguage(data.language),
         } as BlogPostMetadata;
       })
       .filter((post) => post.published)
@@ -82,6 +97,7 @@ export function getBlogPostBySlug(slug: string): BlogPost | null {
       updatedAt: data.updatedAt || '',
       published: data.published ?? true,
       tags: data.tags || [],
+      language: normaliseLanguage(data.language),
       content,
     } as BlogPost;
   } catch (error) {
@@ -100,6 +116,16 @@ export function getAllBlogSlugs(): string[] {
     console.error('Error reading blog slugs:', error);
     return [];
   }
+}
+
+/** Returns published posts whose `language:` frontmatter matches the locale. */
+export function getBlogPostsForLocale(locale: BlogLanguage): BlogPostMetadata[] {
+  return getAllBlogPosts().filter((post) => post.language === locale);
+}
+
+/** Returns the slug+language pairs needed to generate per-locale routes. */
+export function getAllBlogSlugsWithLanguage(): Array<{ slug: string; language: BlogLanguage }> {
+  return getAllBlogPosts().map((post) => ({ slug: post.slug, language: post.language }));
 }
 
 export function formatDate(dateString: string): string {

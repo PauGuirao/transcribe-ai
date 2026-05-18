@@ -2,39 +2,36 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import BlogPostClient from "./blog-post-client";
-import { getBlogPostBySlug, getAllBlogSlugs } from "@/lib/mdx";
+import { getBlogPostBySlug, getAllBlogSlugsWithLanguage } from "@/lib/mdx";
 import {
   JsonLd,
   generateArticleSchema,
   generateBreadcrumbSchema,
 } from "@/components/seo/JsonLd";
-import { generatePageHreflang } from "@/components/seo/HreflangTags";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transcriu.com";
 
 interface BlogPostPageProps {
-  params: {
+  params: Promise<{
     slug: string;
     locale: string;
-  };
-}
-
-// Get blog post by slug from MDX files
-async function getBlogPost(slug: string) {
-  return getBlogPostBySlug(slug);
+  }>;
 }
 
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
-  const post = await getBlogPost(params.slug);
-  const locale = params.locale || "ca";
+  const { slug, locale } = await params;
+  const post = getBlogPostBySlug(slug);
 
-  if (!post) {
+  // Treat /<other-locale>/blog/<post-in-different-language> as not-found so
+  // search engines don't index duplicated content across locales.
+  if (!post || post.language !== locale) {
     return {
       title: "Article no trobat",
       description: "L'article que cerques no existeix.",
     };
   }
 
+  const postUrl = `${BASE_URL}/${post.language}/blog/${post.slug}`;
   return {
     title: `${post.title} | Blog Transcriu`,
     description: post.excerpt,
@@ -42,7 +39,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       title: post.title,
       description: post.excerpt,
       type: "article",
-      url: `${BASE_URL}/${locale}/blog/${post.slug}`,
+      url: postUrl,
       publishedTime: post.createdAt,
       modifiedTime: post.updatedAt,
       authors: [post.author],
@@ -53,25 +50,34 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       title: post.title,
       description: post.excerpt,
     },
-    alternates: generatePageHreflang({
-      currentLocale: locale,
-      path: `/blog/${post.slug}`,
-    }),
+    // Blog posts exist in a single language only — canonical points to that
+    // language's URL and we do not advertise non-existent translations.
+    alternates: {
+      canonical: postUrl,
+      languages: {
+        [post.language]: postUrl,
+        "x-default": postUrl,
+      },
+    },
   };
 }
 
+// Only pre-render (locale, slug) combinations where the post is actually
+// authored in that locale; all other combinations 404.
 export async function generateStaticParams() {
-  const slugs = getAllBlogSlugs();
-  return slugs.map((slug) => ({
-    slug: slug,
+  return getAllBlogSlugsWithLanguage().map(({ slug, language }) => ({
+    slug,
+    locale: language,
   }));
 }
 
-export default async function BlogPostPage({ params }: BlogPostPageProps) {
-  const post = await getBlogPost(params.slug);
-  const locale = params.locale || "ca";
+export const dynamicParams = false;
 
-  if (!post) {
+export default async function BlogPostPage({ params }: BlogPostPageProps) {
+  const { slug, locale } = await params;
+  const post = getBlogPostBySlug(slug);
+
+  if (!post || post.language !== locale) {
     notFound();
   }
 

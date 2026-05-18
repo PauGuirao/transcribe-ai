@@ -1,9 +1,9 @@
 import fs from 'fs';
 import path from 'path';
-import landingsData from '../src/app/[locale]/logopedia/landings.json';
 
-// Import the blog slugs function
-import { getAllBlogSlugs } from '../src/lib/mdx';
+import { getAllLandingParams } from '../src/lib/seo';
+// Import the blog metadata function (slug + language per post).
+import { getAllBlogSlugsWithLanguage } from '../src/lib/mdx';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.transcriu.com';
 const PUBLIC_DIR = path.join(process.cwd(), 'public');
@@ -78,52 +78,48 @@ function generateMainSitemap(): void {
 }
 
 /**
- * Generate logopedia sitemap with all landing pages for all locales
+ * Generate logopedia sitemap. Uses getAllLandingParams which already filters
+ * each (slug, locale) pair through shouldGenerateForLocale, so we only emit
+ * URLs that correspond to actually-rendered pages.
  */
 function generateLogopediaSitemap(): void {
-  const landingSlugs = Object.keys(landingsData);
+  const params = getAllLandingParams();
 
-  const urls: Array<{ loc: string; lastmod: string; changefreq: string; priority: string }> = [];
-
-  for (const locale of LOCALES) {
-    for (const slug of landingSlugs) {
-      urls.push({
-        loc: `${BASE_URL}/${locale}/logopedia/${slug}`,
-        lastmod: new Date().toISOString(),
-        changefreq: 'monthly',
-        priority: '0.9',
-      });
-    }
-  }
+  const urls = params.map(({ slug, locale }) => ({
+    loc: `${BASE_URL}/${locale}/logopedia/${slug}`,
+    lastmod: new Date().toISOString(),
+    changefreq: 'monthly',
+    priority: '0.9',
+  }));
 
   const xml = generateSitemapXML(urls);
   fs.writeFileSync(path.join(PUBLIC_DIR, 'sitemap-logopedia.xml'), xml);
-  console.log(`✅ Generated sitemap-logopedia.xml with ${urls.length} URLs (${LOCALES.length} locales)`);
+  console.log(`✅ Generated sitemap-logopedia.xml with ${urls.length} URLs (locale-filtered)`);
 }
 
 /**
- * Generate blog sitemap for all locales
+ * Generate blog sitemap. Each post is listed only under its own language —
+ * cross-locale URLs (e.g. /en/blog/<catalan-slug>) are intentionally excluded
+ * to avoid duplicate-content signals.
  */
 function generateBlogSitemap(): void {
   try {
-    const blogSlugs = getAllBlogSlugs();
+    const posts = getAllBlogSlugsWithLanguage();
 
     const urls: Array<{ loc: string; lastmod: string; changefreq: string; priority: string }> = [];
 
-    for (const locale of LOCALES) {
-      for (const slug of blogSlugs) {
-        urls.push({
-          loc: `${BASE_URL}/${locale}/blog/${slug}`,
-          lastmod: new Date().toISOString(),
-          changefreq: 'weekly',
-          priority: '0.8',
-        });
-      }
+    for (const { slug, language } of posts) {
+      urls.push({
+        loc: `${BASE_URL}/${language}/blog/${slug}`,
+        lastmod: new Date().toISOString(),
+        changefreq: 'weekly',
+        priority: '0.8',
+      });
     }
 
     const xml = generateSitemapXML(urls);
     fs.writeFileSync(path.join(PUBLIC_DIR, 'sitemap-blog.xml'), xml);
-    console.log(`✅ Generated sitemap-blog.xml with ${urls.length} URLs (${LOCALES.length} locales)`);
+    console.log(`✅ Generated sitemap-blog.xml with ${urls.length} URLs (${posts.length} posts, language-filtered)`);
   } catch (error) {
     console.warn('⚠️  Could not generate blog sitemap:', error);
     // Create empty blog sitemap if no blogs exist
