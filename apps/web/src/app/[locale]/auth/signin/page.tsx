@@ -63,57 +63,11 @@ const SignInContent = React.memo(function SignInContent() {
         return;
       }
 
-      // Check if there's a regular invitation token cookie
-      const inviteTokenMatch = document.cookie.match(/invite_token=([^;]+)/);
-      const inviteToken = inviteTokenMatch ? inviteTokenMatch[1] : null;
-      
-      if (inviteToken) {
-        // If there's an invitation token, process it directly here to avoid infinite loop
-        console.log(`Found invitation token during signin: ${inviteToken}`);
-        
-        // Process the invitation by calling the API directly
-        const processInvitation = async () => {
-          try {
-            const response = await fetch("/api/organization/invite/join", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ token: inviteToken }),
-            });
+      // Regular invitation tokens are now consumed by /auth/callback when the
+      // session is exchanged (it reads the `pending_invite_token` cookie). The
+      // user already being signed in here means callback already ran — nothing
+      // to process. The cookie is cleared by callback on success.
 
-            // Clear the invite token cookie after processing (success or failure)
-            document.cookie = `invite_token=; path=/; max-age=0; SameSite=Lax`;
-
-            if (response.ok) {
-              console.log("Invitation processed successfully from signin page");
-              const data = await response.json();
-              
-              // Set welcome popup data
-              setWelcomeData({
-                organizationName: data.organization?.name || "the organization",
-                userName: user?.user_metadata?.full_name || user?.email || ""
-              });
-              
-              // Show welcome popup instead of immediate redirect
-              setShowWelcomePopup(true);
-            } else {
-              console.error("Failed to process invitation from signin page");
-              // On error, redirect to dashboard as fallback
-              router.push("/dashboard");
-            }
-          } catch (error) {
-            console.error("Error processing invitation from signin page:", error);
-            // Clear cookie and redirect to dashboard on error
-            document.cookie = `invite_token=; path=/; max-age=0; SameSite=Lax`;
-            router.push("/dashboard");
-          }
-        };
-
-        processInvitation();
-        return;
-      }
-      
       // If there's a returnUrl, redirect there, otherwise go to dashboard
       const redirectTo = returnUrl || "/dashboard";
       router.push(redirectTo);

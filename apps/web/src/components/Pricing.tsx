@@ -13,57 +13,60 @@ type PricingProps = {
   onContactClick?: () => void;
 };
 
-export function Pricing({ authLoading, loading, onPrimaryAction, onContactClick }: PricingProps) {
+export function Pricing({ authLoading, loading, onPrimaryAction }: PricingProps) {
   const t = useTranslations('pricing');
   const params = useParams();
-  const locale = (params?.locale as 'ca' | 'es' | 'en') || 'ca';
+  const locale = (params?.locale as 'ca' | 'es' | 'en') || 'es';
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>('monthly');
 
-  const planOrder: PlanId[] = ['free', 'individual', 'team', 'organization'];
+  const planOrder: PlanId[] = ['free', 'basic', 'pro', 'studio'];
 
   return (
-    <section id="pricing" className="py-20">
-      <div className="text-center mb-12">
-        <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+    <section id="pricing" className="mx-auto max-w-6xl px-6 py-24">
+      <div className="mx-auto max-w-2xl text-center">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-3 py-1 text-xs font-medium text-neutral-700 shadow-sm">
+          <span className="inline-flex size-1.5 rounded-full bg-indigo-500" />
+          Pricing
+        </span>
+        <h2 className="mt-4 text-3xl font-normal tracking-tight text-neutral-900 sm:text-4xl">
           {t('title')}
         </h2>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+        <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-neutral-600">
           {t('subtitle')}
         </p>
 
-        {/* Billing Period Toggle */}
-        <div className="flex items-center justify-center gap-4 mb-8">
+        <div className="mt-8 inline-flex items-center rounded-full border border-neutral-200 bg-white p-1 text-sm">
           <button
             onClick={() => setBillingPeriod('monthly')}
-            className={`px-4 py-2 rounded-lg font-medium transition-all ${
+            className={`rounded-full px-4 py-1.5 font-medium transition-colors ${
               billingPeriod === 'monthly'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? 'bg-neutral-900 text-white'
+                : 'text-neutral-600 hover:text-neutral-900'
             }`}
           >
             {t('monthly')}
           </button>
           <button
             onClick={() => setBillingPeriod('yearly')}
-            className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
+            className={`flex items-center gap-2 rounded-full px-4 py-1.5 font-medium transition-colors ${
               billingPeriod === 'yearly'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? 'bg-neutral-900 text-white'
+                : 'text-neutral-600 hover:text-neutral-900'
             }`}
           >
             {t('yearly')}
-            <span className={`text-xs px-2 py-0.5 rounded-full ${
+            <span className={`rounded-full px-1.5 py-0.5 text-[10px] ${
               billingPeriod === 'yearly'
-                ? 'bg-green-400 text-green-900'
-                : 'bg-green-100 text-green-700'
+                ? 'bg-emerald-500 text-white'
+                : 'bg-emerald-50 text-emerald-700'
             }`}>
-              -20%
+              −20%
             </span>
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+      <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {planOrder.map((planId) => {
           const plan = PLANS[planId];
           return (

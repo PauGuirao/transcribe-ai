@@ -137,18 +137,27 @@ export function EditableTranscriptionSegments({
     }
   }, [editingIndex, cursorPosition]);
 
-  // Auto-scroll to current segment
+  // Auto-scroll to current segment (throttled via rAF to avoid layout thrash
+  // when timeupdate fires faster than the browser can scroll).
+  const lastScrolledIndexRef = useRef<number | null>(null);
   useEffect(() => {
-    if (currentSegmentIndex !== null) {
-      const segmentElement = document.querySelector(`[data-segment-index="${currentSegmentIndex}"]`);
+    if (currentSegmentIndex === null) return;
+    if (lastScrolledIndexRef.current === currentSegmentIndex) return;
+    lastScrolledIndexRef.current = currentSegmentIndex;
+
+    const id = window.requestAnimationFrame(() => {
+      const segmentElement = document.querySelector(
+        `[data-segment-index="${currentSegmentIndex}"]`,
+      );
       if (segmentElement) {
         segmentElement.scrollIntoView({
           behavior: 'smooth',
           block: 'center',
-          inline: 'nearest'
+          inline: 'nearest',
         });
       }
-    }
+    });
+    return () => window.cancelAnimationFrame(id);
   }, [currentSegmentIndex]);
 
   // Keyboard event listener for L and N keys when hovering, ESC when editing, and Ctrl+Z for undo

@@ -189,38 +189,52 @@ export function useTranscriptionData(audioId?: string) {
     };
   }, [audioId, fetchData]);
 
-  // ... (the rest of your hook's functions like handleSegmentsChange, saveTranscription, etc. remain the same)
-  const handleSegmentsChange = (segments: TranscriptionSegment[]) => {
+  const handleSegmentsChange = useCallback((segments: TranscriptionSegment[]) => {
     setEditedSegments(segments);
     setHasUnsavedChanges(true);
-  };
+  }, []);
 
-  const handleSpeakersChange = (newSpeakers: Speaker[]) => {
+  const handleSpeakersChange = useCallback((newSpeakers: Speaker[]) => {
     setSpeakers(newSpeakers);
     setHasUnsavedChanges(true);
-  };
+  }, []);
 
-  const saveTranscription = async () => {
-    if (!transcription || !hasUnsavedChanges) return;
+  // Tracks the timestamp of the most recent successful save — drives the
+  // header's "Saved 3s ago" status indicator.
+  const [lastSavedAt, setLastSavedAt] = useState<number | null>(null);
+
+  // Refs so the debounced auto-save closure reads the latest values without
+  // re-creating the timer every keystroke.
+  const editedSegmentsRef = useRef<TranscriptionSegment[]>(editedSegments);
+  const speakersRef = useRef<Speaker[]>(speakers);
+  const transcriptionRef = useRef<Transcription | null>(transcription);
+  editedSegmentsRef.current = editedSegments;
+  speakersRef.current = speakers;
+  transcriptionRef.current = transcription;
+
+  /**
+   * PATCH the transcription. Critically: we do NOT call fetchData() afterward —
+   * the local state is already the source of truth for what we just wrote, and
+   * a re-fetch would force the editor to re-mount and lose cursor/selection.
+   */
+  const saveTranscription = useCallback(async () => {
+    const t = transcriptionRef.current;
+    if (!t) return;
 
     setSaving(true);
     setError(null);
 
     try {
-      // Generate the full edited text by joining all segment texts
-      const generatedEditedText = editedSegments
-        .map((segment) => segment.text)
-        .join(" ");
+      const segs = editedSegmentsRef.current;
+      const generatedEditedText = segs.map((segment) => segment.text).join(" ");
 
-      const response = await fetch(`/api/transcription/${transcription.id}`, {
+      const response = await fetch(`/api/transcription/${t.id}`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           editedText: generatedEditedText,
-          editedSegments: editedSegments,
-          speakers: speakers,
+          editedSegments: segs,
+          speakers: speakersRef.current,
         }),
       });
 
@@ -229,8 +243,7 @@ export function useTranscriptionData(audioId?: string) {
       }
 
       setHasUnsavedChanges(false);
-      await fetchData(); // Refresh data from the server to be in sync
-      console.log("Transcription saved successfully!");
+      setLastSavedAt(Date.now());
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "An unknown error occurred";
@@ -239,7 +252,21 @@ export function useTranscriptionData(audioId?: string) {
     } finally {
       setSaving(false);
     }
-  };
+  }, []);
+
+  /**
+   * Debounced auto-save: whenever the user pauses for 1.5s, persist current
+   * state. Restarts on every change so we don't fire mid-edit. Skipped while
+   * an earlier save is still in flight (the next change will reschedule).
+   */
+  useEffect(() => {
+    if (!hasUnsavedChanges || !transcription) return;
+    if (saving) return;
+    const id = window.setTimeout(() => {
+      saveTranscription();
+    }, 1500);
+    return () => window.clearTimeout(id);
+  }, [hasUnsavedChanges, editedSegments, speakers, transcription, saving, saveTranscription]);
 
   const saveTitle = async (newTitle: string) => {
     if (!audio || !newTitle) return;
@@ -247,9 +274,7 @@ export function useTranscriptionData(audioId?: string) {
     try {
       const response = await fetch(`/api/audio/${audio.id}/title`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ customName: newTitle }),
       });
 
@@ -257,13 +282,15 @@ export function useTranscriptionData(audioId?: string) {
         throw new Error("Failed to update title");
       }
 
-      await fetchData(); // Refresh data to get the updated title
+      // Optimistic local update — avoids a full fetchData() that would remount
+      // the editor.
+      setAudio((prev) => (prev ? { ...prev, customName: newTitle } : prev));
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to update title";
       setError(errorMessage);
       console.error("Failed to save title:", errorMessage);
-      throw err; // Re-throw to handle in the component
+      throw err;
     }
   };
 
@@ -297,6 +324,7 @@ export function useTranscriptionData(audioId?: string) {
     saving,
     error,
     hasUnsavedChanges,
+    lastSavedAt,
     // Transcription progress (WebSocket-based)
     transcriptionProgress,
     isTranscribing,

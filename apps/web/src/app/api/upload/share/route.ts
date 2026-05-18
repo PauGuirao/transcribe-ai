@@ -178,7 +178,7 @@ export async function POST(request: NextRequest) {
             p_user_id: user.id,
             p_audio_id: audioId,
             p_idempotency_key: idempotencyKey,
-            p_provider: "openai",
+            p_provider: "workers_ai",
           }
         );
 
@@ -192,11 +192,14 @@ export async function POST(request: NextRequest) {
 
         const jobId = jobResult.job_id;
 
-        // Forward to Cloudflare Worker
+        // Forward to Cloudflare Worker.
+        // Note: this share-target flow uploaded the source file via the worker's
+        // legacy /upload route (whole-file in R2), so we call /transcribe-direct
+        // to transcribe in one shot. For files > 25 MB this still fails — those
+        // should flow through the chunked client path instead.
         try {
-          const endpoint = "/ingest"; // Using queue endpoint for shared audio
-          const baseUrl = CF_INGEST_URL.replace(/\/ingest$/, "");
-          const targetUrl = `${baseUrl}${endpoint}`;
+          const baseUrl = CF_INGEST_URL.replace(/\/(ingest|transcribe-direct)$/, "");
+          const targetUrl = `${baseUrl}/transcribe-direct`;
 
           const headers: Record<string, string> = {
             "Content-Type": "application/json",
@@ -226,7 +229,7 @@ export async function POST(request: NextRequest) {
               filename: uploadResult.filename,
               originalName: file.name,
               filePath,
-              provider: "openai",
+              provider: "workers_ai",
             }),
           });
 

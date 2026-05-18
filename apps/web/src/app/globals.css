@@ -60,7 +60,7 @@ html, body {
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(0.99 0 0);
+  --background: oklch(1 0 0);
   --foreground: oklch(0.15 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.15 0 0);
@@ -143,4 +143,33 @@ html, body {
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
   }
+
+  .bg-grid-lines {
+    background-image:
+      linear-gradient(to right, rgb(15 23 42 / 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(15 23 42 / 0.06) 1px, transparent 1px);
+    background-size: 64px 64px;
+    background-position: calc(50% + 32px) 0;
+  }
+
+  .bg-grid-fade {
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, black 55%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 0%, black 55%, transparent 100%);
+  }
+}
+
+/* Transcript editor — karaoke playback highlight (ProseMirror decorations) */
+.ProseMirror .karaoke-paragraph {
+  background-color: rgb(254 252 232 / 0.6); /* amber-50 */
+  border-radius: 6px;
+  transition: background-color 200ms ease-out;
+}
+.ProseMirror .karaoke-word {
+  background-color: rgb(252 211 77 / 0.55); /* amber-300 / soft */
+  border-radius: 3px;
+  padding: 0 2px;
+  margin: 0 -2px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  transition: background-color 80ms ease-out;
 }

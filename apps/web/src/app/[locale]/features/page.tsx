@@ -4,6 +4,13 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import featuresJson from "./features.json";
 import { ArrowRight } from "lucide-react";
+import {
+  JsonLd,
+  generateBreadcrumbSchema,
+  generateItemListSchema,
+} from "@/components/seo/JsonLd";
+
+const BASE_URL = "https://www.transcriu.com";
 
 const features = featuresJson as Record<
   string,
@@ -33,17 +40,35 @@ export const metadata: Metadata = {
       "Descobreix totes les funcionalitats de Transcriu per a logopedes professionals.",
     type: "website",
     url: "https://www.transcriu.com/features",
-    images: ["https://www.transcriu.com/og-image.jpg"],
   },
 };
 
 export default function FeaturesIndexPage() {
   const featureEntries = Object.entries(features);
 
+  const breadcrumbSchema = generateBreadcrumbSchema({
+    items: [
+      { name: "Inici", url: `${BASE_URL}/ca` },
+      { name: "Funcionalitats", url: `${BASE_URL}/ca/features` },
+    ],
+  });
+
+  const itemListSchema = generateItemListSchema({
+    name: "Funcionalitats de Transcriu",
+    items: featureEntries.map(([slug, feature], i) => ({
+      position: i + 1,
+      name: feature.heroTitle,
+      url: `${BASE_URL}/ca/features/${slug}`,
+      description: feature.heroDescription,
+    })),
+  });
+
   return (
     <div className="min-h-screen bg-gray-20">
+      <JsonLd data={breadcrumbSchema} />
+      <JsonLd data={itemListSchema} />
       <div id="nav-sentinel" className="h-1" />
-      <Navbar onContactClick={() => {}} />
+      <Navbar />
 
       <main className="mx-auto w-full max-w-7xl px-6 pb-24 pt-8">
         {/* Header */}

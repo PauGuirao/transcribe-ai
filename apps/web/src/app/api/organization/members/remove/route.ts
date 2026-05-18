@@ -79,15 +79,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Target user profile not found' }, { status: 404 });
     }
 
-    // Create a new free plan organization for the removed user
+    // Derive a personal-org name from the removed user's profile.
+    const firstName = (targetUserProfile.full_name || '').split(' ')[0]
+      || (targetUserProfile.email?.split('@')[0])
+      || 'Grup';
+    const personalOrgName = `${firstName}'s Grup`;
+
+    // Create a new free-plan personal organization for the removed user.
+    // Matches the schema written by provisionUserAccount.
     const { data: newOrganization, error: orgCreateError } = await supabase
       .from('organizations')
       .insert({
-        name: 'Grup', // Default name that will require setup
+        name: personalOrgName,
         owner_id: userId,
-        plan_type: 'individual',
+        plan: 'free',
+        minutes_per_month: 60,
+        minutes_used_this_period: 0,
         max_members: 1,
-        subscription_status: 'inactive',
+        subscription_status: null,
         settings: {}
       })
       .select()

@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Navbar from './Navbar';
 import AppSidebar from './AppSidebar';
 import MobileSidebar from './MobileSidebar';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
@@ -22,16 +21,13 @@ export default function AppLayout({ children, selectedAudioId, onAudioSelect, on
 
   return (
     <div className="h-screen flex flex-col">
-      {/* Mobile Sidebar */}
+      {/* Mobile: floating menu FAB + Sheet */}
       <MobileSidebar />
-      
-      {/* Top Navbar - Full Width */}
-      <Navbar />
-      
-      {/* Desktop Layout with Sidebar */}
-      <div className="hidden md:flex flex-1 pt-[65px]">
+
+      {/* Desktop: full-height sidebar + content (no top navbar) */}
+      <div className="hidden md:flex flex-1 min-h-0">
         <SidebarProvider>
-          <AppSidebar 
+          <AppSidebar
             selectedAudioId={selectedAudioId}
             onAudioSelect={handleAudioSelect}
             onUploadComplete={handleUploadComplete}
@@ -43,9 +39,9 @@ export default function AppLayout({ children, selectedAudioId, onAudioSelect, on
           </SidebarInset>
         </SidebarProvider>
       </div>
-      
-      {/* Mobile Layout - Full width content */}
-      <div className="md:hidden flex-1 pt-[65px] overflow-auto bg-white">
+
+      {/* Mobile content */}
+      <div className="md:hidden flex-1 overflow-auto bg-white">
         {children}
       </div>
     </div>

@@ -197,7 +197,7 @@ export const getCachedOrganization = async (orgId: string, supabaseClient: any) 
   if (!cached) {
     const { data, error } = await supabaseClient
       .from("organizations")
-      .select("id, name, plan_type, subscription_status, max_members, stripe_customer_id, stripe_subscription_id")
+      .select("id, name, description, image_url, plan_type, subscription_status, max_members, stripe_customer_id, stripe_subscription_id")
       .eq("id", orgId)
       .single();
     

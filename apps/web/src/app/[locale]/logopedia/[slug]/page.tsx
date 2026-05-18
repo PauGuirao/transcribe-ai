@@ -8,6 +8,11 @@ import {
   parseLandingSlug,
   Locale,
 } from "@/lib/seo";
+import {
+  JsonLd,
+  generateBreadcrumbSchema,
+  generateServiceSchema,
+} from "@/components/seo/JsonLd";
 
 const BASE_URL = "https://www.transcriu.com";
 
@@ -47,13 +52,11 @@ export async function generateMetadata({
       description: metadata.description,
       type: "website",
       url: `${BASE_URL}/${locale}/logopedia/${slug}`,
-      images: [`${BASE_URL}/og-image.png`],
     },
     twitter: {
       card: "summary_large_image",
       title: metadata.title,
       description: metadata.description,
-      images: [`${BASE_URL}/og-image.png`],
     },
     alternates: {
       canonical: `${BASE_URL}/${locale}/logopedia/${slug}`,
@@ -86,5 +89,56 @@ export default async function LandingPage({ params }: LandingPageProps) {
     notFound();
   }
 
-  return <ClientLanding landing={landingData} />;
+  const pageUrl = `${BASE_URL}/${validLocale}/logopedia/${slug}`;
+  const cityName =
+    (landingData as { city?: string; cityName?: string }).cityName ||
+    (landingData as { city?: string }).city ||
+    citySlug;
+
+  const breadcrumbSchema = generateBreadcrumbSchema({
+    items: [
+      {
+        name: validLocale === "ca" ? "Inici" : validLocale === "en" ? "Home" : "Inicio",
+        url: `${BASE_URL}/${validLocale}`,
+      },
+      { name: "Logopedia", url: `${BASE_URL}/${validLocale}/logopedia` },
+      { name: String(cityName), url: pageUrl },
+    ],
+  });
+
+  const serviceName =
+    validLocale === "ca"
+      ? `Transcripció amb IA per a logopedes a ${cityName}`
+      : validLocale === "en"
+      ? `AI transcription for speech therapists in ${cityName}`
+      : `Transcripción con IA para logopedas en ${cityName}`;
+
+  const serviceDescription =
+    validLocale === "ca"
+      ? `Transcripció automàtica de sessions clíniques i informes amb IA per a logopedes a ${cityName}. 98% de precisió en català i castellà.`
+      : validLocale === "en"
+      ? `Automated AI transcription of clinical sessions and reports for speech therapists in ${cityName}. 98% accuracy in Spanish, Catalan and English.`
+      : `Transcripción automática de sesiones clínicas e informes con IA para logopedas en ${cityName}. 98% de precisión en español y catalán.`;
+
+  const serviceSchema = generateServiceSchema({
+    name: serviceName,
+    description: serviceDescription,
+    url: pageUrl,
+    providerName: "Transcriu",
+    providerUrl: BASE_URL,
+    serviceType:
+      validLocale === "en" ? "Speech therapy transcription" : "Transcripción para logopedia",
+    areaServed: String(cityName),
+    audience:
+      validLocale === "en" ? "Speech-language pathologists" : "Logopedas",
+    offers: { price: "9.99", priceCurrency: "EUR" },
+  });
+
+  return (
+    <>
+      <JsonLd data={breadcrumbSchema} />
+      <JsonLd data={serviceSchema} />
+      <ClientLanding landing={landingData} />
+    </>
+  );
 }

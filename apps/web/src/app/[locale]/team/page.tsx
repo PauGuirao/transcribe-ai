@@ -4,7 +4,9 @@ import React, { useEffect, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/contexts/AuthContext";
-import { Users, User, Loader2, AlertCircle, UserPlus, MoreHorizontal } from "lucide-react";
+import { Users, User, Loader2, AlertCircle, UserPlus, MoreHorizontal, Pencil } from "lucide-react";
+import { PageSkeleton } from "@/components/layout/states/PageSkeleton";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -22,14 +24,19 @@ import {
 } from "@/components/ui/dialog";
 import AppLayout from "@/components/layout/AppLayout";
 import { InviteModal } from "@/components/team/InviteModal";
+import { EditOrganizationDrawer } from "@/components/team/EditOrganizationDrawer";
+import { apiCache } from "@/lib/cache";
 import UpgradeModal from "@/components/UpgradeModal";
 import { WelcomePopup } from "@/components/WelcomePopup";
 import { PLANS } from "@/config/pricing";
 
 interface OrganizationMember {
   id: string;
+  user_id?: string;
   role: string;
   joined_at: string;
+  /** Minutes used by this member during the current billing period. Server-computed. */
+  minutes_used?: number;
   profiles: {
     id: string;
     full_name: string | null;
@@ -56,12 +63,14 @@ const TeamPage = React.memo(function TeamPage() {
     organizationMembers,
     currentUserRole,
     planType,
-    refreshOrganizationData
+    refreshOrganizationData,
+    refreshTokens,
   } = useAuth();
   const [data, setData] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [isEditOrgOpen, setIsEditOrgOpen] = useState(false);
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [isLimitDialogOpen, setIsLimitDialogOpen] = useState(false);
   const [hasInitialized, setHasInitialized] = useState(false);
@@ -164,6 +173,49 @@ const TeamPage = React.memo(function TeamPage() {
     setMemberToRemove(null);
   };
 
+  /** Promote/demote a member. Optimistically updates local state then refreshes. */
+  const handleRoleChange = async (member: OrganizationMember, nextRole: 'admin' | 'member') => {
+    const targetUserId = member.user_id ?? member.profiles.id;
+    if (!targetUserId) return;
+    const previousRole = member.role;
+
+    // Optimistic update.
+    if (data) {
+      setData({
+        ...data,
+        members: data.members.map((m) =>
+          m.id === member.id ? { ...m, role: nextRole } : m,
+        ),
+      });
+    }
+
+    try {
+      const res = await fetch('/api/organization/members/role', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: targetUserId, role: nextRole }),
+      });
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson?.error || 'Failed to update role');
+      }
+      // Pull fresh data so org context (e.g. AppSidebar) stays in sync.
+      refreshOrganizationData();
+    } catch (e) {
+      console.error('Role change failed:', e);
+      setError(e instanceof Error ? e.message : 'Failed to update role');
+      // Roll back optimistic update.
+      if (data) {
+        setData({
+          ...data,
+          members: data.members.map((m) =>
+            m.id === member.id ? { ...m, role: previousRole } : m,
+          ),
+        });
+      }
+    }
+  };
+
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const showWelcome = urlParams.get('welcome');
@@ -217,12 +269,7 @@ const TeamPage = React.memo(function TeamPage() {
   if (authLoading) {
     return (
       <AppLayout>
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100/50 flex items-center justify-center">
-          <div className="text-center">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground mx-auto mb-3" />
-            <p className="text-[13px] text-muted-foreground">{t("loadingTeam")}</p>
-          </div>
-        </div>
+        <PageSkeleton variant="cards" count={6} />
       </AppLayout>
     );
   }
@@ -230,7 +277,7 @@ const TeamPage = React.memo(function TeamPage() {
   if (!user) {
     return (
       <AppLayout>
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100/50 flex items-center justify-center">
+        <div className="min-h-screen bg-white flex items-center justify-center">
           <div className="text-center">
             <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-muted flex items-center justify-center">
               <AlertCircle className="h-7 w-7 text-muted-foreground" />
@@ -246,12 +293,7 @@ const TeamPage = React.memo(function TeamPage() {
   if (loading && !data) {
     return (
       <AppLayout>
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100/50 flex items-center justify-center">
-          <div className="text-center">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground mx-auto mb-3" />
-            <p className="text-[13px] text-muted-foreground">{t("loadingTeam")}</p>
-          </div>
-        </div>
+        <PageSkeleton variant="cards" count={6} />
       </AppLayout>
     );
   }
@@ -259,7 +301,7 @@ const TeamPage = React.memo(function TeamPage() {
   if (error) {
     return (
       <AppLayout>
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100/50 flex items-center justify-center">
+        <div className="min-h-screen bg-white flex items-center justify-center">
           <div className="text-center">
             <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-red-50 flex items-center justify-center">
               <AlertCircle className="h-7 w-7 text-red-500" />
@@ -278,7 +320,7 @@ const TeamPage = React.memo(function TeamPage() {
   if (!authLoading && user && !organization && hasInitialized) {
     return (
       <AppLayout>
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100/50 flex items-center justify-center">
+        <div className="min-h-screen bg-white flex items-center justify-center">
           <div className="text-center">
             <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-muted flex items-center justify-center">
               <Users className="h-7 w-7 text-muted-foreground" />
@@ -297,15 +339,20 @@ const TeamPage = React.memo(function TeamPage() {
   if (loading || authLoading || !hasInitialized || !data) {
     return (
       <AppLayout>
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100/50 flex items-center justify-center">
-          <div className="text-center">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground mx-auto mb-3" />
-            <p className="text-[13px] text-muted-foreground">{t("loadingTeam")}</p>
-          </div>
-        </div>
+        <PageSkeleton variant="cards" count={6} />
       </AppLayout>
     );
   }
+
+  /** Compact minutes-used label: "—" / "0 min" / "8 min" / "2 h 35 min" / "12 h". */
+  const formatMinutes = (mins: number | undefined | null) => {
+    if (mins === undefined || mins === null) return '—';
+    if (mins <= 0) return '0 min';
+    if (mins < 60) return `${mins} min`;
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    return m === 0 ? `${h} h` : `${h} h ${m} min`;
+  };
 
   const getRoleStyle = (role: string) => {
     switch (role) {
@@ -320,21 +367,42 @@ const TeamPage = React.memo(function TeamPage() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100/50">
-        <div className="mx-auto max-w-5xl px-4 py-8">
+      <div className="min-h-screen bg-white">
+        <div className="w-full px-8 py-6">
           {/* Header - Clean like Library */}
-          <div className="flex items-start justify-between mb-6">
-            <div>
-              <h1 className="text-xl font-semibold text-gray-900">{data.organization.name}</h1>
-              <p className="text-[13px] text-gray-500 mt-1">
-                {data.members.length} {data.members.length === 1 ? 'membre' : 'membres'}
-              </p>
+          <div className="flex items-start justify-between mb-6 gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <Avatar className="h-12 w-12 shrink-0">
+                {(organization as any)?.image_url ? (
+                  <AvatarImage src={(organization as any).image_url} alt={data.organization.name} />
+                ) : null}
+                <AvatarFallback className="text-base">
+                  {(data.organization.name || "O").charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0">
+                <h1 className="text-xl font-semibold text-gray-900 truncate">{data.organization.name}</h1>
+                <p className="text-[13px] text-gray-500 mt-0.5">
+                  {data.members.length} {data.members.length === 1 ? 'membre' : 'membres'}
+                </p>
+              </div>
             </div>
             {data.currentUserRole && (data.currentUserRole === 'admin' || data.currentUserRole === 'owner') && (
-              <Button onClick={handleInviteClick} size="sm" className="gap-2">
-                <UserPlus className="h-4 w-4" />
-                {t("inviteMember")}
-              </Button>
+              <div className="flex items-center gap-2 shrink-0">
+                <Button
+                  onClick={() => setIsEditOrgOpen(true)}
+                  size="sm"
+                  variant="outline"
+                  className="gap-2"
+                >
+                  <Pencil className="h-4 w-4" />
+                  {t("editOrganization")}
+                </Button>
+                <Button onClick={handleInviteClick} size="sm" className="gap-2">
+                  <UserPlus className="h-4 w-4" />
+                  {t("inviteMember")}
+                </Button>
+              </div>
             )}
           </div>
 
@@ -362,6 +430,9 @@ const TeamPage = React.memo(function TeamPage() {
                     <tr className="bg-gray-50/80 border-b border-gray-100">
                       <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">{t("table.name")}</th>
                       <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider w-[120px]">{t("table.role")}</th>
+                      <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider w-[140px]">
+                        Minuts (mes)
+                      </th>
                       <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider w-[120px]">{t("table.joinedDate")}</th>
                       {data.currentUserRole && (data.currentUserRole === 'admin' || data.currentUserRole === 'owner') && (
                         <th className="w-[50px]"></th>
@@ -394,6 +465,9 @@ const TeamPage = React.memo(function TeamPage() {
                               {getRoleDisplayName(member.role)}
                             </span>
                           </td>
+                          <td className="px-4 py-3 text-[13px] font-medium text-gray-700 tabular-nums">
+                            {formatMinutes(member.minutes_used)}
+                          </td>
                           <td className="px-4 py-3 text-[12px] text-gray-500">
                             {new Date(member.joined_at).toLocaleDateString(undefined, {
                               day: "numeric",
@@ -402,21 +476,42 @@ const TeamPage = React.memo(function TeamPage() {
                           </td>
                           {data.currentUserRole && (data.currentUserRole === 'admin' || data.currentUserRole === 'owner') && (
                             <td className="px-4 py-3">
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <button className="w-7 h-7 rounded-md flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100">
-                                    <MoreHorizontal className="h-4 w-4" />
-                                  </button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-44 p-1">
-                                  <DropdownMenuItem
-                                    onClick={() => handleRemoveClick(member)}
-                                    className="text-[13px] rounded-md text-red-600 focus:text-red-600 focus:bg-red-50"
-                                  >
-                                    {t("removeFromTeam")}
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
+                              {member.role === 'owner' || (member.user_id ?? member.profiles.id) === user?.id ? (
+                                // Don't show actions for the owner row or the caller's own row.
+                                <span className="block h-7 w-7" />
+                              ) : (
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <button className="w-7 h-7 rounded-md flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100">
+                                      <MoreHorizontal className="h-4 w-4" />
+                                    </button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end" className="w-48 p-1">
+                                    {member.role !== 'admin' && (
+                                      <DropdownMenuItem
+                                        onClick={() => handleRoleChange(member, 'admin')}
+                                        className="text-[13px] rounded-md"
+                                      >
+                                        Fer administrador
+                                      </DropdownMenuItem>
+                                    )}
+                                    {member.role === 'admin' && (
+                                      <DropdownMenuItem
+                                        onClick={() => handleRoleChange(member, 'member')}
+                                        className="text-[13px] rounded-md"
+                                      >
+                                        Treure administrador
+                                      </DropdownMenuItem>
+                                    )}
+                                    <DropdownMenuItem
+                                      onClick={() => handleRemoveClick(member)}
+                                      className="text-[13px] rounded-md text-red-600 focus:text-red-600 focus:bg-red-50"
+                                    >
+                                      {t("removeFromTeam")}
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              )}
                             </td>
                           )}
                         </tr>
@@ -456,16 +551,40 @@ const TeamPage = React.memo(function TeamPage() {
                                 })}
                               </span>
                             </div>
+                            <p className="mt-1 text-[11px] text-gray-500">
+                              <span className="font-medium text-gray-700">
+                                {formatMinutes(member.minutes_used)}
+                              </span>{' '}
+                              aquest mes
+                            </p>
                           </div>
                         </div>
-                        {data.currentUserRole && (data.currentUserRole === 'admin' || data.currentUserRole === 'owner') && (
+                        {data.currentUserRole && (data.currentUserRole === 'admin' || data.currentUserRole === 'owner') &&
+                          member.role !== 'owner' &&
+                          (member.user_id ?? member.profiles.id) !== user?.id && (
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <button className="w-8 h-8 rounded-md flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors shrink-0">
                                 <MoreHorizontal className="h-4 w-4" />
                               </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-44">
+                            <DropdownMenuContent align="end" className="w-48">
+                              {member.role !== 'admin' && (
+                                <DropdownMenuItem
+                                  onClick={() => handleRoleChange(member, 'admin')}
+                                  className="text-[13px]"
+                                >
+                                  Fer administrador
+                                </DropdownMenuItem>
+                              )}
+                              {member.role === 'admin' && (
+                                <DropdownMenuItem
+                                  onClick={() => handleRoleChange(member, 'member')}
+                                  className="text-[13px]"
+                                >
+                                  Treure administrador
+                                </DropdownMenuItem>
+                              )}
                               <DropdownMenuItem
                                 onClick={() => handleRemoveClick(member)}
                                 className="text-[13px] text-red-600 focus:text-red-600 focus:bg-red-50"
@@ -498,8 +617,8 @@ const TeamPage = React.memo(function TeamPage() {
             {(() => {
               const maxMembers = data?.organization?.max_members ?? organization?.max_members ?? 1;
               const currentMembers = data?.members?.length ?? organizationMembers?.length ?? 0;
-              const teamPlan = PLANS.team;
-              const orgPlan = PLANS.organization;
+              const teamPlan = PLANS.pro;
+              const orgPlan = PLANS.studio;
 
               return (
                 <div className="rounded-lg border bg-muted/30 p-4">
@@ -575,6 +694,24 @@ const TeamPage = React.memo(function TeamPage() {
         organizationName={organization?.name || ""}
         userName={user?.user_metadata?.full_name || user?.email || ""}
       />
+
+      {organization && (
+        <EditOrganizationDrawer
+          open={isEditOrgOpen}
+          onOpenChange={setIsEditOrgOpen}
+          organization={{
+            id: (organization as any).id,
+            name: (organization as any).name,
+            description: (organization as any).description ?? null,
+            image_url: (organization as any).image_url ?? null,
+          }}
+          onSaved={async () => {
+            const orgId = (organization as any)?.id;
+            if (orgId) apiCache.delete(`org:${orgId}`);
+            await refreshTokens();
+          }}
+        />
+      )}
     </AppLayout>
   );
 });

@@ -1,363 +1,257 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Users, CheckCircle, XCircle, Building2, UserPlus, ArrowRight, Shield } from "lucide-react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { WelcomePopup } from "@/components/WelcomePopup";
+import { Loader2, Users, Building2 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
-interface OrganizationInfo {
-  id: string;
-  name: string;
-  description?: string;
+type InvalidReason = "expired" | "used" | "not_found";
+
+interface InviteValid {
+  valid: true;
+  organizationId: string;
+  organizationName: string | null;
+  organizationImageUrl: string | null;
+  inviterName: string | null;
+  role: "member" | "admin";
+  expiresAt: string | null;
 }
 
-interface InviteValidation {
-  valid: boolean;
-  organization?: OrganizationInfo;
-  error?: string;
+interface InviteInvalid {
+  valid: false;
+  reason: InvalidReason;
 }
 
-const InvitePage = React.memo(function InvitePage() {
+type InviteResponse = InviteValid | InviteInvalid;
+
+const REASON_COPY: Record<InvalidReason, { title: string; description: string }> = {
+  expired: {
+    title: "Aquesta invitació ha caducat",
+    description: "Demana al teu equip que te'n generi una de nova.",
+  },
+  used: {
+    title: "Aquesta invitació ja s'ha utilitzat",
+    description: "Si necessites accés, demana una nova invitació.",
+  },
+  not_found: {
+    title: "Invitació no vàlida",
+    description: "Aquest enllaç no existeix o ja no és vàlid.",
+  },
+};
+
+export default function InvitePage() {
   const params = useParams();
   const router = useRouter();
-  const token = params.token as string;
-  
-  const [validation, setValidation] = useState<InviteValidation | null>(null);
-  const [isJoining, setIsJoining] = useState(false);
-  const [joinResult, setJoinResult] = useState<{ success: boolean; message: string } | null>(null);
-  const [user, setUser] = useState<any>(null);
-  const [showWelcomePopup, setShowWelcomePopup] = useState(false);
-  
-  const supabase = createClientComponentClient();
+  const token = (params?.token as string) ?? "";
+  const { user, loading: authLoading } = useAuth();
 
-  const checkUser = useCallback(async () => {
-    try {
-      // First try to get the session (more reliable for client-side)
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError) {
-        console.error('Session error:', sessionError);
-        setUser(null);
-        return;
-      }
-
-      if (session?.user) {
-        console.log('User found via session:', session.user);
-        setUser(session.user);
-        return;
-      }
-
-      // Fallback to getUser if no session
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      
-      if (userError) {
-        console.error('User error:', userError);
-        setUser(null);
-        return;
-      }
-
-      console.log('User check response:', user);
-      setUser(user);
-    } catch (error) {
-      console.error('Error checking user:', error);
-      setUser(null);
-    }
-  }, [supabase]);
-
-  const validateInvite = useCallback(async () => {
-    try {
-      const response = await fetch(`/api/organization/invite/validate?token=${token}`);
-      console.log('Invite validation response:', response);
-      const data = await response.json();
-      setValidation(data);
-    } catch (error) {
-      setValidation({ valid: false, error: "No s'ha pogut validar la invitació" });
-    }
-  }, [token]);
+  const [invite, setInvite] = useState<InviteResponse | null>(null);
+  const [loadingInvite, setLoadingInvite] = useState(true);
+  const [accepting, setAccepting] = useState(false);
+  const [acceptError, setAcceptError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Add auth state listener to handle real-time auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.id);
-        
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-          setUser(session?.user || null);
-        } else if (event === 'SIGNED_OUT') {
-          setUser(null);
+    let cancelled = false;
+    async function load() {
+      if (!token) {
+        if (!cancelled) {
+          setInvite({ valid: false, reason: "not_found" });
+          setLoadingInvite(false);
         }
+        return;
       }
-    );
-
-    // Initial checks
-    const initializePage = async () => {
-      await validateInvite();
-      await checkUser();
-    };
-    
-    initializePage();
-
-    // Cleanup subscription on unmount
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [validateInvite, checkUser, supabase.auth]);
-
-  const handleJoinOrganization = useCallback(async () => {
-    if (!user) {
-      console.log('User not found, redirecting to signin');
-      document.cookie = `invite_token=${token}; path=/; max-age=3600; SameSite=Lax`;
-      router.push(`/auth/signin`);
-      return;
+      try {
+        const res = await fetch(
+          `/api/invitations?token=${encodeURIComponent(token)}`,
+          { cache: "no-store" }
+        );
+        const data = (await res.json()) as InviteResponse;
+        if (!cancelled) setInvite(data);
+      } catch (err) {
+        console.error("Failed to load invitation:", err);
+        if (!cancelled) setInvite({ valid: false, reason: "not_found" });
+      } finally {
+        if (!cancelled) setLoadingInvite(false);
+      }
     }
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
 
-    // If user is already authenticated, call the join API directly
-    // Set the invite token cookie for consistency with the auth callback flow
-    document.cookie = `invite_token=${token}; path=/; max-age=3600; SameSite=Lax`;
-    
-    setIsJoining(true);
+  const handleSignIn = useCallback(() => {
+    // Hand off to /auth/signin via the pending_invite_token cookie.
+    // HttpOnly isn't possible from client; that's acceptable here.
+    document.cookie = `pending_invite_token=${encodeURIComponent(
+      token
+    )}; max-age=3600; path=/; samesite=lax`;
+    router.push("/auth/signin");
+  }, [router, token]);
+
+  const handleAccept = useCallback(async () => {
+    if (!token) return;
+    setAccepting(true);
+    setAcceptError(null);
     try {
-      const response = await fetch("/api/organization/invite/join", {
+      const res = await fetch("/api/invitations/accept", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token }),
       });
 
-      const data = await response.json();
-      
-      if (response.ok) {
-        setJoinResult({ success: true, message: "T'has unit correctament a l'organització!" });
-        
-        // Clear the invite token cookie after successful processing
-        document.cookie = `invite_token=; path=/; max-age=0; SameSite=Lax`;
-        
-        // Show welcome popup
-        setShowWelcomePopup(true);
-      } else {
-        // Clear the invite token cookie on error as well
-        document.cookie = `invite_token=; path=/; max-age=0; SameSite=Lax`;
-        setJoinResult({ success: false, message: data.error || "No s'ha pogut unir a l'organització" });
+      if (res.ok) {
+        // Clear any stale handoff cookie.
+        document.cookie = "pending_invite_token=; max-age=0; path=/; samesite=lax";
+        router.push("/dashboard");
+        router.refresh();
+        return;
       }
-    } catch (error) {
-      // Clear the invite token cookie on error
-      document.cookie = `invite_token=; path=/; max-age=0; SameSite=Lax`;
-      setJoinResult({ success: false, message: "S'ha produït un error en unir-se" });
+
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 410) {
+        const reason = (data?.reason as InvalidReason) ?? "not_found";
+        setInvite({ valid: false, reason });
+        return;
+      }
+      setAcceptError(
+        typeof data?.error === "string"
+          ? data.error
+          : "No s'ha pogut acceptar la invitació"
+      );
+    } catch (err) {
+      console.error("Failed to accept invitation:", err);
+      setAcceptError("S'ha produït un error en acceptar la invitació.");
     } finally {
-      setIsJoining(false);
+      setAccepting(false);
     }
-  }, [user, token, router]);
+  }, [router, token]);
 
-  if (!validation) {
+  const isLoading = loadingInvite || authLoading;
+
+  if (isLoading || !invite) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/10">
-        <Card className="w-full max-w-md rounded-3xl border border-border/60 shadow-xl">
-          <CardContent className="flex items-center justify-center p-8">
-            <div className="flex flex-col items-center space-y-4">
-              <div className="relative">
-                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                </div>
-              </div>
-              <p className="text-sm text-muted-foreground">Validant la invitació...</p>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="flex min-h-screen items-center justify-center bg-white px-4">
+        <div className="flex flex-col items-center gap-3 text-neutral-500">
+          <Loader2 className="size-6 animate-spin" />
+          <p className="text-sm">Validant la invitació...</p>
+        </div>
       </div>
     );
   }
 
-  if (!validation.valid) {
+  if (!invite.valid) {
+    const copy = REASON_COPY[invite.reason];
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-background to-red-50/30">
-        <Card className="w-full max-w-md rounded-3xl border border-red-200/60 shadow-xl">
-          <CardHeader className="text-center pb-4">
-            <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-red-100 flex items-center justify-center">
-              <XCircle className="h-8 w-8 text-red-600" />
-            </div>
-            <CardTitle className="text-xl font-semibold text-red-900">Invitació no vàlida</CardTitle>
-            <CardDescription className="text-red-700/80 mt-2">
-              {validation.error || "Aquest enllaç d'invitació no és vàlid o ha caducat."}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <Button 
-              onClick={() => router.push("/")} 
-              className="w-full rounded-xl bg-red-600 hover:bg-red-700 text-white"
-              size="lg"
-            >
-              Tornar a l'inici
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (joinResult) {
-    return (
-      <div className={`min-h-screen flex items-center justify-center ${
-        joinResult.success 
-          ? "bg-gradient-to-br from-green-50 via-background to-green-50/30" 
-          : "bg-gradient-to-br from-red-50 via-background to-red-50/30"
-      }`}>
-        <Card className={`w-full max-w-md rounded-3xl shadow-xl ${
-          joinResult.success 
-            ? "border border-green-200/60" 
-            : "border border-red-200/60"
-        }`}>
-          <CardHeader className="text-center pb-4">
-            <div className={`mx-auto mb-4 h-16 w-16 rounded-full flex items-center justify-center ${
-              joinResult.success 
-                ? "bg-green-100" 
-                : "bg-red-100"
-            }`}>
-              {joinResult.success ? (
-                <CheckCircle className="h-8 w-8 text-green-600" />
-              ) : (
-                <XCircle className="h-8 w-8 text-red-600" />
-              )}
-            </div>
-            <CardTitle className={`text-xl font-semibold ${
-              joinResult.success ? "text-green-900" : "text-red-900"
-            }`}>
-              {joinResult.success ? "Benvingut/da!" : "Error"}
-            </CardTitle>
-            <CardDescription className={`mt-2 ${
-              joinResult.success ? "text-green-700/80" : "text-red-700/80"
-            }`}>
-              {joinResult.message}
-            </CardDescription>
-          </CardHeader>
-          {joinResult.success && (
-            <CardContent className="text-center pt-0">
-              <div className="flex items-center justify-center space-x-2 text-sm text-green-600">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Redirigint al teu equip...</span>
-              </div>
-            </CardContent>
-          )}
-        </Card>
+      <div className="flex min-h-screen items-center justify-center bg-white px-4">
+        <div className="w-full max-w-md rounded-2xl border border-rose-100 bg-rose-50 p-8 text-center">
+          <h1 className="text-2xl font-normal tracking-tight text-rose-900">
+            {copy.title}
+          </h1>
+          <p className="mt-2 text-sm text-rose-700/80">{copy.description}</p>
+          <button
+            onClick={() => router.push("/")}
+            className="mt-6 inline-flex h-10 items-center justify-center rounded-md bg-neutral-900 px-4 text-sm font-medium text-white transition-colors hover:bg-neutral-800"
+          >
+            Tornar a l'inici
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/10 p-4">
-      <Card className="w-full max-w-lg rounded-3xl border border-border/60 shadow-xl overflow-hidden">
-        {/* Header with gradient background */}
-        <div className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-8 text-center">
-          <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-primary-foreground/20 flex items-center justify-center backdrop-blur-sm">
-            <UserPlus className="h-8 w-8" />
-          </div>
-          <h1 className="text-2xl font-bold mb-2">T'han convidat!</h1>
-          <p className="text-primary-foreground/90 text-sm">
-            Uneix-te a l'equip i comença a col·laborar
+    <div className="flex min-h-screen items-center justify-center bg-white px-4 py-12">
+      <div className="w-full max-w-md">
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-normal tracking-tight text-neutral-900">
+            T'han convidat a unir-te
+          </h1>
+          <p className="mt-2 text-sm text-neutral-600">
+            Revisa els detalls de la invitació abans d'acceptar-la.
           </p>
         </div>
 
-        <CardContent className="p-8 space-y-6">
-          {/* Organization info */}
-          <div className="text-center space-y-4">
-            <div className="flex items-center justify-center space-x-3 p-4 bg-primary/10 border border-primary/20 rounded-2xl">
-              <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center">
-                <Building2 className="h-6 w-6 text-primary" />
-              </div>
-              <div className="text-left">
-                <h2 className="font-semibold text-lg text-foreground">
-                  {validation.organization?.name}
-                </h2>
-                <p className="text-sm text-muted-foreground">Organització</p>
-              </div>
+        <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="flex size-12 items-center justify-center overflow-hidden rounded-xl bg-neutral-100">
+              {invite.organizationImageUrl ? (
+                <Image
+                  src={invite.organizationImageUrl}
+                  alt={invite.organizationName ?? "Organització"}
+                  width={48}
+                  height={48}
+                  className="size-12 object-cover"
+                  unoptimized
+                />
+              ) : (
+                <Building2 className="size-6 text-neutral-500" />
+              )}
             </div>
-            
-            {validation.organization?.description && (
-              <div className="p-4 bg-muted/50 rounded-xl">
-                <p className="text-sm text-muted-foreground text-center">
-                  {validation.organization.description}
-                </p>
-              </div>
-            )}
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-base font-medium text-neutral-900">
+                {invite.organizationName ?? "Organització"}
+              </p>
+              <p className="mt-0.5 text-xs text-neutral-500">
+                {invite.inviterName
+                  ? `Convidat per ${invite.inviterName}`
+                  : "T'han convidat a aquest equip"}
+              </p>
+            </div>
+            <span className="inline-flex items-center gap-1 rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1 text-xs font-medium text-neutral-700">
+              <Users className="size-3" />
+              {invite.role === "admin" ? "Admin" : "Membre"}
+            </span>
           </div>
 
-          {/* Benefits section */}
-          <div className="space-y-3">
-            <h3 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">
-              Què obtindràs:
-            </h3>
-            <div className="space-y-2">
-              <div className="flex items-center space-x-3 text-sm">
-                <div className="h-2 w-2 rounded-full bg-primary"></div>
-                <span>Accés a les transcripcions de l'equip</span>
-              </div>
-              <div className="flex items-center space-x-3 text-sm">
-                <div className="h-2 w-2 rounded-full bg-primary"></div>
-                <span>Col·laboració en temps real</span>
-              </div>
-              <div className="flex items-center space-x-3 text-sm">
-                <div className="h-2 w-2 rounded-full bg-primary"></div>
-                <span>Gestió compartida de perfils</span>
-              </div>
+          {acceptError && (
+            <div className="mt-4 rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">
+              {acceptError}
             </div>
-          </div>
+          )}
 
-          {/* Action buttons */}
-          <div className="space-y-3">
-            {!user ? (
+          <div className="mt-6 flex flex-col gap-2">
+            {user ? (
               <>
-                <Button 
-                  onClick={handleJoinOrganization}
-                  className="w-full rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground h-12 text-base font-medium"
-                  size="lg"
+                <button
+                  onClick={handleAccept}
+                  disabled={accepting}
+                  className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md bg-neutral-900 px-4 text-sm font-medium text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  <span>Iniciar sessió per unir-se</span>
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-                <div className="flex items-center justify-center space-x-2 text-xs text-muted-foreground">
-                  <Shield className="h-3 w-3" />
-                  <span>Necessites iniciar sessió per unir-te a aquesta organització</span>
-                </div>
+                  {accepting ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin" />
+                      Acceptant...
+                    </>
+                  ) : (
+                    "Acceptar invitació"
+                  )}
+                </button>
+                <button
+                  onClick={() => router.push("/")}
+                  disabled={accepting}
+                  className="inline-flex h-10 w-full items-center justify-center rounded-md border border-neutral-200 bg-white px-4 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  Cancel·lar
+                </button>
               </>
             ) : (
-              <Button 
-                onClick={handleJoinOrganization}
-                disabled={isJoining}
-                className="w-full rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground h-12 text-base font-medium"
-                size="lg"
-              >
-                {isJoining ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    Unint-se...
-                  </>
-                ) : (
-                  <>
-                    <span>Unir-se a l'organització</span>
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </>
-                )}
-              </Button>
+              <>
+                <button
+                  onClick={handleSignIn}
+                  className="inline-flex h-10 w-full items-center justify-center rounded-md bg-neutral-900 px-4 text-sm font-medium text-white transition-colors hover:bg-neutral-800"
+                >
+                  Inicia sessió per acceptar
+                </button>
+                <p className="text-center text-xs text-neutral-500">
+                  Necessites iniciar sessió per acceptar aquesta invitació.
+                </p>
+              </>
             )}
           </div>
-        </CardContent>
-      </Card>
-      
-      {/* Welcome Popup */}
-      <WelcomePopup
-        isOpen={showWelcomePopup}
-        onClose={() => {
-          setShowWelcomePopup(false);
-          router.push("/team");
-        }}
-        organizationName={validation?.organization?.name || ""}
-        userName={user?.user_metadata?.full_name || user?.email || ""}
-      />
+        </div>
+      </div>
     </div>
   );
-});
-
-export default InvitePage;
+}

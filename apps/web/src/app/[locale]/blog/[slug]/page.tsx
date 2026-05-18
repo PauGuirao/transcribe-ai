@@ -3,10 +3,18 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import BlogPostClient from "./blog-post-client";
 import { getBlogPostBySlug, getAllBlogSlugs } from "@/lib/mdx";
+import {
+  JsonLd,
+  generateArticleSchema,
+  generateBreadcrumbSchema,
+} from "@/components/seo/JsonLd";
+
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transcriu.com";
 
 interface BlogPostPageProps {
   params: {
     slug: string;
+    locale: string;
   };
 }
 
@@ -54,6 +62,7 @@ export async function generateStaticParams() {
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const post = await getBlogPost(params.slug);
+  const locale = params.locale || "ca";
 
   if (!post) {
     notFound();
@@ -73,9 +82,39 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     slug: post.slug,
   };
 
+  const postUrl = `${BASE_URL}/${locale}/blog/${post.slug}`;
+  const articleSchema = generateArticleSchema({
+    headline: post.title,
+    description: post.excerpt,
+    url: postUrl,
+    datePublished: post.createdAt,
+    dateModified: post.updatedAt,
+    authorName: post.author,
+    publisherName: "Transcriu",
+    publisherLogo: `${BASE_URL}/logo.png`,
+    inLanguage:
+      locale === "ca" ? "ca-ES" : locale === "en" ? "en-US" : "es-ES",
+    keywords: post.tags,
+  });
+
+  const breadcrumbSchema = generateBreadcrumbSchema({
+    items: [
+      {
+        name: locale === "ca" ? "Inici" : locale === "en" ? "Home" : "Inicio",
+        url: `${BASE_URL}/${locale}`,
+      },
+      { name: "Blog", url: `${BASE_URL}/${locale}/blog` },
+      { name: post.title, url: postUrl },
+    ],
+  });
+
   return (
-    <Suspense fallback={<div>Carregant...</div>}>
-      <BlogPostClient post={blogPost} />
-    </Suspense>
+    <>
+      <JsonLd data={articleSchema} />
+      <JsonLd data={breadcrumbSchema} />
+      <Suspense fallback={<div>Carregant...</div>}>
+        <BlogPostClient post={blogPost} />
+      </Suspense>
+    </>
   );
 }

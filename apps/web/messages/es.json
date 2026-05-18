@@ -1,7 +1,7 @@
 {
   "hero": {
-    "title": "Transcribe sesiones de logopedia en segundos",
-    "description": "Utiliza una plataforma diseñada para alta precisión. Confiada por profesionales de todos los tamaños para gestionar millones de palabras cada mes.",
+    "title": "Transcribir audio a texto con IA",
+    "description": "Pasa audio a texto al instante con 98% de precisión en español y catalán. Sube un MP3, WAV o nota de voz y obtén la transcripción lista para editar, exportar y compartir. Para logopedas, periodistas, investigadores y podcasters.",
     "preparing": "Preparando...",
     "goToDashboard": "Ir al panel",
     "signInWithEmail": "Entra con tu correo",
@@ -9,7 +9,10 @@
       "professionals": "Profesionales de confianza",
       "accuracy": "Precisión media",
       "timeSaved": "Ahorro por semana"
-    }
+    },
+    "ctaSecondary": "Ver cómo funciona",
+    "signUpWithGoogle": "Regístrate con Google",
+    "caption": "Gratis para empezar · sin tarjeta · cancela cuando quieras"
   },
   "transcriptionExample": {
     "dropzone": "Arrastra tu archivo de audio aquí",
@@ -53,7 +56,12 @@
       "title": "Sube el audio",
       "description": "Carga los archivos de audio de tus sesiones de logopedia desde cualquier dispositivo de forma rápida y segura.",
       "dropzone": "Arrastra tu archivo de audio aquí",
-      "processing": "Procesando audio..."
+      "processing": "Procesando audio...",
+      "items": [
+        "Compatible con MP3, WAV y M4A",
+        "Arrastra o navega para subir",
+        "Archivos hasta 500 MB"
+      ]
     },
     "step2": {
       "number": "02",
@@ -61,7 +69,12 @@
       "description": "Nuestra IA especializada en catalán convierte el audio en texto con alta precisión.",
       "transcribing": "Transcribiendo audio...",
       "duration": "Duración",
-      "accuracy": "Precisión"
+      "accuracy": "Precisión",
+      "items": [
+        "Identificación automática de hablantes",
+        "98% de precisión en español",
+        "Procesa mientras trabajas"
+      ]
     },
     "step3": {
       "number": "03",
@@ -72,7 +85,12 @@
       "exportDOCX": "Exportar como DOCX",
       "sendGmail": "Enviar por Gmail",
       "saveDrive": "Guardar en Drive",
-      "clickAny": "Haz clic en cualquier opción para exportar"
+      "clickAny": "Haz clic en cualquier opción para exportar",
+      "items": [
+        "Exporta en PDF, DOCX y TXT",
+        "Comparte con Gmail o Drive",
+        "Edita antes de exportar"
+      ]
     }
   },
   "features": {
@@ -181,7 +199,10 @@
         "question": "¿Puedo cancelar la suscripción en cualquier momento?",
         "answer": "Sí, puedes cancelar tu suscripción en cualquier momento desde la configuración de tu cuenta. No hay permanencia ni penalizaciones. Si cancelas, mantendrás acceso hasta el final del período de facturación actual y podrás descargar todas tus transcripciones."
       }
-    ]
+    ],
+    "badge": "FAQ",
+    "ctaLabel": "¿No encuentras la respuesta?",
+    "ctaButton": "Contacta con nosotros"
   },
   "footer": {
     "products": {
@@ -218,7 +239,7 @@
       "terms": "Términos del servicio",
       "privacy": "Política de privacidad"
     },
-    "copyright": "© 2025 Transcriu — Todos los derechos reservados",
+    "copyright": "© 2026 Transcriu — Todos los derechos reservados",
     "rating": "Valorado por profesionales de la logopedia"
   },
   "dashboard": {
@@ -254,7 +275,7 @@
     "sidebar": {
       "home": "Inicio",
       "transcribe": "Transcribir",
-      "library": "Biblioteca",
+      "library": "Transcripciones",
       "blog": "Blog",
       "students": "Alumnos",
       "tutorials": "Tutoriales",
@@ -266,10 +287,14 @@
       "tokenError": "No se pudieron cargar los tokens"
     },
     "plans": {
-      "group": "Grupal",
-      "individual": "Individual",
-      "free": "Gratuito",
-      "pro": "Profesional"
+      "free": "Prueba",
+      "basic": "Básico",
+      "pro": "Pro",
+      "studio": "Estudio",
+      "individual": "Básico",
+      "team": "Pro",
+      "organization": "Estudio",
+      "group": "Estudio"
     },
     "navbar": {
       "loading": "Cargando...",
@@ -293,10 +318,10 @@
       "libraryDesc": "Gestiona todos tus audios y transcripciones"
     },
     "library": {
-      "title": "Biblioteca",
+      "title": "Transcripciones",
       "filesCount": "{count} archivo",
       "filesCountPlural": "{count} archivos",
-      "emptyTitle": "Biblioteca vacía",
+      "emptyTitle": "Sin transcripciones todavía",
       "emptyDesc": "Sube tu primer archivo de audio para comenzar a transcribir.",
       "uploadAudio": "Subir audio",
       "viewAll": "Todos",
@@ -308,7 +333,8 @@
         "name": "Nombre",
         "status": "Estado",
         "student": "Alumno",
-        "date": "Fecha"
+        "date": "Fecha",
+        "duration": "Duración"
       },
       "status": {
         "completed": "Transcrito",
@@ -337,7 +363,34 @@
         "selectStudent": "Selecciona alumno",
         "onlyTranscribed": "Solo disponible para archivos transcritos",
         "saveChanges": "Guardar cambios"
-      }
+      },
+      "retry": "Reintentar",
+      "errors": {
+        "assignStudent": "No se ha podido asignar el alumno",
+        "loadStudents": "No se han podido cargar los alumnos"
+      },
+      "edit": {
+        "title": "Editar transcripción",
+        "subtitle": "Renombra el archivo o asígnalo a un alumno",
+        "info": "Información",
+        "originalName": "Nombre original",
+        "status": "Estado",
+        "date": "Fecha",
+        "customName": "Nombre personalizado",
+        "customNamePlaceholder": "Por ejemplo: Sesión María 12/03",
+        "assignStudent": "Alumno",
+        "selectStudent": "Selecciona un alumno",
+        "unassigned": "Sin asignar",
+        "onlyTranscribed": "Solo para transcripciones completadas",
+        "years": "años",
+        "save": "Guardar cambios",
+        "saving": "Guardando...",
+        "cancel": "Cancelar",
+        "loading": "Cargando..."
+      },
+      "viewCalendar": "Calendario",
+      "today": "Hoy",
+      "noFilesThisDay": "Sin transcripciones este día"
     },
     "profiles": {
       "title": "Alumnos",
@@ -370,6 +423,8 @@
       }
     },
     "upload": {
+      "drawerTitle": "Nueva transcripción",
+      "drawerDescription": "Sube un archivo de audio. La transcripción se procesa en segundo plano — puedes cerrar este panel mientras tanto.",
       "dropHere": "Suelta aquí tu audio",
       "uploadAudio": "Sube un archivo de audio",
       "dragDropHint": "Arrastra y suelta o haz clic para seleccionar",
@@ -438,6 +493,9 @@
         "title": "Error en la transcripción",
         "description": "Hubo un error procesando tu archivo de audio. Por favor, intenta subirlo de nuevo.",
         "refreshPage": "Actualizar página"
+      },
+      "sidebar": {
+        "title": "Detalles"
       }
     },
     "team": {
@@ -452,6 +510,29 @@
       "teamMembers": "Miembros del equipo",
       "invite": "Invitar",
       "inviteMember": "Invitar miembro",
+      "editOrganization": "Editar",
+      "editDrawer": {
+        "title": "Editar organización",
+        "description": "Actualiza el nombre, la descripción y el logotipo de tu organización.",
+        "logoLabel": "Logotipo",
+        "changeImage": "Cambiar imagen",
+        "uploading": "Subiendo...",
+        "imageHint": "PNG, JPG, WebP o GIF. Máximo 5 MB.",
+        "nameLabel": "Nombre",
+        "namePlaceholder": "Mi organización",
+        "descriptionLabel": "Descripción",
+        "descriptionPlaceholder": "Una breve descripción de tu organización (opcional)",
+        "cancel": "Cancelar",
+        "save": "Guardar cambios",
+        "saving": "Guardando...",
+        "errors": {
+          "nameTooShort": "El nombre debe tener al menos 2 caracteres.",
+          "nameTooLong": "El nombre debe tener menos de 100 caracteres.",
+          "descTooLong": "La descripción debe tener menos de 500 caracteres.",
+          "uploadFailed": "No se pudo subir la imagen.",
+          "saveFailed": "No se pudieron guardar los cambios."
+        }
+      },
       "inviteFirstMember": "Invitar primer miembro",
       "noMembers": "Aún no hay miembros",
       "noMembersDesc": "Invita a tus compañeros de equipo para empezar a colaborar juntos.",

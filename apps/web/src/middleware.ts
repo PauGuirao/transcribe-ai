@@ -91,7 +91,7 @@ export async function middleware(req: NextRequest) {
 
   if (isProtectedPath && !user) {
     // Redirect to sign in page (preserve locale)
-    const locale = req.nextUrl.pathname.match(/^\/(ca|es|en)/)?.[1] || 'ca';
+    const locale = req.nextUrl.pathname.match(/^\/(ca|es|en)/)?.[1] || 'es';
     const redirectUrl = req.nextUrl.clone()
     redirectUrl.pathname = `/${locale}/auth/signin`
     redirectUrl.searchParams.set('redirectedFrom', req.nextUrl.pathname)

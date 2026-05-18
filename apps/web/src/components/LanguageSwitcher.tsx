@@ -12,9 +12,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 const languages = [
-    { code: 'ca', name: 'Català', flag: '🇦🇩' },
-    { code: 'es', name: 'Español', flag: '🇪🇸' },
-    { code: 'en', name: 'English', flag: '🇬🇧' },
+    { code: 'ca', name: 'Català' },
+    { code: 'es', name: 'Español' },
+    { code: 'en', name: 'English' },
 ];
 
 export function LanguageSwitcher() {
@@ -35,8 +35,7 @@ export function LanguageSwitcher() {
                     className="flex items-center gap-2 px-2.5 py-1.5 text-[13px] font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
                 >
                     <Globe className="h-4 w-4" />
-                    <span className="hidden sm:inline">{currentLanguage?.name}</span>
-                    <span className="sm:hidden">{currentLanguage?.flag}</span>
+                    <span>{currentLanguage?.name}</span>
                 </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-36 p-1">
@@ -49,7 +48,6 @@ export function LanguageSwitcher() {
                             locale === lang.code && "bg-blue-50 text-blue-700 font-medium"
                         )}
                     >
-                        <span className="mr-2">{lang.flag}</span>
                         {lang.name}
                     </DropdownMenuItem>
                 ))}

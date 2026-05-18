@@ -51,8 +51,8 @@ export async function upload(request: Request, env: Env) {
       id: audioId, user_id: userId, filename: uniqueFilename,
       original_filename: originalFilename, storage_path: filePath, status: 'uploaded',
     };
-    const inserted = await insertAudio(env, record);
-    return json({ success: true, audioId, filename: uniqueFilename, originalName: originalFilename, filePath, fileSize: file.size, mimeType: file.type, record: inserted[0] ?? inserted });
+    const inserted = (await insertAudio(env, record)) as any;
+    return json({ success: true, audioId, filename: uniqueFilename, originalName: originalFilename, filePath, fileSize: file.size, mimeType: file.type, record: inserted?.[0] ?? inserted });
   } catch (e: any) {
     await r2Delete(env.AUDIO_FILES, filePath);
     return json({ error: 'Failed to create audio record', details: e?.message }, 500);

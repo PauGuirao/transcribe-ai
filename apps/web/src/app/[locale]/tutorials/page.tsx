@@ -41,7 +41,7 @@ import Link from 'next/link'
 export default function TutorialsPage() {
   return (
     <AppLayout>
-      <div className="max-w-6xl mx-auto px-4">
+      <div className="w-full px-8 py-6">
         {/* Header */}
         <div className="text-center">
           <h2 className="mt-20 text-2xl font-bold text-gray-900">Tutorials</h2>

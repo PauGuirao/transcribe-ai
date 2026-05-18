@@ -127,6 +127,7 @@ export async function GET(request: NextRequest) {
       uploadDate: audioFile.created_at,
       status: audioFile.status,
       alumneId: audioFile.alumne_id,
+      durationSeconds: audioFile.duration_seconds ?? null,
       transcription: audioFile.transcriptions?.[0]
         ? {
             id: audioFile.transcriptions[0].id,

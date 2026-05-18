@@ -21,6 +21,7 @@ import { Features } from "@/components/Features";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { Pricing } from "@/components/Pricing";
+import { useStartCheckout } from "@/hooks/useStartCheckout";
 import { CheckCircle2, Loader2, ChevronDown, ChevronUp, Quote, MapPin, Building2, Users, ArrowRight, Sparkles } from "lucide-react";
 
 import type { LandingPageData } from "@/lib/seo/types";
@@ -33,6 +34,7 @@ export default function ClientLanding({ landing }: ClientLandingProps) {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const { startCheckout, loading: checkoutLoading } = useStartCheckout();
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -392,8 +394,8 @@ Informació de la sol·licitud:
         {/* Pricing Section */}
         <Pricing
           authLoading={authLoading}
-          loading={loading}
-          onPrimaryAction={handlePrimaryAction}
+          loading={checkoutLoading}
+          onPrimaryAction={startCheckout}
           onContactClick={() => setIsContactOpen(true)}
         />
       </main>

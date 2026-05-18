@@ -252,7 +252,7 @@ export default async function TutorialPage({ params }: TutorialPageProps) {
 
   return (
     <AppLayout>
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="w-full px-8 py-6">
         {/* Back Button */}
         <div className="mt-8">
           <Link href="/tutorials">

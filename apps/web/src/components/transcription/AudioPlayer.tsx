@@ -25,11 +25,42 @@ export function AudioPlayer({ audioId, className, onRef, onTimeUpdate }: AudioPl
   const [isMuted, setIsMuted] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
+  const [isBuffering, setIsBuffering] = useState(false);
+  const [bufferedPercent, setBufferedPercent] = useState(0);
   const [error, setError] = useState<string | null>(null);
+
+  // Reset local state when the audio source changes so we don't briefly show
+  // the previous file's duration / playback position.
+  useEffect(() => {
+    setIsPlaying(false);
+    setCurrentTime(0);
+    setDuration(0);
+    setBufferedPercent(0);
+    setIsBuffering(false);
+    setIsLoading(true);
+    setError(null);
+  }, [audioId]);
 
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
+
+    // Debounce the "Buffering…" label so brief (<300ms) stalls don't flash.
+    let bufferingTimer: number | null = null;
+    const scheduleBufferingOn = () => {
+      if (bufferingTimer != null) return;
+      bufferingTimer = window.setTimeout(() => {
+        setIsBuffering(true);
+        bufferingTimer = null;
+      }, 300);
+    };
+    const cancelBuffering = () => {
+      if (bufferingTimer != null) {
+        window.clearTimeout(bufferingTimer);
+        bufferingTimer = null;
+      }
+      setIsBuffering(false);
+    };
 
     const handleLoadedMetadata = () => {
       setDuration(audio.duration);
@@ -37,19 +68,25 @@ export function AudioPlayer({ audioId, className, onRef, onTimeUpdate }: AudioPl
     };
 
     const handleTimeUpdate = () => {
-      const currentTime = audio.currentTime;
-      setCurrentTime(currentTime);
-      onTimeUpdate?.(currentTime);
+      const t = audio.currentTime;
+      setCurrentTime(t);
+      onTimeUpdate?.(t);
+      // If the playhead is advancing, by definition we're not buffering.
+      // This guards against `playing`/`canplay` events that some browsers
+      // skip after a brief `waiting`.
+      cancelBuffering();
     };
 
     const handleEnded = () => {
       setIsPlaying(false);
       setCurrentTime(0);
+      cancelBuffering();
     };
 
     const handleError = () => {
       setError('Failed to load audio file');
       setIsLoading(false);
+      cancelBuffering();
     };
 
     const handleLoadStart = () => {
@@ -57,18 +94,50 @@ export function AudioPlayer({ audioId, className, onRef, onTimeUpdate }: AudioPl
       setError(null);
     };
 
+    const handleWaiting = () => {
+      // Only treat as "buffering" if we're actively playing — otherwise
+      // `waiting` during seek-while-paused or initial metadata load is noise.
+      if (!audio.paused) scheduleBufferingOn();
+    };
+    const handleStalled = () => {
+      if (!audio.paused) scheduleBufferingOn();
+    };
+    const handlePlaying = cancelBuffering;
+    const handleCanPlay = cancelBuffering;
+    const handlePause = cancelBuffering;
+
+    const handleProgress = () => {
+      const dur = audio.duration;
+      if (!dur || !isFinite(dur) || audio.buffered.length === 0) return;
+      const end = audio.buffered.end(audio.buffered.length - 1);
+      setBufferedPercent(Math.min(100, (end / dur) * 100));
+    };
+
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
     audio.addEventListener('timeupdate', handleTimeUpdate);
     audio.addEventListener('ended', handleEnded);
     audio.addEventListener('error', handleError);
     audio.addEventListener('loadstart', handleLoadStart);
+    audio.addEventListener('waiting', handleWaiting);
+    audio.addEventListener('stalled', handleStalled);
+    audio.addEventListener('playing', handlePlaying);
+    audio.addEventListener('canplay', handleCanPlay);
+    audio.addEventListener('pause', handlePause);
+    audio.addEventListener('progress', handleProgress);
 
     return () => {
+      cancelBuffering();
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
       audio.removeEventListener('timeupdate', handleTimeUpdate);
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('error', handleError);
       audio.removeEventListener('loadstart', handleLoadStart);
+      audio.removeEventListener('waiting', handleWaiting);
+      audio.removeEventListener('stalled', handleStalled);
+      audio.removeEventListener('playing', handlePlaying);
+      audio.removeEventListener('canplay', handleCanPlay);
+      audio.removeEventListener('pause', handlePause);
+      audio.removeEventListener('progress', handleProgress);
     };
   }, [audioId]);
 
@@ -217,29 +286,39 @@ export function AudioPlayer({ audioId, className, onRef, onTimeUpdate }: AudioPl
 
   return (
   <div className={cn("w-full", className)}>
-    <div className="rounded-xl border bg-card/70 backdrop-blur p-4 shadow-sm">
+    <div className="rounded-xl border border-neutral-200 bg-white/90 px-4 py-3 shadow-sm backdrop-blur">
       <audio
         ref={audioRef}
         src={`/api/audio/${audioId}/file`}
         preload="metadata"
       />
 
-      <div className="flex items-center gap-4">
-        {/* Time */}
-        <div className="min-w-[110px] text-sm text-muted-foreground tabular-nums">
-          <span className="font-medium">{formatTime(currentTime)}</span>
-          <span className="mx-1">/</span>
+      <div className="flex items-center gap-3">
+        {/* Time + buffering indicator */}
+        <div className="flex shrink-0 items-center gap-2 text-sm tabular-nums text-neutral-600">
+          <span className="font-medium text-neutral-900">{formatTime(currentTime)}</span>
+          <span className="text-neutral-300">/</span>
           <span>{formatTime(duration)}</span>
+          {isBuffering && (
+            <span
+              className="ml-1 inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wide text-amber-600"
+              role="status"
+              aria-live="polite"
+            >
+              <span className="size-1.5 animate-pulse rounded-full bg-amber-500" />
+              Buffering
+            </span>
+          )}
         </div>
 
-        {/* Controls */}
-        <div className="flex items-center gap-1.5">
+        {/* Transport controls */}
+        <div className="flex shrink-0 items-center gap-1">
           <Button
-            variant="outline"
+            variant="ghost"
             size="icon"
             onClick={skipBackward}
             disabled={isLoading}
-            className="h-9 w-9"
+            className="h-9 w-9 text-neutral-700 hover:bg-neutral-100"
             title="Retroceder 10s"
             aria-label="Retroceder 10 segundos"
           >
@@ -250,19 +329,19 @@ export function AudioPlayer({ audioId, className, onRef, onTimeUpdate }: AudioPl
             size="icon"
             onClick={togglePlayPause}
             disabled={isLoading}
-            className="h-11 w-11 rounded-full bg-black text-white hover:bg-black/90"
+            className="h-10 w-10 rounded-full bg-neutral-900 text-white shadow-sm hover:bg-neutral-800"
             title={isPlaying ? "Pausa" : "Reproducir"}
             aria-label={isPlaying ? "Pausa" : "Reproducir"}
           >
-            {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
+            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
           </Button>
 
           <Button
-            variant="outline"
+            variant="ghost"
             size="icon"
             onClick={skipForward}
             disabled={isLoading}
-            className="h-9 w-9"
+            className="h-9 w-9 text-neutral-700 hover:bg-neutral-100"
             title="Avanzar 10s"
             aria-label="Avanzar 10 segundos"
           >
@@ -274,7 +353,7 @@ export function AudioPlayer({ audioId, className, onRef, onTimeUpdate }: AudioPl
             size="icon"
             onClick={resetAudio}
             disabled={isLoading}
-            className="h-9 w-9"
+            className="h-9 w-9 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700"
             title="Reiniciar"
             aria-label="Reiniciar"
           >
@@ -282,15 +361,15 @@ export function AudioPlayer({ audioId, className, onRef, onTimeUpdate }: AudioPl
           </Button>
         </div>
 
-        {/* Speed */}
-        <div className="flex items-center gap-2">
+        {/* Playback rate */}
+        <div className="shrink-0">
           <label htmlFor="rate" className="sr-only">Velocidad</label>
           <select
             id="rate"
             value={playbackRate}
             onChange={(e) => setPlaybackRate(Number(e.target.value))}
             disabled={isLoading}
-            className="h-8 rounded-md border bg-background px-2 text-xs font-medium"
+            className="h-8 cursor-pointer rounded-md border border-neutral-200 bg-white px-2 text-xs font-medium text-neutral-700 transition-colors hover:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-neutral-300"
             title="Velocidad de reproducción"
           >
             <option value={0.5}>0.5×</option>
@@ -302,8 +381,14 @@ export function AudioPlayer({ audioId, className, onRef, onTimeUpdate }: AudioPl
           </select>
         </div>
 
-        {/* Progress (flex grows) */}
-        <div className="mx-2 flex-1">
+        {/* Progress (flex grows) — slider + buffered-range overlay */}
+        <div className="relative mx-1 flex-1">
+          {/* Buffered-range indicator behind the slider track */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute left-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-neutral-300/70 transition-[width] duration-300 ease-out"
+            style={{ width: `${bufferedPercent}%` }}
+          />
           <Slider
             value={[progressPercentage]}
             onValueChange={handleSeek}
@@ -313,33 +398,36 @@ export function AudioPlayer({ audioId, className, onRef, onTimeUpdate }: AudioPl
             disabled={isLoading || !duration}
             aria-label="Progreso"
             className={cn(
-              // track
-              "[&>span:first-child]:h-2 [&>span:first-child]:rounded-full [&>span:first-child]:bg-muted",
-              // range (filled)
-              "[&>span:first-child>span]:bg-black",
-              // thumb
-              "[&_[role=slider]]:h-4 [&_[role=slider]]:w-4 [&_[role=slider]]:border [&_[role=slider]]:border-border [&_[role=slider]]:bg-background"
+              "[&>span:first-child]:h-1.5 [&>span:first-child]:rounded-full [&>span:first-child]:bg-neutral-200",
+              "[&>span:first-child>span]:bg-neutral-900",
+              "[&_[role=slider]]:h-3.5 [&_[role=slider]]:w-3.5 [&_[role=slider]]:border [&_[role=slider]]:border-neutral-300 [&_[role=slider]]:bg-white [&_[role=slider]]:shadow-sm",
             )}
           />
         </div>
 
-        {/* Volume */}
-        <div className="flex items-center gap-2">
+        {/* Volume — collapsed by default, expands on hover */}
+        <div className="group/vol relative flex shrink-0 items-center">
           <Button
             variant="ghost"
             size="icon"
             onClick={toggleMute}
-            className="h-8 w-8"
+            className="h-9 w-9 text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
             title={isMuted || volume === 0 ? "Activar sonido" : "Silenciar"}
             aria-label={isMuted || volume === 0 ? "Activar sonido" : "Silenciar"}
           >
             {isMuted || volume === 0 ? (
-              <VolumeX className="h-5 w-5" />
+              <VolumeX className="h-4 w-4" />
             ) : (
-              <Volume2 className="h-5 w-5" />
+              <Volume2 className="h-4 w-4" />
             )}
           </Button>
-          <div className="w-24">
+          {/* Hover-expanding volume slider — keeps the audio bar tight by default. */}
+          <div
+            className={cn(
+              "ml-1 overflow-hidden transition-[width,opacity] duration-200 ease-out",
+              "w-0 opacity-0 group-hover/vol:w-24 group-hover/vol:opacity-100 group-focus-within/vol:w-24 group-focus-within/vol:opacity-100",
+            )}
+          >
             <Slider
               value={[isMuted ? 0 : volume * 100]}
               onValueChange={handleVolumeChange}
@@ -347,9 +435,9 @@ export function AudioPlayer({ audioId, className, onRef, onTimeUpdate }: AudioPl
               step={1}
               aria-label="Volumen"
               className={cn(
-                "[&>span:first-child]:h-1.5 [&>span:first-child]:rounded-full [&>span:first-child]:bg-muted",
-                "[&>span:first-child>span]:bg-black",
-                "[&_[role=slider]]:h-3.5 [&_[role=slider]]:w-3.5 [&_[role=slider]]:border [&_[role=slider]]:border-border [&_[role=slider]]:bg-background"
+                "[&>span:first-child]:h-1 [&>span:first-child]:rounded-full [&>span:first-child]:bg-neutral-200",
+                "[&>span:first-child>span]:bg-neutral-900",
+                "[&_[role=slider]]:h-3 [&_[role=slider]]:w-3 [&_[role=slider]]:border [&_[role=slider]]:border-neutral-300 [&_[role=slider]]:bg-white",
               )}
             />
           </div>

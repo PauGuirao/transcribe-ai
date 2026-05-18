@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/contexts/AuthContext";
 import AppLayout from "@/components/layout/AppLayout";
+import { PageSkeleton } from "@/components/layout/states/PageSkeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -133,19 +134,14 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <AppLayout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">{t("loading")}</p>
-          </div>
-        </div>
+        <PageSkeleton variant="form" count={3} />
       </AppLayout>
     );
   }
 
   return (
     <AppLayout>
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="w-full px-8 py-6">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">

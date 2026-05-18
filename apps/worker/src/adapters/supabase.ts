@@ -24,7 +24,9 @@ export async function upsertTranscription(env: Env, row: any) {
 }
 
 export async function update(env: Env, table: string, match: Record<string,string>, values: Record<string,any>) {
-  const qs = new URLSearchParams(Object.entries(match).map(([k,v])=>[k,`eq.${v}`]));
+  const qs = new URLSearchParams(
+    Object.entries(match).map(([k, v]) => [k, `eq.${v}`] as [string, string]),
+  );
   const res = await fetch(`${env.SUPABASE_URL}/rest/v1/${table}?${qs}`, {
     method: 'PATCH',
     headers: { 'Content-Type':'application/json','Authorization':`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,'apikey': env.SUPABASE_SERVICE_ROLE_KEY,'Prefer':'return=representation' },
@@ -44,8 +46,15 @@ export async function insertAudio(env: Env, audioRecord: any) {
   return res.json();
 }
 
+export async function consumeOrgMinutes(env: Env, orgId: string, minutes: number) {
+  return rpc(env, 'consume_org_minutes', { p_org_id: orgId, p_minutes: minutes });
+}
+
 export async function select(env: Env, table: string, query: Record<string,string>, select='*') {
-  const qp = new URLSearchParams([['select', select], ...Object.entries(query).map(([k,v])=>[k,`eq.${v}`])]);
+  const qp = new URLSearchParams([
+    ['select', select] as [string, string],
+    ...Object.entries(query).map(([k, v]) => [k, `eq.${v}`] as [string, string]),
+  ]);
   const res = await fetch(`${env.SUPABASE_URL}/rest/v1/${table}?${qp}`, {
     headers: { 'Authorization':`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`, 'apikey': env.SUPABASE_SERVICE_ROLE_KEY, 'Accept':'application/json' },
   });

@@ -1,7 +1,7 @@
 {
   "hero": {
-    "title": "Transcriu sessions de logopèdia en segons",
-    "description": "Utilitza una plataforma dissenyada per a alta precisió. Confiada per professionals de totes les mides per gestionar milions de paraules cada mes.",
+    "title": "Transcriure àudio a text amb IA",
+    "description": "Passa àudio a text al moment amb el 98% de precisió en català i castellà. Puja un MP3, WAV o nota de veu i obtén la transcripció a punt per editar, exportar i compartir. Per a logopedes, periodistes, investigadors i podcasters.",
     "preparing": "Preparant...",
     "goToDashboard": "Anar al panell",
     "signInWithEmail": "Entra amb el teu correu",
@@ -9,7 +9,10 @@
       "professionals": "Professionals confiats",
       "accuracy": "Precisió mitjana",
       "timeSaved": "Estalvi per setmana"
-    }
+    },
+    "ctaSecondary": "Veure com funciona",
+    "signUpWithGoogle": "Registra't amb Google",
+    "caption": "Gratis per començar · sense targeta · cancel·la quan vulguis"
   },
   "transcriptionExample": {
     "dropzone": "Arrossega el teu arxiu d'àudio aquí",
@@ -53,7 +56,12 @@
       "title": "Puja l'àudio",
       "description": "Carrega els fitxers d'àudio de les teves sessions de logopèdia des de qualsevol dispositiu de forma ràpida i segura.",
       "dropzone": "Arrossega el teu fitxer d'àudio aquí",
-      "processing": "Processant àudio..."
+      "processing": "Processant àudio...",
+      "items": [
+        "Compatible amb MP3, WAV i M4A",
+        "Arrossega o navega per pujar",
+        "Fitxers fins a 500 MB"
+      ]
     },
     "step2": {
       "number": "02",
@@ -61,7 +69,12 @@
       "description": "La nostra IA especialitzada en català converteix l'àudio en text amb alta precisió.",
       "transcribing": "Transcrivint àudio...",
       "duration": "Durada",
-      "accuracy": "Precisió"
+      "accuracy": "Precisió",
+      "items": [
+        "Identificació automàtica d'interlocutors",
+        "98% de precisió en català",
+        "Processa mentre treballes"
+      ]
     },
     "step3": {
       "number": "03",
@@ -72,7 +85,12 @@
       "exportDOCX": "Exportar com DOCX",
       "sendGmail": "Enviar per Gmail",
       "saveDrive": "Guardar a Drive",
-      "clickAny": "Fes clic en qualsevol opció per exportar"
+      "clickAny": "Fes clic en qualsevol opció per exportar",
+      "items": [
+        "Exporta en PDF, DOCX i TXT",
+        "Comparteix amb Gmail o Drive",
+        "Edita abans d'exportar"
+      ]
     }
   },
   "features": {
@@ -181,7 +199,10 @@
         "question": "Puc cancel·lar la subscripció en qualsevol moment?",
         "answer": "Sí, pots cancel·lar la teva subscripció en qualsevol moment des de la configuració del teu compte. No hi ha permanència ni penalitzacions. Si cancel·les, mantindràs accés fins al final del període de facturació actual i podràs descarregar totes les teves transcripcions."
       }
-    ]
+    ],
+    "badge": "FAQ",
+    "ctaLabel": "No trobes la resposta?",
+    "ctaButton": "Contacta amb nosaltres"
   },
   "footer": {
     "products": {
@@ -218,7 +239,7 @@
       "terms": "Termes del servei",
       "privacy": "Política de privacitat"
     },
-    "copyright": "© 2025 Transcriu — Tots els drets reservats",
+    "copyright": "© 2026 Transcriu — Tots els drets reservats",
     "rating": "Valorat per professionals de la logopèdia"
   },
   "dashboard": {
@@ -254,7 +275,7 @@
     "sidebar": {
       "home": "Inici",
       "transcribe": "Transcriure",
-      "library": "Biblioteca",
+      "library": "Transcripcions",
       "blog": "Blog",
       "students": "Alumnes",
       "tutorials": "Tutorials",
@@ -266,10 +287,14 @@
       "tokenError": "No s'han pogut carregar els tokens"
     },
     "plans": {
-      "group": "Grupal",
-      "individual": "Individual",
-      "free": "Gratuït",
-      "pro": "Professional"
+      "free": "Prova",
+      "basic": "Bàsic",
+      "pro": "Pro",
+      "studio": "Estudi",
+      "individual": "Bàsic",
+      "team": "Pro",
+      "organization": "Estudi",
+      "group": "Estudi"
     },
     "navbar": {
       "loading": "Carregant...",
@@ -293,10 +318,10 @@
       "libraryDesc": "Gestiona tots els teus àudios i transcripcions"
     },
     "library": {
-      "title": "Biblioteca",
+      "title": "Transcripcions",
       "filesCount": "{count} arxiu",
       "filesCountPlural": "{count} arxius",
-      "emptyTitle": "Biblioteca buida",
+      "emptyTitle": "Encara cap transcripció",
       "emptyDesc": "Puja el teu primer fitxer d'àudio per començar a transcriure.",
       "uploadAudio": "Pujar àudio",
       "viewAll": "Tots",
@@ -308,7 +333,8 @@
         "name": "Nom",
         "status": "Estat",
         "student": "Alumne",
-        "date": "Data"
+        "date": "Data",
+        "duration": "Durada"
       },
       "status": {
         "completed": "Transcrit",
@@ -337,7 +363,34 @@
         "selectStudent": "Selecciona alumne",
         "onlyTranscribed": "Només disponible per arxius transcrits",
         "saveChanges": "Guardar canvis"
-      }
+      },
+      "retry": "Reintentar",
+      "errors": {
+        "assignStudent": "No s'ha pogut assignar l'alumne",
+        "loadStudents": "No s'han pogut carregar els alumnes"
+      },
+      "edit": {
+        "title": "Editar transcripció",
+        "subtitle": "Renombra el fitxer o assigna'l a un alumne",
+        "info": "Informació",
+        "originalName": "Nom original",
+        "status": "Estat",
+        "date": "Data",
+        "customName": "Nom personalitzat",
+        "customNamePlaceholder": "Per exemple: Sessió Maria 12/03",
+        "assignStudent": "Alumne",
+        "selectStudent": "Selecciona un alumne",
+        "unassigned": "Sense assignar",
+        "onlyTranscribed": "Només per a transcripcions completades",
+        "years": "anys",
+        "save": "Desar canvis",
+        "saving": "Desant...",
+        "cancel": "Cancel·lar",
+        "loading": "Carregant..."
+      },
+      "viewCalendar": "Calendari",
+      "today": "Avui",
+      "noFilesThisDay": "Sense transcripcions aquest dia"
     },
     "profiles": {
       "title": "Alumnes",
@@ -370,6 +423,8 @@
       }
     },
     "upload": {
+      "drawerTitle": "Nova transcripció",
+      "drawerDescription": "Puja un fitxer d'àudio. La transcripció comença en segon pla — pots tancar aquest panell mentre es processa.",
       "dropHere": "Deixa anar aquí el teu àudio",
       "uploadAudio": "Puja un arxiu d'àudio",
       "dragDropHint": "Arrossega i deixa anar o fes clic per seleccionar",
@@ -438,6 +493,9 @@
         "title": "Error en la transcripció",
         "description": "Hi ha hagut un error processant el teu fitxer d'àudio. Si us plau, prova de pujar-lo de nou.",
         "refreshPage": "Actualitzar pàgina"
+      },
+      "sidebar": {
+        "title": "Detalls"
       }
     },
     "team": {
@@ -452,6 +510,29 @@
       "teamMembers": "Membres de l'equip",
       "invite": "Convidar",
       "inviteMember": "Convidar membre",
+      "editOrganization": "Edita",
+      "editDrawer": {
+        "title": "Edita l'organització",
+        "description": "Actualitza el nom, la descripció i el logotip de la teva organització.",
+        "logoLabel": "Logotip",
+        "changeImage": "Canvia la imatge",
+        "uploading": "Pujant...",
+        "imageHint": "PNG, JPG, WebP o GIF. Màxim 5 MB.",
+        "nameLabel": "Nom",
+        "namePlaceholder": "La meva organització",
+        "descriptionLabel": "Descripció",
+        "descriptionPlaceholder": "Una breu descripció de la teva organització (opcional)",
+        "cancel": "Cancel·la",
+        "save": "Desa els canvis",
+        "saving": "Desant...",
+        "errors": {
+          "nameTooShort": "El nom ha de tenir almenys 2 caràcters.",
+          "nameTooLong": "El nom ha de tenir menys de 100 caràcters.",
+          "descTooLong": "La descripció ha de tenir menys de 500 caràcters.",
+          "uploadFailed": "No s'ha pogut pujar la imatge.",
+          "saveFailed": "No s'han pogut desar els canvis."
+        }
+      },
       "inviteFirstMember": "Convidar primer membre",
       "noMembers": "Encara no hi ha membres",
       "noMembersDesc": "Convida els teus companys d'equip per començar a col·laborar junts.",

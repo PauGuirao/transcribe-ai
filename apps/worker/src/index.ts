@@ -6,8 +6,10 @@ import { remove } from './routes/delete';
 import { processBatch } from './queue/processor';
 import { handleTranscribeDirectGet, handleTranscribeDirectPost } from './routes/transcribe-direct';
 import { handleUpdateTranscriptionPost } from './routes/update-transcription';
-import { uploadOrganizationImage, deleteOrganizationImage } from './routes/organization-image';
+import { uploadOrganizationImage, deleteOrganizationImage, serveOrganizationImage } from './routes/organization-image';
 import { generatePresignedUpload, confirmUpload } from './routes/presigned-upload';
+import { chunkedUploadInit, chunkedUploadSource, chunkedUploadChunk, chunkedUploadProcess } from './routes/chunked-upload';
+import { handleWhatsAppEvent, handleWhatsAppVerify } from './routes/whatsapp';
 import { TranscriptionStatus } from './durable-objects/transcription-status';
 
 const routes: Record<string, (req: Request, env: Env) => Promise<Response>> = {
@@ -46,6 +48,9 @@ export default {
         return methodNotAllowed();
       }
       if (path.startsWith('/organization-image/')) {
+        // Public read for <img> tags: GET /organization-image/{orgId}.{ext}.
+        // Auth'd admin delete: DELETE /organization-image/{orgId}.
+        if (request.method === 'GET') return serveOrganizationImage(request, env);
         if (request.method === 'DELETE') return deleteOrganizationImage(request, env);
         return methodNotAllowed();
       }
@@ -60,9 +65,34 @@ export default {
         return methodNotAllowed();
       }
 
+      // Chunked-upload endpoints (primary transcription path)
+      if (path === '/chunked-upload/init') {
+        if (request.method === 'POST') return chunkedUploadInit(request, env);
+        return methodNotAllowed();
+      }
+      if (path === '/chunked-upload/source') {
+        if (request.method === 'POST') return chunkedUploadSource(request, env);
+        return methodNotAllowed();
+      }
+      if (path === '/chunked-upload/chunk') {
+        if (request.method === 'POST') return chunkedUploadChunk(request, env);
+        return methodNotAllowed();
+      }
+      if (path === '/chunked-upload/process') {
+        if (request.method === 'POST') return chunkedUploadProcess(request, env);
+        return methodNotAllowed();
+      }
+
       // Public audio URL endpoint (returns CDN URL)
       if (path === '/public-url') {
         if (request.method === 'POST') return getPublicAudioUrl(request, env);
+        return methodNotAllowed();
+      }
+
+      // WhatsApp Cloud API webhook (Meta).
+      if (path === '/wa/webhook') {
+        if (request.method === 'GET') return handleWhatsAppVerify(request, env);
+        if (request.method === 'POST') return handleWhatsAppEvent(request, env, ctx);
         return methodNotAllowed();
       }
 

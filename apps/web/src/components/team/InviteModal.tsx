@@ -4,19 +4,25 @@ import React, { useState, useCallback, useReducer, useRef, useEffect } from "rea
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  Copy, 
-  Check, 
-  Loader2, 
-  X, 
-  Mail, 
-  Link, 
-  Users, 
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import {
+  Copy,
+  Check,
+  Loader2,
+  X,
+  Mail,
+  Link,
+  Users,
   MessageCircle,
   Twitter,
   Facebook,
-  Share2
+  Share2,
 } from "lucide-react";
 
 interface InviteModalProps {
@@ -188,65 +194,45 @@ function InviteModalComponent({ isOpen, onClose }: InviteModalProps) {
     }
   }, [state.isCopied]);
 
-  const getOrCreateInvite = useCallback(async (retryCount = 0): Promise<void> => {
-    // Check cache first
+  const getOrCreateInvite = useCallback(async (retryCount = 0, email?: string): Promise<void> => {
+    // Cache lookup remains for UX during a single session (avoids re-minting
+    // a token just because the modal re-opened). New per-email tokens are
+    // minted on demand by sendEmailInvite below.
     const cached = getCachedInvite();
     if (cached) {
       dispatch({ type: 'SET_CACHED_URL', payload: cached });
       return;
     }
 
-    // Cancel previous request
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
+    // Without an email we cannot create a per-email invite under the new model.
+    // The modal's "share link" UI will only show a URL once an email-based
+    // invite is sent via sendEmailInvite.
+    if (!email) {
+      dispatch({ type: 'SET_LOADING', payload: false });
+      return;
     }
 
-    // Create new abort controller
+    if (abortControllerRef.current) abortControllerRef.current.abort();
     abortControllerRef.current = new AbortController();
-
     dispatch({ type: 'SET_LOADING', payload: true });
 
     try {
-      // First, try to get existing invite
-      const getResponse = await fetch("/api/organization/invite", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        signal: abortControllerRef.current.signal,
-      });
-
-      if (getResponse.ok) {
-        const getData = await getResponse.json();
-        if (getData.inviteUrl) {
-          // Existing invite found
-          const cacheData = setCachedInvite(getData.inviteUrl);
-          dispatch({ type: 'SET_CACHED_URL', payload: cacheData });
-          console.log("Enllaç d'invitació existent recuperat");
-          return;
-        }
-      }
-
-      // No existing invite found, create a new one
-      const postResponse = await fetch("/api/organization/invite", {
+      const postResponse = await fetch("/api/invitations", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
         signal: abortControllerRef.current.signal,
       });
 
       if (!postResponse.ok) {
-        const errorData = await postResponse.json();
+        const errorData = await postResponse.json().catch(() => ({}));
         throw new Error(errorData.error || "Failed to generate invite");
       }
 
       const postData = await postResponse.json();
-      
       if (postData.inviteUrl) {
         const cacheData = setCachedInvite(postData.inviteUrl);
         dispatch({ type: 'SET_CACHED_URL', payload: cacheData });
-        console.log("Nou enllaç d'invitació generat");
       } else {
         throw new Error("No invite URL received");
       }
@@ -348,7 +334,7 @@ function InviteModalComponent({ isOpen, onClose }: InviteModalProps) {
     dispatch({ type: 'SET_EMAIL_SUCCESS', payload: false });
 
     try {
-      const response = await fetch('/api/organization/invite/email', {
+      const response = await fetch('/api/invitations', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -391,36 +377,36 @@ function InviteModalComponent({ isOpen, onClose }: InviteModalProps) {
     }
   }, [isOpen, state.inviteUrl, state.isLoading, getOrCreateInvite]);
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black/80 bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <Card className="w-full max-w-md">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-lg font-semibold flex items-center gap-2">
-            <Users className="w-5 h-5" />
+    <Sheet open={isOpen} onOpenChange={(open) => { if (!open) handleClose(); }}>
+      <SheetContent
+        side="right"
+        className="flex w-full flex-col gap-0 p-0 sm:max-w-lg"
+      >
+        <SheetHeader className="border-b border-neutral-200 px-6 py-5">
+          <SheetTitle className="flex items-center gap-2 text-lg font-semibold text-neutral-900">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-sm">
+              <Users className="h-4.5 w-4.5 text-white" />
+            </span>
             Convidar membres
-          </CardTitle>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleClose}
-            className="h-8 w-8 p-0"
-          >
-            <X className="w-4 h-4" />
-          </Button>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Email Invitation Section */}
+          </SheetTitle>
+          <SheetDescription className="text-sm text-neutral-600">
+            Envia una invitació per correu. L&apos;enllaç és segur, personalitzat i vàlid durant 7 dies.
+          </SheetDescription>
+        </SheetHeader>
+
+        <div className="flex-1 overflow-y-auto px-6 py-5">
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Mail className="w-4 h-4" />
-              <h3 className="font-medium">Enviar invitació per correu</h3>
+            <div className="flex items-center gap-2 text-[13px] font-medium text-neutral-500">
+              <Mail className="h-3.5 w-3.5" />
+              Enviar invitació per correu
             </div>
-            
+
             <div className="space-y-3">
-              <div className="space-y-2">
-                <Label htmlFor="invite-email">Correu electrònic</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="invite-email" className="text-[13px] font-medium text-neutral-700">
+                  Correu electrònic
+                </Label>
                 <Input
                   id="invite-email"
                   type="email"
@@ -430,7 +416,7 @@ function InviteModalComponent({ isOpen, onClose }: InviteModalProps) {
                   disabled={state.emailInvite.isLoading}
                 />
               </div>
-              
+
               <Button
                 onClick={sendEmailInvite}
                 disabled={!state.emailInvite.email || state.emailInvite.isLoading}
@@ -438,40 +424,38 @@ function InviteModalComponent({ isOpen, onClose }: InviteModalProps) {
               >
                 {state.emailInvite.isLoading ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Enviant...
                   </>
                 ) : (
                   <>
-                    <Mail className="w-4 h-4 mr-2" />
+                    <Mail className="mr-2 h-4 w-4" />
                     Enviar invitació
                   </>
                 )}
               </Button>
 
               {state.emailInvite.success && (
-                <div className="text-sm text-green-600 dark:text-green-400 flex items-center gap-2">
-                  <Check className="w-4 h-4" />
+                <div className="flex items-center gap-2 rounded-md border border-emerald-100 bg-emerald-50 px-3 py-2 text-[13px] text-emerald-700">
+                  <Check className="h-4 w-4" />
                   Invitació enviada correctament
                 </div>
               )}
 
               {state.emailInvite.error && (
-                <div className="text-sm text-red-600 dark:text-red-400">
+                <div className="rounded-md border border-rose-100 bg-rose-50 px-3 py-2 text-[13px] text-rose-700">
                   {state.emailInvite.error}
                 </div>
               )}
 
-              <p className="text-xs text-gray-500">
-                S'enviarà un correu amb un enllaç d'invitació segur i personalitzat vàlid per 7 dies
+              <p className="text-[11px] text-neutral-500">
+                S&apos;enviarà un correu amb un enllaç d&apos;invitació segur i personalitzat vàlid per 7 dies.
               </p>
             </div>
           </div>
-
-
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 }
 

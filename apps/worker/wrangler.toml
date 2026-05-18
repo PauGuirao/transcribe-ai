@@ -1,10 +1,20 @@
 name = "transcribe-worker"
 main = "src/index.ts"
-compatibility_date = "2024-09-01"
+compatibility_date = "2026-05-01"
+compatibility_flags = ["nodejs_compat"]
 
 # Bind environment variables at deploy time via `wrangler secret put` or Cloudflare dashboard
 [vars]
 SUPABASE_URL = "https://qtjbjxtujdjvauzwzfkw.supabase.co"
+# Public base URL of the web app — used for deep links sent to WhatsApp users.
+PUBLIC_SITE_URL = "https://www.transcriu.com"
+
+# Required secrets (set via `wrangler secret put`):
+#   SUPABASE_SERVICE_ROLE_KEY     — Supabase service-role JWT
+#   WHATSAPP_VERIFY_TOKEN         — random string you also configure in the Meta webhook UI
+#   WHATSAPP_ACCESS_TOKEN         — Meta system-user / app access token
+#   WHATSAPP_PHONE_NUMBER_ID      — the WABA phone-number-id (NOT the phone number itself)
+#   WHATSAPP_APP_SECRET           — Meta app secret (used to verify X-Hub-Signature-256)
 
 # Workers AI binding for Whisper models
 [ai]
@@ -20,11 +30,8 @@ preview_bucket_name = "transcribe-audio-files-dev"
 binding = "TRANSCRIPTIONS"
 bucket_name = "transcribe-transcriptions"
 preview_bucket_name = "transcribe-transcriptions-dev"
-
-[[r2_buckets]]
-binding = "ORGANIZATION_IMAGES"
-bucket_name = "transcribe-org-images"
-preview_bucket_name = "transcribe-org-images-dev"
+# Org logos live in this bucket too, under the `org-images/{orgId}/logo.{ext}` prefix.
+# Served publicly via the worker's GET /organization-image/{orgId}.{ext} route.
 
 # Queue bindings
 [[queues.producers]]
@@ -33,12 +40,26 @@ binding = "TRANSCRIBE_JOBS"
 
 [[queues.consumers]]
 queue = "transcribe-jobs"
+# Process one chunk per message so failures isolate.
+max_batch_size = 1
+# Run up to N chunks of one audio (or N audios) in parallel.
+max_concurrency = 10
+# 5 attempts, retries via msg.retry() with our own backoff.
+max_retries = 5
+# Each invocation should finish well within the worker CPU window for one chunk.
+max_batch_timeout = 30
+dead_letter_queue = "transcribe-jobs-dlq"
+
+# Dead-letter queue for messages that exhausted retries.
+[[queues.producers]]
+queue = "transcribe-jobs-dlq"
+binding = "TRANSCRIBE_DLQ"
 
 # KV Namespace for caching
 [[kv_namespaces]]
 binding = "CACHE"
-id = "transcribe-cache"
-preview_id = "transcribe-cache-dev"
+id = "59f4fed1e83a41de9bcda255a707d3f4"
+preview_id = "d4cb1e0a536d45788ff976c3cfa599a0"
 
 # Durable Objects for real-time status
 [durable_objects]

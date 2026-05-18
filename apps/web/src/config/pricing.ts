@@ -1,46 +1,32 @@
 /**
- * Pricing configuration - Single source of truth for all pricing data
+ * Pricing configuration — single source of truth for all plan data.
+ *
+ * Pricing model: minute-based. Each plan grants a monthly allowance of
+ * transcription minutes. Going over the cap blocks new uploads until the
+ * next billing cycle (or upgrade) — see usage tracking in the backend.
+ *
+ * Plan IDs (`free`, `basic`, `pro`, `studio`) are positioned by audio volume.
+ * Feature set is identical across all paid tiers — the only differentiator is
+ * the monthly minute budget (and seat count on `studio`).
  */
 
-export type PlanId = 'free' | 'individual' | 'team' | 'organization';
+export type PlanId = 'free' | 'basic' | 'pro' | 'studio';
 export type BillingPeriod = 'monthly' | 'yearly';
 
 export interface PlanConfig {
   id: PlanId;
-  name: {
-    ca: string;
-    es: string;
-    en: string;
-  };
-  description: {
-    ca: string;
-    es: string;
-    en: string;
-  };
+  name: { ca: string; es: string; en: string };
+  description: { ca: string; es: string; en: string };
   pricing: {
-    monthly: number;
-    yearly: number; // Total per year
+    monthly: number; // €/month
+    yearly: number;  // €/year (total — divide by 12 for /mo equivalent)
   };
-  perUser: boolean; // If true, price is per user
-  users: {
-    min: number;
-    max: number;
-  };
+  perUser: boolean;
+  users: { min: number; max: number };
   limits: {
-    minutesPerMonth: number | null; // null = unlimited
-    diarization: boolean;
-    exports: boolean;
-    advancedEditor: boolean;
-    teamManagement: boolean;
-    sharedLibrary: boolean;
-    prioritySupport: boolean;
-    centralizedBilling: boolean;
+    minutesPerMonth: number | null;
   };
-  features: {
-    ca: string[];
-    es: string[];
-    en: string[];
-  };
+  features: { ca: string[]; es: string[]; en: string[] };
   stripePriceIds: {
     monthly: string | null;
     yearly: string | null;
@@ -51,241 +37,202 @@ export interface PlanConfig {
 export const PLANS: Record<PlanId, PlanConfig> = {
   free: {
     id: 'free',
-    name: {
-      ca: 'Gratuït',
-      es: 'Gratuito',
-      en: 'Free',
-    },
+    name: { ca: 'Prova', es: 'Prueba', en: 'Trial' },
     description: {
-      ca: 'Perfecte per provar la plataforma',
-      es: 'Perfecto para probar la plataforma',
-      en: 'Perfect for trying the platform',
+      ca: 'Per a provar la plataforma',
+      es: 'Para probar la plataforma',
+      en: 'For trying out the platform',
     },
-    pricing: {
-      monthly: 0,
-      yearly: 0,
-    },
+    pricing: { monthly: 0, yearly: 0 },
     perUser: false,
-    users: {
-      min: 1,
-      max: 1,
-    },
+    users: { min: 1, max: 1 },
     limits: {
-      minutesPerMonth: 60,
-      diarization: false,
-      exports: false,
-      advancedEditor: false,
-      teamManagement: false,
-      sharedLibrary: false,
-      prioritySupport: false,
-      centralizedBilling: false,
+      minutesPerMonth: 10,
     },
     features: {
       ca: [
-        '60 minuts de transcripció/mes',
-        'Transcripció bàsica',
-        'Exportar TXT',
-        '1 usuari',
+        '10 min de transcripció / mes',
+        'Identificació de parlants (diarització)',
+        'Exportar PDF, DOCX i TXT',
+        'Editor avançat',
+        'Plantilles de resum clínic amb IA',
+        'Glossari personalitzat',
       ],
       es: [
-        '60 minutos de transcripción/mes',
-        'Transcripción básica',
-        'Exportar TXT',
-        '1 usuario',
+        '10 min de transcripción / mes',
+        'Identificación de hablantes (diarización)',
+        'Exportar PDF, DOCX y TXT',
+        'Editor avanzado',
+        'Plantillas de resumen clínico con IA',
+        'Glosario personalizado',
       ],
       en: [
-        '60 minutes transcription/month',
-        'Basic transcription',
-        'Export TXT',
-        '1 user',
+        '10 min of transcription / month',
+        'Speaker diarization',
+        'Export PDF, DOCX and TXT',
+        'Advanced editor',
+        'AI-generated clinical summary templates',
+        'Custom vocabulary glossary',
+      ],
+    },
+    stripePriceIds: { monthly: null, yearly: null },
+  },
+
+  // Bàsic — part-time / casual use, ~10 h/mo of audio.
+  basic: {
+    id: 'basic',
+    name: { ca: 'Bàsic', es: 'Básico', en: 'Basic' },
+    description: {
+      ca: 'Per a ús casual i pràctica privada inicial',
+      es: 'Para uso casual y práctica privada inicial',
+      en: 'For casual use and early private practice',
+    },
+    pricing: { monthly: 9, yearly: 84 }, // €7/mo annual → ~22% discount
+    perUser: false,
+    users: { min: 1, max: 200 },
+    limits: {
+      minutesPerMonth: 600,
+    },
+    features: {
+      ca: [
+        '10 hores (600 min) de transcripció / mes',
+        'Usuaris il·limitats compartint el mateix límit',
+        'Identificació de parlants (diarització)',
+        'Exportar PDF, DOCX i TXT',
+        'Editor avançat',
+        'Plantilles de resum clínic amb IA',
+        'Glossari personalitzat',
+      ],
+      es: [
+        '10 horas (600 min) de transcripción / mes',
+        'Usuarios ilimitados compartiendo el mismo límite',
+        'Identificación de hablantes (diarización)',
+        'Exportar PDF, DOCX y TXT',
+        'Editor avanzado',
+        'Plantillas de resumen clínico con IA',
+        'Glosario personalizado',
+      ],
+      en: [
+        '10 hours (600 min) of transcription / month',
+        'Unlimited users sharing the same allowance',
+        'Speaker diarization',
+        'Export PDF, DOCX and TXT',
+        'Advanced editor',
+        'AI-generated clinical summary templates',
+        'Custom vocabulary glossary',
       ],
     },
     stripePriceIds: {
-      monthly: null,
-      yearly: null,
+      monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC_MONTHLY || null,
+      yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC_YEARLY || null,
     },
   },
-  individual: {
-    id: 'individual',
-    name: {
-      ca: 'Individual',
-      es: 'Individual',
-      en: 'Individual',
-    },
+
+  // Pro — full-time logopeda, ~50 h/mo of audio. Most popular tier.
+  pro: {
+    id: 'pro',
+    name: { ca: 'Pro', es: 'Pro', en: 'Pro' },
     description: {
-      ca: 'Per a professionals independents',
-      es: 'Para profesionales independientes',
-      en: 'For independent professionals',
+      ca: 'Per a logopedes a temps complet',
+      es: 'Para logopedas a tiempo completo',
+      en: 'For full-time speech therapists',
     },
-    pricing: {
-      monthly: 9,
-      yearly: 86,
-    },
+    pricing: { monthly: 19, yearly: 180 }, // €15/mo annual → ~21% discount
     perUser: false,
-    users: {
-      min: 1,
-      max: 1,
-    },
+    users: { min: 1, max: 200 },
     limits: {
-      minutesPerMonth: null,
-      diarization: true,
-      exports: true,
-      advancedEditor: true,
-      teamManagement: false,
-      sharedLibrary: false,
-      prioritySupport: true,
-      centralizedBilling: false,
+      minutesPerMonth: 3000,
     },
     features: {
       ca: [
-        'Transcripcions il·limitades',
-        'Diarització (identificació de parlants)',
-        'Exportar PDF, DOCX, TXT',
+        '50 hores (3.000 min) de transcripció / mes',
+        'Usuaris il·limitats compartint el mateix límit',
+        'Identificació de parlants (diarització)',
+        'Exportar PDF, DOCX i TXT',
         'Editor avançat',
-        'Suport prioritari',
+        'Plantilles de resum clínic amb IA',
+        'Glossari personalitzat',
       ],
       es: [
-        'Transcripciones ilimitadas',
-        'Diarización (identificación de hablantes)',
-        'Exportar PDF, DOCX, TXT',
+        '50 horas (3.000 min) de transcripción / mes',
+        'Usuarios ilimitados compartiendo el mismo límite',
+        'Identificación de hablantes (diarización)',
+        'Exportar PDF, DOCX y TXT',
         'Editor avanzado',
-        'Soporte prioritario',
+        'Plantillas de resumen clínico con IA',
+        'Glosario personalizado',
       ],
       en: [
-        'Unlimited transcriptions',
-        'Diarization (speaker identification)',
-        'Export PDF, DOCX, TXT',
+        '50 hours (3,000 min) of transcription / month',
+        'Unlimited users sharing the same allowance',
+        'Speaker diarization',
+        'Export PDF, DOCX and TXT',
         'Advanced editor',
-        'Priority support',
+        'AI-generated clinical summary templates',
+        'Custom vocabulary glossary',
       ],
     },
     stripePriceIds: {
-      monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_INDIVIDUAL_MONTHLY || null,
-      yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_INDIVIDUAL_YEARLY || null,
+      monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTHLY || null,
+      yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_YEARLY || null,
     },
     highlighted: true,
   },
-  team: {
-    id: 'team',
-    name: {
-      ca: 'Equip',
-      es: 'Equipo',
-      en: 'Team',
-    },
+
+  // Estudi — clinic / power user, ~150 h/mo of audio. Unlimited seats sharing pool
+  // (with a 200-seat safety cap to prevent abuse).
+  studio: {
+    id: 'studio',
+    name: { ca: 'Estudi', es: 'Estudio', en: 'Studio' },
     description: {
-      ca: 'Per a petits equips i clíniques',
-      es: 'Para pequeños equipos y clínicas',
-      en: 'For small teams and clinics',
+      ca: 'Per a clíniques i equips petits',
+      es: 'Para clínicas y equipos pequeños',
+      en: 'For clinics and small teams',
     },
-    pricing: {
-      monthly: 7,
-      yearly: 67,
-    },
-    perUser: true,
-    users: {
-      min: 3,
-      max: 10,
-    },
+    pricing: { monthly: 49, yearly: 468 }, // €39/mo annual → ~20% discount
+    perUser: false,
+    users: { min: 1, max: 200 },
     limits: {
-      minutesPerMonth: null,
-      diarization: true,
-      exports: true,
-      advancedEditor: true,
-      teamManagement: true,
-      sharedLibrary: true,
-      prioritySupport: true,
-      centralizedBilling: false,
+      minutesPerMonth: 9000,
     },
     features: {
       ca: [
-        'Tot d\'Individual inclòs',
-        '3-10 usuaris',
-        'Gestió d\'equip',
-        'Biblioteca compartida',
-        'Permisos per rol',
+        '150 hores (9.000 min) de transcripció / mes',
+        'Usuaris il·limitats compartint el mateix límit',
+        'Identificació de parlants (diarització)',
+        'Exportar PDF, DOCX i TXT',
+        'Editor avançat',
+        'Plantilles de resum clínic amb IA',
+        'Glossari personalitzat',
       ],
       es: [
-        'Todo de Individual incluido',
-        '3-10 usuarios',
-        'Gestión de equipo',
-        'Biblioteca compartida',
-        'Permisos por rol',
+        '150 horas (9.000 min) de transcripción / mes',
+        'Usuarios ilimitados compartiendo el mismo límite',
+        'Identificación de hablantes (diarización)',
+        'Exportar PDF, DOCX y TXT',
+        'Editor avanzado',
+        'Plantillas de resumen clínico con IA',
+        'Glosario personalizado',
       ],
       en: [
-        'Everything in Individual',
-        '3-10 users',
-        'Team management',
-        'Shared library',
-        'Role-based permissions',
+        '150 hours (9,000 min) of transcription / month',
+        'Unlimited users sharing the same allowance',
+        'Speaker diarization',
+        'Export PDF, DOCX and TXT',
+        'Advanced editor',
+        'AI-generated clinical summary templates',
+        'Custom vocabulary glossary',
       ],
     },
     stripePriceIds: {
-      monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_TEAM_MONTHLY || null,
-      yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_TEAM_YEARLY || null,
-    },
-  },
-  organization: {
-    id: 'organization',
-    name: {
-      ca: 'Organització',
-      es: 'Organización',
-      en: 'Organization',
-    },
-    description: {
-      ca: 'Per a grans equips i institucions',
-      es: 'Para grandes equipos e instituciones',
-      en: 'For large teams and institutions',
-    },
-    pricing: {
-      monthly: 6,
-      yearly: 58,
-    },
-    perUser: true,
-    users: {
-      min: 11,
-      max: 50,
-    },
-    limits: {
-      minutesPerMonth: null,
-      diarization: true,
-      exports: true,
-      advancedEditor: true,
-      teamManagement: true,
-      sharedLibrary: true,
-      prioritySupport: true,
-      centralizedBilling: true,
-    },
-    features: {
-      ca: [
-        'Tot d\'Equip inclòs',
-        '11-50 usuaris',
-        'Facturació centralitzada',
-        'Millor preu per usuari',
-        'Onboarding personalitzat',
-      ],
-      es: [
-        'Todo de Equipo incluido',
-        '11-50 usuarios',
-        'Facturación centralizada',
-        'Mejor precio por usuario',
-        'Onboarding personalizado',
-      ],
-      en: [
-        'Everything in Team',
-        '11-50 users',
-        'Centralized billing',
-        'Best price per user',
-        'Personalized onboarding',
-      ],
-    },
-    stripePriceIds: {
-      monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_ORG_MONTHLY || null,
-      yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_ORG_YEARLY || null,
+      monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_STUDIO_MONTHLY || null,
+      yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_STUDIO_YEARLY || null,
     },
   },
 };
 
-// Helper functions
+/* ----------------------------- Helpers ------------------------------- */
+
 export function getPlan(planId: PlanId): PlanConfig {
   return PLANS[planId];
 }
@@ -296,24 +243,19 @@ export function getAllPlans(): PlanConfig[] {
 
 export function getPlanPrice(planId: PlanId, period: BillingPeriod, users: number = 1): number {
   const plan = PLANS[planId];
-  const basePrice = period === 'monthly' ? plan.pricing.monthly : plan.pricing.yearly;
-
-  if (plan.perUser) {
-    return basePrice * users;
-  }
-  return basePrice;
+  const base = period === 'monthly' ? plan.pricing.monthly : plan.pricing.yearly;
+  return plan.perUser ? base * users : base;
 }
 
 export function getMonthlyEquivalent(planId: PlanId, period: BillingPeriod): number {
   const plan = PLANS[planId];
-  if (period === 'monthly') {
-    return plan.pricing.monthly;
-  }
+  if (period === 'monthly') return plan.pricing.monthly;
   return Math.round((plan.pricing.yearly / 12) * 100) / 100;
 }
 
 export function getYearlyDiscount(planId: PlanId): number {
   const plan = PLANS[planId];
+  if (plan.pricing.monthly === 0) return 0;
   const monthlyTotal = plan.pricing.monthly * 12;
   const yearlyTotal = plan.pricing.yearly;
   return Math.round((1 - yearlyTotal / monthlyTotal) * 100);
@@ -321,25 +263,23 @@ export function getYearlyDiscount(planId: PlanId): number {
 
 export function validateUserCount(planId: PlanId, users: number): { valid: boolean; message?: string } {
   const plan = PLANS[planId];
-
   if (users < plan.users.min) {
-    return {
-      valid: false,
-      message: `Mínim ${plan.users.min} usuaris per aquest pla`
-    };
+    return { valid: false, message: `Mínim ${plan.users.min} usuaris per aquest pla` };
   }
-
   if (users > plan.users.max) {
-    return {
-      valid: false,
-      message: `Màxim ${plan.users.max} usuaris per aquest pla`
-    };
+    return { valid: false, message: `Màxim ${plan.users.max} usuaris per aquest pla` };
   }
-
   return { valid: true };
 }
 
 export function getStripePriceId(planId: PlanId, period: BillingPeriod): string | null {
-  const plan = PLANS[planId];
-  return plan.stripePriceIds[period];
+  return PLANS[planId].stripePriceIds[period];
+}
+
+/** Format a monthly minute allowance for display: "60 min", "10 h", "150 h". */
+export function formatMinutesAllowance(minutes: number | null, locale: 'ca' | 'es' | 'en' = 'ca'): string {
+  if (minutes === null) return locale === 'en' ? 'Unlimited' : locale === 'es' ? 'Ilimitado' : 'Il·limitat';
+  if (minutes < 120) return `${minutes} min`;
+  const hours = Math.round(minutes / 60);
+  return `${hours} h`;
 }

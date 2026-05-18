@@ -2,6 +2,13 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ClientFeature from "./ClientFeature";
 import featuresJson from "../features.json";
+import {
+  JsonLd,
+  generateBreadcrumbSchema,
+  generateFAQSchema,
+} from "@/components/seo/JsonLd";
+
+const BASE_URL = "https://www.transcriu.com";
 
 // Features content registry
 const features = featuresJson as Record<
@@ -59,13 +66,11 @@ export async function generateMetadata({
       description,
       type: "website",
       url: `${baseUrl}/${locale}/features/${slug}`,
-      images: [`${baseUrl}/og-image.png`],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [`${baseUrl}/og-image.png`],
     },
     alternates: {
       canonical: `${baseUrl}/${locale}/features/${slug}`,
@@ -83,12 +88,46 @@ interface FeaturePageProps {
 }
 
 export default async function FeaturePage({ params }: FeaturePageProps) {
-  const { slug } = await params;
+  const { slug, locale } = await params;
   const feature = features[slug as keyof typeof features];
 
   if (!feature) {
     notFound();
   }
 
-  return <ClientFeature feature={feature} />;
+  const validLocale = ["ca", "es", "en"].includes(locale) ? locale : "ca";
+  const pageUrl = `${BASE_URL}/${validLocale}/features/${slug}`;
+
+  const breadcrumbSchema = generateBreadcrumbSchema({
+    items: [
+      {
+        name:
+          validLocale === "ca" ? "Inici" : validLocale === "en" ? "Home" : "Inicio",
+        url: `${BASE_URL}/${validLocale}`,
+      },
+      {
+        name:
+          validLocale === "ca"
+            ? "Funcionalitats"
+            : validLocale === "en"
+            ? "Features"
+            : "Funcionalidades",
+        url: `${BASE_URL}/${validLocale}/features`,
+      },
+      { name: feature.heroTitle || feature.title, url: pageUrl },
+    ],
+  });
+
+  const faqSchema =
+    feature.faqs && feature.faqs.length > 0
+      ? generateFAQSchema({ faqs: feature.faqs })
+      : null;
+
+  return (
+    <>
+      <JsonLd data={breadcrumbSchema} />
+      {faqSchema && <JsonLd data={faqSchema} />}
+      <ClientFeature feature={feature} />
+    </>
+  );
 }

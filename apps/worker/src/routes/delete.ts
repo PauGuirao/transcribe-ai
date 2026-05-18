@@ -20,7 +20,7 @@ export async function remove(request: Request, env: Env) {
     headers: { 'Authorization': `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`, 'apikey': env.SUPABASE_SERVICE_ROLE_KEY },
   });
   if (!res.ok) return json({ error: 'Failed to verify file ownership' }, 500);
-  const rows = await res.json();
+  const rows = (await res.json()) as unknown[] | null;
   if (!rows?.length) return json({ error: 'File not found or access denied' }, 404);
 
   // Delete audio file from R2

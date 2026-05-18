@@ -150,15 +150,16 @@ const OrganizationPageContent = React.memo(function OrganizationPageContent() {
     setError(null);
 
     try {
-      const response = await fetch("/api/organization/setup", {
-        method: "POST",
+      // /api/organization/setup was removed — rename now goes through the
+      // canonical update endpoint, which only modifies the caller's active
+      // org and enforces owner/admin role check.
+      const response = await fetch("/api/organization/update", {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           name: organizationName.trim(),
-          isGroupSetup: isGroupSetup,
-          groupInvitationData: groupInvitationData, // Include the group invitation data
         }),
       });
 

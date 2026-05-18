@@ -8,7 +8,6 @@ const PUBLIC_URL_CACHE_TTL = 3600;
 function pickBucket(env: Env, name: string): R2Bucket | null {
   return name === 'audio-files' ? env.AUDIO_FILES
        : name === 'transcriptions' ? env.TRANSCRIPTIONS
-       : name === 'organization-images' ? env.ORGANIZATION_IMAGES
        : null;
 }
 
@@ -175,7 +174,7 @@ async function getSignatureKey(
   region: string,
   service: string
 ): Promise<ArrayBuffer> {
-  const kDate = await hmac(new TextEncoder().encode('AWS4' + secretKey), dateStamp);
+  const kDate = await hmac(new TextEncoder().encode('AWS4' + secretKey).buffer as ArrayBuffer, dateStamp);
   const kRegion = await hmac(kDate, region);
   const kService = await hmac(kRegion, service);
   return hmac(kService, 'aws4_request');

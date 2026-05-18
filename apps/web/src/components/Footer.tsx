@@ -2,187 +2,78 @@
 
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from 'next-intl';
-import { Mail } from "lucide-react";
+import Image from "next/image";
 
 export function Footer() {
   const t = useTranslations('footer');
 
+  const columns = [
+    {
+      title: t('products.title'),
+      links: [
+        { href: '/transcribe', label: t('products.transcription') },
+        { href: '/annotate', label: t('products.editor') },
+        { href: '/library', label: t('products.library') },
+        { href: '/organization', label: t('products.teams') },
+      ],
+    },
+    {
+      title: t('resources.title'),
+      links: [
+        { href: '/help', label: t('resources.help') },
+        { href: '/tutorials', label: t('resources.tutorials') },
+        { href: '/blog', label: t('resources.blog') },
+      ],
+    },
+    {
+      title: t('company.title'),
+      links: [
+        { href: '/pricing', label: t('company.pricing') },
+        { href: '/contact', label: t('company.contact') },
+        { href: '/terms', label: t('legal.terms') },
+        { href: '/privacy', label: t('legal.privacy') },
+      ],
+    },
+  ];
+
   return (
-    <footer className="bg-gray-50 text-gray-900 border-t border-gray-200">
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Products Section */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-4">
-              {t('products.title')}
-            </h3>
-            <ul className="space-y-3">
-              <li>
-                <Link href="/transcribe" className="text-gray-600 hover:text-gray-900 transition-colors">
-                  {t('products.transcription')}
-                </Link>
-              </li>
-              <li>
-                <Link href="/annotate" className="text-gray-600 hover:text-gray-900 transition-colors">
-                  {t('products.editor')}
-                </Link>
-              </li>
-              <li>
-                <Link href="/library" className="text-gray-600 hover:text-gray-900 transition-colors">
-                  {t('products.library')}
-                </Link>
-              </li>
-              <li>
-                <Link href="/organization" className="text-gray-600 hover:text-gray-900 transition-colors">
-                  {t('products.teams')}
-                </Link>
-              </li>
-              <li>
-                <Link href="/dashboard" className="text-gray-600 hover:text-gray-900 transition-colors">
-                  {t('products.dashboard')}
-                </Link>
-              </li>
-            </ul>
+    <footer className="border-t border-neutral-200 bg-white">
+      <div className="mx-auto max-w-6xl px-6 py-16">
+        <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
+          <div className="col-span-2 sm:col-span-1">
+            <Link href="/" className="inline-flex items-center gap-2">
+              <Image src="/logo3.png" alt="Transcriu" width={24} height={24} />
+              <span className="text-sm font-semibold tracking-tight text-neutral-900">transcriu</span>
+            </Link>
+            <p className="mt-4 max-w-xs text-sm text-neutral-500">
+              {t('copyright')}
+            </p>
           </div>
 
-          {/* Resources Section */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-4">
-              {t('resources.title')}
-            </h3>
-            <ul className="space-y-3">
-              <li>
-                <Link href="/help" className="text-gray-600 hover:text-gray-900 transition-colors">
-                  {t('resources.help')}
-                </Link>
-              </li>
-              <li>
-                <Link href="/tutorials" className="text-gray-600 hover:text-gray-900 transition-colors">
-                  {t('resources.tutorials')}
-                </Link>
-              </li>
-              <li>
-                <Link href="/api-docs" className="text-gray-600 hover:text-gray-900 transition-colors">
-                  {t('resources.apiDocs')}
-                </Link>
-              </li>
-              <li>
-                <Link href="/blog" className="text-gray-600 hover:text-gray-900 transition-colors">
-                  {t('resources.blog')}
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Learn Section */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-4">
-              {t('learn.title')}
-            </h3>
-            <ul className="space-y-3">
-              <li>
-                <Link href="/guides/getting-started" className="text-gray-600 hover:text-gray-900 transition-colors">
-                  {t('learn.gettingStarted')}
-                </Link>
-              </li>
-              <li>
-                <Link href="/guides/best-practices" className="text-gray-600 hover:text-gray-900 transition-colors">
-                  {t('learn.bestPractices')}
-                </Link>
-              </li>
-              <li>
-                <Link href="/guides/speech-therapy" className="text-gray-600 hover:text-gray-900 transition-colors">
-                  {t('learn.speechTherapy')}
-                </Link>
-              </li>
-              <li>
-                <Link href="/webinars" className="text-gray-600 hover:text-gray-900 transition-colors">
-                  {t('learn.webinars')}
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Company Section */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-4">
-              {t('company.title')}
-            </h3>
-            <ul className="space-y-3">
-              <li>
-                <Link href="/about" className="text-gray-600 hover:text-gray-900 transition-colors">
-                  {t('company.about')}
-                </Link>
-              </li>
-              <li>
-                <Link href="/pricing" className="text-gray-600 hover:text-gray-900 transition-colors">
-                  {t('company.pricing')}
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="text-gray-600 hover:text-gray-900 transition-colors">
-                  {t('company.contact')}
-                </Link>
-              </li>
-              <li>
-                <Link href="/careers" className="text-gray-600 hover:text-gray-900 transition-colors">
-                  {t('company.careers')}
-                </Link>
-              </li>
-            </ul>
-
-            {/* Legal Links */}
-            <div className="mt-6">
-              <h4 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3">
-                {t('legal.title')}
-              </h4>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="/terms" className="text-gray-600 hover:text-gray-900 transition-colors text-sm">
-                    {t('legal.terms')}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/privacy" className="text-gray-600 hover:text-gray-900 transition-colors text-sm">
-                    {t('legal.privacy')}
-                  </Link>
-                </li>
+          {columns.map((col) => (
+            <div key={col.title}>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
+                {col.title}
+              </h3>
+              <ul className="mt-4 space-y-3">
+                {col.links.map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="text-sm text-neutral-700 transition-colors hover:text-neutral-900">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
-          </div>
+          ))}
         </div>
 
-        {/* Bottom Section */}
-        <div className="border-t border-gray-300 mt-12 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            {/* Copyright and Contact */}
-            <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6">
-              <p className="text-gray-600 text-sm">
-                {t('copyright')}
-              </p>
-              <a
-                href="mailto:guiraocastells@gmail.com"
-                className="text-gray-600 hover:text-gray-900 transition-colors text-sm flex items-center"
-              >
-                <Mail className="h-4 w-4 mr-1" />
-                guiraocastells@gmail.com
-              </a>
-            </div>
-            {/* Rating/Review Section */}
-            <div className="flex justify-center mt-6">
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
-                <div className="flex items-center">
-                  {[...Array(5)].map((_, i) => (
-                    <span key={i} className="text-yellow-400">★</span>
-                  ))}
-                  <span className="ml-2 font-medium">4.9</span>
-                </div>
-                <span>•</span>
-                <span>{t('rating')}</span>
-              </div>
-            </div>
+        <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-neutral-100 pt-8 text-xs text-neutral-500 sm:flex-row sm:items-center">
+          <p>© {new Date().getFullYear()} Transcriu</p>
+          <div className="flex items-center gap-4">
+            <span>★ 4.9 · {t('rating')}</span>
+            <a href="mailto:pau@transcriu.com" className="hover:text-neutral-900">pau@transcriu.com</a>
           </div>
-
         </div>
       </div>
     </footer>

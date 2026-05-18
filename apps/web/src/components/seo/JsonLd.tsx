@@ -214,6 +214,187 @@ export function generateBreadcrumbSchema(props: BreadcrumbSchemaProps) {
   };
 }
 
+export interface HowToSchemaProps {
+  name: string;
+  description: string;
+  totalTime?: string; // ISO 8601, e.g. "PT5M"
+  image?: string;
+  steps: Array<{
+    name: string;
+    text: string;
+    image?: string;
+    url?: string;
+  }>;
+}
+
+export function generateHowToSchema(props: HowToSchemaProps) {
+  const schema: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name: props.name,
+    description: props.description,
+    step: props.steps.map((s, i) => ({
+      "@type": "HowToStep",
+      position: i + 1,
+      name: s.name,
+      text: s.text,
+      ...(s.image && { image: s.image }),
+      ...(s.url && { url: s.url }),
+    })),
+  };
+  if (props.totalTime) schema.totalTime = props.totalTime;
+  if (props.image) schema.image = props.image;
+  return schema;
+}
+
+export interface ItemListSchemaProps {
+  name: string;
+  items: Array<{
+    position: number;
+    name: string;
+    url: string;
+    description?: string;
+  }>;
+}
+
+export function generateItemListSchema(props: ItemListSchemaProps) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: props.name,
+    itemListElement: props.items.map((item) => ({
+      "@type": "ListItem",
+      position: item.position,
+      name: item.name,
+      url: item.url,
+      ...(item.description && { description: item.description }),
+    })),
+  };
+}
+
+export interface WebSiteSchemaProps {
+  name: string;
+  url: string;
+  alternateName?: string;
+  inLanguage?: string[];
+  searchUrlTemplate?: string;
+}
+
+export function generateWebSiteSchema(props: WebSiteSchemaProps) {
+  const schema: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: props.name,
+    url: props.url,
+  };
+  if (props.alternateName) schema.alternateName = props.alternateName;
+  if (props.inLanguage) schema.inLanguage = props.inLanguage;
+  if (props.searchUrlTemplate) {
+    schema.potentialAction = {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: props.searchUrlTemplate,
+      },
+      "query-input": "required name=search_term_string",
+    };
+  }
+  return schema;
+}
+
+export interface ArticleSchemaProps {
+  headline: string;
+  description: string;
+  url: string;
+  datePublished: string;
+  dateModified?: string;
+  authorName: string;
+  authorUrl?: string;
+  publisherName: string;
+  publisherLogo: string;
+  image?: string | string[];
+  inLanguage?: string;
+  keywords?: string[];
+}
+
+export function generateArticleSchema(props: ArticleSchemaProps) {
+  const schema: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: props.headline,
+    description: props.description,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": props.url,
+    },
+    datePublished: props.datePublished,
+    dateModified: props.dateModified || props.datePublished,
+    author: {
+      "@type": "Person",
+      name: props.authorName,
+      ...(props.authorUrl && { url: props.authorUrl }),
+    },
+    publisher: {
+      "@type": "Organization",
+      name: props.publisherName,
+      logo: {
+        "@type": "ImageObject",
+        url: props.publisherLogo,
+      },
+    },
+  };
+  if (props.image) schema.image = Array.isArray(props.image) ? props.image : [props.image];
+  if (props.inLanguage) schema.inLanguage = props.inLanguage;
+  if (props.keywords && props.keywords.length > 0) schema.keywords = props.keywords.join(", ");
+  return schema;
+}
+
+export interface ServiceSchemaProps {
+  name: string;
+  description: string;
+  url: string;
+  providerName: string;
+  providerUrl: string;
+  serviceType?: string;
+  areaServed?: string | string[];
+  audience?: string;
+  offers?: {
+    price: string;
+    priceCurrency: string;
+  };
+}
+
+export function generateServiceSchema(props: ServiceSchemaProps) {
+  const schema: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: props.name,
+    description: props.description,
+    url: props.url,
+    provider: {
+      "@type": "Organization",
+      name: props.providerName,
+      url: props.providerUrl,
+    },
+  };
+  if (props.serviceType) schema.serviceType = props.serviceType;
+  if (props.areaServed) schema.areaServed = props.areaServed;
+  if (props.audience) {
+    schema.audience = {
+      "@type": "Audience",
+      audienceType: props.audience,
+    };
+  }
+  if (props.offers) {
+    schema.offers = {
+      "@type": "Offer",
+      price: props.offers.price,
+      priceCurrency: props.offers.priceCurrency,
+    };
+  }
+  return schema;
+}
+
 export interface WebPageSchemaProps {
   name: string;
   description: string;

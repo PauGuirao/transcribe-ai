@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface TranscriptionStatus {
   audioId: string;
@@ -43,6 +44,7 @@ export function useTranscriptionStatus(
   const reconnectAttempts = useRef(0);
   const maxReconnectAttempts = 5;
 
+  const { session } = useAuth();
   const workerUrl = process.env.NEXT_PUBLIC_CLOUDFLARE_WORKER_URL || 'https://transcribe-worker.guiraocastells.workers.dev';
   const wsUrl = workerUrl.replace('https://', 'wss://').replace('http://', 'ws://');
 
@@ -63,9 +65,14 @@ export function useTranscriptionStatus(
   // Connect via WebSocket
   const connectWebSocket = useCallback(() => {
     if (!audioId) return;
+    const token = session?.access_token;
+    if (!token) {
+      console.log('[WS] No auth token yet, skipping connect');
+      return;
+    }
 
     try {
-      const ws = new WebSocket(`${wsUrl}/ws/status/${audioId}`);
+      const ws = new WebSocket(`${wsUrl}/ws/status/${audioId}?token=${encodeURIComponent(token)}`);
 
       ws.onopen = () => {
         console.log('[WS] Connected for', audioId);
@@ -132,7 +139,7 @@ export function useTranscriptionStatus(
         onError?.(e as Error);
       }
     }
-  }, [audioId, wsUrl, fallbackToPolling, onStatusChange, onComplete, onError]);
+  }, [audioId, wsUrl, fallbackToPolling, onStatusChange, onComplete, onError, session?.access_token]);
 
   // Fallback: Poll for status
   const startPolling = useCallback(() => {

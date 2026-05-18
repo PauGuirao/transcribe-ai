@@ -1,12 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { CheckCircle2, Minus } from "lucide-react";
+import { Minus, Plus, Clock } from "lucide-react";
 import { useTranslations } from 'next-intl';
-import { type PlanConfig, type BillingPeriod, getMonthlyEquivalent } from "@/config/pricing";
+import { type PlanConfig, type BillingPeriod, getMonthlyEquivalent, formatMinutesAllowance } from "@/config/pricing";
 
-// Legacy type alias for backwards compatibility with team page
 export type PricingPlan = {
   key: string;
   name: string;
@@ -25,6 +23,14 @@ type PricingCardProps = {
   onSelect: (users?: number) => void;
 };
 
+function CheckIcon() {
+  return (
+    <svg className="mt-0.5 size-4 shrink-0 text-emerald-600" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path d="M5 10.5l3 3 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export function PricingCard({
   plan,
   locale,
@@ -39,7 +45,6 @@ export function PricingCard({
   const isFreePlan = plan.id === 'free';
   const needsUserInput = plan.perUser && plan.users.max > plan.users.min;
 
-  // Calculate display price
   const monthlyPrice = billingPeriod === 'monthly'
     ? plan.pricing.monthly
     : getMonthlyEquivalent(plan.id, 'yearly');
@@ -58,50 +63,46 @@ export function PricingCard({
 
   return (
     <div
-      className={`rounded-2xl p-6 relative flex flex-col h-full transition-all duration-300 ${
+      className={`relative flex h-full flex-col rounded-2xl border bg-white p-6 transition-shadow ${
         plan.highlighted
-          ? "bg-white shadow-xl shadow-blue-500/20 border-2 border-blue-500 scale-[1.02]"
-          : "bg-white border border-gray-200 hover:border-blue-300 hover:shadow-lg"
+          ? "border-neutral-900 shadow-lg"
+          : "border-neutral-200 hover:shadow-md"
       }`}
     >
-      {/* Popular badge */}
       {plan.highlighted && (
-        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-          <div className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-neutral-900 px-3 py-1 text-[11px] font-medium text-white">
+            <span className="inline-flex size-1.5 rounded-full bg-emerald-400" />
             {t('mostPopular')}
-          </div>
+          </span>
         </div>
       )}
 
-      {/* Plan name and description */}
-      <div className="mb-4">
-        <h3 className="text-xl font-bold text-gray-900 mb-1">
+      <div>
+        <h3 className="text-lg font-semibold text-neutral-900">
           {plan.name[locale]}
         </h3>
-        <p className="text-sm text-gray-500">
+        <p className="mt-1 text-sm text-neutral-500">
           {plan.description[locale]}
         </p>
       </div>
 
-      {/* Price */}
-      <div className="mb-6">
+      <div className="mt-6">
         {isFreePlan ? (
-          <div className="flex items-baseline">
-            <span className="text-4xl font-bold text-gray-900">0</span>
-            <span className="text-xl font-bold text-gray-900">€</span>
-            <span className="text-gray-500 ml-1">/{t('month')}</span>
+          <div className="flex items-baseline gap-1">
+            <span className="text-4xl font-semibold tracking-tight text-neutral-900">0€</span>
+            <span className="text-sm text-neutral-500">/{t('month')}</span>
           </div>
         ) : (
           <>
-            <div className="flex items-baseline">
-              <span className="text-4xl font-bold text-gray-900">{monthlyPrice}</span>
-              <span className="text-xl font-bold text-gray-900">€</span>
-              <span className="text-gray-500 ml-1">
+            <div className="flex items-baseline gap-1">
+              <span className="text-4xl font-semibold tracking-tight text-neutral-900">{monthlyPrice}€</span>
+              <span className="text-sm text-neutral-500">
                 {plan.perUser ? `/${t('userMonth')}` : `/${t('month')}`}
               </span>
             </div>
             {billingPeriod === 'yearly' && (
-              <p className="text-sm text-green-600 mt-1">
+              <p className="mt-1 text-xs text-emerald-600">
                 {t('billedYearly')}: {totalPrice}€/{t('year')}
               </p>
             )}
@@ -109,19 +110,23 @@ export function PricingCard({
         )}
       </div>
 
-      {/* User count input for team/org plans */}
+      <div className="mt-4 inline-flex items-center gap-1.5 rounded-md border border-neutral-200 bg-neutral-50 px-2.5 py-1 text-xs font-medium text-neutral-700">
+        <Clock className="size-3.5 text-neutral-500" />
+        {formatMinutesAllowance(plan.limits.minutesPerMonth, locale)} {locale === 'en' ? '/ month' : locale === 'es' ? '/ mes' : '/ mes'}
+      </div>
+
       {needsUserInput && (
-        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="mt-6 rounded-lg border border-neutral-200 bg-neutral-50 p-3">
+          <label className="block text-xs font-medium text-neutral-700">
             {t('numberOfUsers')}
           </label>
-          <div className="flex items-center gap-3">
+          <div className="mt-2 flex items-center gap-2">
             <button
               onClick={() => setUserCount(Math.max(plan.users.min, userCount - 1))}
               disabled={userCount <= plan.users.min}
-              className="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex size-8 items-center justify-center rounded-md border border-neutral-200 bg-white hover:bg-neutral-50 disabled:opacity-50"
             >
-              <Minus className="w-4 h-4" />
+              <Minus className="size-3.5" />
             </button>
             <input
               type="number"
@@ -132,55 +137,48 @@ export function PricingCard({
                 const val = parseInt(e.target.value) || plan.users.min;
                 setUserCount(Math.min(Math.max(val, plan.users.min), plan.users.max));
               }}
-              className="w-16 h-10 text-center border border-gray-300 rounded-lg font-semibold"
+              className="h-8 w-14 rounded-md border border-neutral-200 bg-white text-center text-sm font-medium"
             />
             <button
               onClick={() => setUserCount(Math.min(plan.users.max, userCount + 1))}
               disabled={userCount >= plan.users.max}
-              className="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex size-8 items-center justify-center rounded-md border border-neutral-200 bg-white hover:bg-neutral-50 disabled:opacity-50"
             >
-              <span className="text-lg">+</span>
+              <Plus className="size-3.5" />
             </button>
           </div>
-          <p className="text-xs text-gray-500 mt-2">
-            {plan.users.min}-{plan.users.max} {t('users')}
-          </p>
           {plan.perUser && (
-            <p className="text-sm font-medium text-gray-900 mt-2">
-              Total: {billingPeriod === 'monthly'
+            <p className="mt-2 text-xs font-medium text-neutral-900">
+              {billingPeriod === 'monthly'
                 ? `${plan.pricing.monthly * userCount}€/${t('month')}`
-                : `${plan.pricing.yearly * userCount}€/${t('year')}`
-              }
+                : `${plan.pricing.yearly * userCount}€/${t('year')}`}
             </p>
           )}
         </div>
       )}
 
-      {/* Features list */}
-      <ul className="space-y-3 mb-6 flex-1">
+      <ul className="mt-6 flex-1 space-y-3">
         {plan.features[locale].map((feature, idx) => (
-          <li key={idx} className="flex items-start gap-2 text-sm text-gray-700">
-            <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+          <li key={idx} className="flex items-start gap-2 text-sm text-neutral-700">
+            <CheckIcon />
             <span>{feature}</span>
           </li>
         ))}
       </ul>
 
-      {/* CTA Button */}
-      <Button
+      <button
         disabled={authLoading || loading}
         onClick={handleSelect}
-        className={`w-full ${
+        className={`mt-8 inline-flex h-10 w-full items-center justify-center rounded-md text-sm font-medium transition-colors disabled:opacity-50 ${
           plan.highlighted
-            ? 'bg-blue-600 hover:bg-blue-700 text-white'
+            ? "bg-neutral-900 text-white hover:bg-neutral-800"
             : isFreePlan
-            ? 'bg-gray-100 hover:bg-gray-200 text-gray-900'
-            : 'bg-gray-900 hover:bg-gray-800 text-white'
+            ? "border border-neutral-300 bg-white text-neutral-900 hover:bg-neutral-50"
+            : "bg-neutral-900 text-white hover:bg-neutral-800"
         }`}
-        variant={isFreePlan ? "outline" : "default"}
       >
         {loading ? t('loading') : isFreePlan ? t('startFree') : t('subscribe')}
-      </Button>
+      </button>
     </div>
   );
 }

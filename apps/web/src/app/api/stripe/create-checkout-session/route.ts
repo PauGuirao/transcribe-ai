@@ -19,17 +19,17 @@ const priceMap: Record<PlanId, Record<BillingPeriod, string | undefined>> = {
     monthly: undefined,
     yearly: undefined,
   },
-  individual: {
-    monthly: process.env.STRIPE_PRICE_INDIVIDUAL_MONTHLY,
-    yearly: process.env.STRIPE_PRICE_INDIVIDUAL_YEARLY,
+  basic: {
+    monthly: process.env.STRIPE_PRICE_BASIC_MONTHLY,
+    yearly: process.env.STRIPE_PRICE_BASIC_YEARLY,
   },
-  team: {
-    monthly: process.env.STRIPE_PRICE_TEAM_MONTHLY,
-    yearly: process.env.STRIPE_PRICE_TEAM_YEARLY,
+  pro: {
+    monthly: process.env.STRIPE_PRICE_PRO_MONTHLY,
+    yearly: process.env.STRIPE_PRICE_PRO_YEARLY,
   },
-  organization: {
-    monthly: process.env.STRIPE_PRICE_ORG_MONTHLY,
-    yearly: process.env.STRIPE_PRICE_ORG_YEARLY,
+  studio: {
+    monthly: process.env.STRIPE_PRICE_STUDIO_MONTHLY,
+    yearly: process.env.STRIPE_PRICE_STUDIO_YEARLY,
   },
 };
 

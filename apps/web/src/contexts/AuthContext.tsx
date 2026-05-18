@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
-import { getCachedUserProfile, getCachedOrganization, getCachedSubscriptionStatus } from "@/lib/cache";
+import { getCachedUserProfile, getCachedOrganization, getCachedSubscriptionStatus, apiCache } from "@/lib/cache";
 
 // Define the shape of the context's value
 interface AuthContextType {
@@ -20,8 +20,14 @@ interface AuthContextType {
   signInWithGoogle: (returnUrl?: string) => Promise<void>;
   signOut: () => Promise<void>;
   refreshTokens: () => Promise<void>;
-  refreshOrganizationData: () => Promise<void>;
+  refreshOrganizationData: () => Promise<RefreshOrganizationResult>;
 }
+
+export type RefreshOrganizationResult = {
+  organization: any | null;
+  members: any[] | null;
+  currentUserRole: string | null;
+} | null;
 
 // Create the context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -201,7 +207,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (tokenMatch) {
         const token = tokenMatch[1];
         // Set invitation token in cookie for server-side processing
-        document.cookie = `invite_token=${token}; path=/; max-age=3600; SameSite=Lax`;
+        document.cookie = `pending_invite_token=${token}; path=/; max-age=3600; SameSite=Lax`;
       }
     }
     
@@ -267,16 +273,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user]);
 
-  // Function to refresh organization data including members (now uses deduplication)
-  const refreshOrganizationData = useCallback(async () => {
-    if (!user || !organization?.id) return;
-    
+  // Refresh organization (logo, name, description, plan, status) AND members.
+  // Returns the freshly-loaded payload so callers can update local UI without
+  // a second round trip through React state.
+  const refreshOrganizationData = useCallback(async (): Promise<RefreshOrganizationResult> => {
+    if (!user || !organization?.id) return null;
+
+    const orgId: string = organization.id;
     try {
-      await fetchOrganizationMembers(organization.id);
+      // Bust the org cache so we don't get stale name/logo after an edit.
+      apiCache.invalidateByPrefix(`org:${orgId}`);
+
+      // Re-fetch the org row + members in parallel.
+      const [freshOrg, memberData] = await Promise.all([
+        getCachedOrganization(orgId, supabase).catch(() => null),
+        fetchOrganizationMembers(orgId).catch(() => null),
+      ]);
+
+      if (freshOrg) {
+        setOrganization(freshOrg);
+        setIsSubscribed(freshOrg.subscription_status === 'active');
+        setPlanType(freshOrg.plan_type || null);
+      }
+
+      const result: RefreshOrganizationResult = {
+        organization: freshOrg ?? organization,
+        members: memberData?.members ?? null,
+        currentUserRole: memberData?.currentUserRole ?? null,
+      };
+      return result;
     } catch (error) {
       console.error("Error refreshing organization data:", error);
+      return null;
     }
-  }, [user, organization?.id, fetchOrganizationMembers]);
+  }, [user, organization, fetchOrganizationMembers]);
 
   // Memoize the context value to prevent unnecessary re-renders
   const value = useMemo(() => ({

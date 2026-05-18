@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
-import { JsonLd, generateOrganizationSchema, generateSoftwareApplicationSchema, generateFAQSchema, generateWebPageSchema } from './JsonLd';
+import { JsonLd, generateOrganizationSchema, generateSoftwareApplicationSchema, generateFAQSchema, generateWebPageSchema, generateHowToSchema, generateWebSiteSchema, generateBreadcrumbSchema } from './JsonLd';
 import { useParams } from 'next/navigation';
 
 interface LandingPageSchemasProps {
@@ -12,24 +11,30 @@ interface LandingPageSchemasProps {
 }
 
 /**
- * Comprehensive JSON-LD schemas for landing page SEO
- * Includes Organization, SoftwareApplication, FAQ, and WebPage schemas
+ * Comprehensive JSON-LD schemas for landing page SEO.
+ * Renders Organization, SoftwareApplication, WebPage, HowTo and FAQ schemas.
+ *
+ * NOTE: aggregateRating is intentionally omitted. Per Google's structured-data
+ * policy, aggregateRating must reflect real reviews collected on-site. Add it
+ * back only once we ship a real review system.
  */
 export function LandingPageSchemas({ faqs }: LandingPageSchemasProps) {
   const params = useParams();
-  const locale = (params?.locale as string) || 'ca';
+  const locale = (params?.locale as string) || 'es';
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.transcriu.com';
 
-  // Organization Schema
+  const orgDescription =
+    locale === 'ca'
+      ? 'Plataforma de transcripció amb IA: passa àudio a text en català, castellà i anglès amb un 98% de precisió. Per a logopedes, periodistes, investigadors i podcasters.'
+      : locale === 'en'
+      ? 'AI transcription platform: turn audio into text in Spanish, Catalan and English with 98% accuracy. Built for clinicians, journalists, researchers and podcasters.'
+      : 'Plataforma de transcripción con IA: pasa audio a texto en español, catalán e inglés con un 98% de precisión. Para logopedas, periodistas, investigadores y podcasters.';
+
   const organizationSchema = generateOrganizationSchema({
     name: 'Transcriu',
     url: baseUrl,
     logo: `${baseUrl}/logo.png`,
-    description: locale === 'ca'
-      ? 'Plataforma professional de transcripció amb IA per a logopedes. Transcriu sessions de teràpia del llenguatge amb alta precisió en català.'
-      : locale === 'es'
-      ? 'Plataforma profesional de transcripción con IA para logopedas. Transcribe sesiones de terapia del lenguaje con alta precisión en catalán.'
-      : 'Professional AI transcription platform for speech therapists. Transcribe language therapy sessions with high accuracy in Catalan.',
+    description: orgDescription,
     sameAs: [
       'https://www.linkedin.com/company/transcriu',
       'https://twitter.com/transcriu',
@@ -37,14 +42,14 @@ export function LandingPageSchemas({ faqs }: LandingPageSchemasProps) {
     ],
   });
 
-  // Software Application Schema
   const softwareSchema = generateSoftwareApplicationSchema({
     name: 'Transcriu',
-    description: locale === 'ca'
-      ? 'Plataforma de transcripció automàtica amb IA especialitzada en català per a logopedes. Transcriu sessions de teràpia, comparteix amb el teu equip i exporta en múltiples formats.'
-      : locale === 'es'
-      ? 'Plataforma de transcripción automática con IA especializada en catalán para logopedas. Transcribe sesiones de terapia, comparte con tu equipo y exporta en múltiples formatos.'
-      : 'Automatic AI transcription platform specialized in Catalan for speech therapists. Transcribe therapy sessions, share with your team and export in multiple formats.',
+    description:
+      locale === 'ca'
+        ? 'Transcriu àudio a text amb IA. Sube MP3, WAV o notes de veu i obtén una transcripció amb identificació d\'interlocutors, llesta per editar, exportar (PDF, DOCX, TXT) i compartir.'
+        : locale === 'en'
+        ? 'Transcribe audio to text with AI. Upload MP3, WAV or voice notes and get a transcript with speaker identification, ready to edit, export (PDF, DOCX, TXT) and share.'
+        : 'Transcribe audio a texto con IA. Sube MP3, WAV o notas de voz y obtén una transcripción con identificación de interlocutores, lista para editar, exportar (PDF, DOCX, TXT) y compartir.',
     url: baseUrl,
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web, Windows, macOS, Linux, iOS, Android',
@@ -52,118 +57,199 @@ export function LandingPageSchemas({ faqs }: LandingPageSchemasProps) {
       price: '9.99',
       priceCurrency: 'EUR',
     },
-    aggregateRating: {
-      ratingValue: 4.9,
-      ratingCount: 1200,
-      bestRating: 5,
-    },
     author: {
       name: 'Transcriu',
       url: baseUrl,
     },
   });
 
-  // WebPage Schema
   const webPageSchema = generateWebPageSchema({
-    name: locale === 'ca'
-      ? 'Transcriu – Transcripció IA per a Logopedes'
-      : locale === 'es'
-      ? 'Transcriu – Transcripción IA para Logopedas'
-      : 'Transcriu – AI Transcription for Speech Therapists',
-    description: locale === 'ca'
-      ? 'Transcriu sessions de logopèdia amb IA en català. 98% precisió. Estalvia 5h/setmana en documentació.'
-      : locale === 'es'
-      ? 'Transcribe sesiones de logopedia con IA en catalán. 98% precisión. Ahorra 5h/semana en documentación.'
-      : 'Transcribe speech therapy sessions with AI in Catalan. 98% accuracy. Save 5h/week on documentation.',
+    name:
+      locale === 'ca'
+        ? 'Transcriure àudio a text amb IA | Transcriu'
+        : locale === 'en'
+        ? 'Transcribe audio to text with AI | Transcriu'
+        : 'Transcribir audio a texto con IA | Transcriu',
+    description:
+      locale === 'ca'
+        ? 'Passa àudio a text amb IA: 98% de precisió en català i castellà. Puja MP3, WAV o notes de veu i obtén la transcripció en segons.'
+        : locale === 'en'
+        ? 'Turn audio into text with AI: 98% accuracy across Spanish, Catalan and English. Upload an MP3, WAV or voice note and get a transcript in seconds.'
+        : 'Pasa audio a texto con IA: 98% de precisión en español y catalán. Sube MP3, WAV o notas de voz y obtén la transcripción en segundos.',
     url: `${baseUrl}/${locale}`,
-    inLanguage: locale === 'ca' ? 'ca-ES' : locale === 'es' ? 'es-ES' : 'en-US',
+    inLanguage: locale === 'ca' ? 'ca-ES' : locale === 'en' ? 'en-US' : 'es-ES',
     isPartOf: {
       name: 'Transcriu',
       url: baseUrl,
     },
   });
 
-  // FAQ Schema (if FAQs are provided)
+  const howToSchema = generateHowToSchema({
+    name:
+      locale === 'ca'
+        ? 'Com transcriure un àudio a text amb Transcriu'
+        : locale === 'en'
+        ? 'How to transcribe audio to text with Transcriu'
+        : 'Cómo transcribir un audio a texto con Transcriu',
+    description:
+      locale === 'ca'
+        ? 'Tres passos per passar un àudio (MP3, WAV, nota de veu) a text amb IA.'
+        : locale === 'en'
+        ? 'Three steps to turn an audio file (MP3, WAV, voice note) into text with AI.'
+        : 'Tres pasos para pasar un audio (MP3, WAV, nota de voz) a texto con IA.',
+    totalTime: 'PT3M',
+    steps:
+      locale === 'ca'
+        ? [
+            { name: 'Puja l\'àudio', text: 'Arrossega el fitxer MP3, WAV, M4A o OGG, o enganxa una nota de veu. Suporta fitxers fins a 500 MB.' },
+            { name: 'Transcriu amb IA', text: 'La IA transcriu l\'àudio en segons amb un 98% de precisió i identifica els interlocutors automàticament.' },
+            { name: 'Edita, exporta i comparteix', text: 'Revisa la transcripció a l\'editor i exporta-la en PDF, DOCX o TXT, o comparteix-la amb el teu equip.' },
+          ]
+        : locale === 'en'
+        ? [
+            { name: 'Upload the audio', text: 'Drag and drop your MP3, WAV, M4A or OGG file, or paste a voice note. Supports files up to 500 MB.' },
+            { name: 'Transcribe with AI', text: 'The AI transcribes your audio in seconds with 98% accuracy and identifies speakers automatically.' },
+            { name: 'Edit, export and share', text: 'Review the transcript in the editor and export it as PDF, DOCX or TXT, or share it with your team.' },
+          ]
+        : [
+            { name: 'Sube el audio', text: 'Arrastra tu archivo MP3, WAV, M4A u OGG, o pega una nota de voz. Soporta archivos de hasta 500 MB.' },
+            { name: 'Transcribe con IA', text: 'La IA transcribe tu audio en segundos con un 98% de precisión e identifica a los interlocutores automáticamente.' },
+            { name: 'Edita, exporta y comparte', text: 'Revisa la transcripción en el editor y expórtala como PDF, DOCX o TXT, o compártela con tu equipo.' },
+          ],
+  });
+
   const faqSchema = faqs && faqs.length > 0 ? generateFAQSchema({ faqs }) : null;
+
+  const webSiteSchema = generateWebSiteSchema({
+    name: 'Transcriu',
+    url: baseUrl,
+    inLanguage: ['ca-ES', 'es-ES', 'en-US'],
+    searchUrlTemplate: `${baseUrl}/${locale}/blog?q={search_term_string}`,
+  });
+
+  const breadcrumbSchema = generateBreadcrumbSchema({
+    items: [
+      {
+        name: locale === 'ca' ? 'Inici' : locale === 'en' ? 'Home' : 'Inicio',
+        url: `${baseUrl}/${locale}`,
+      },
+    ],
+  });
 
   return (
     <>
       <JsonLd data={organizationSchema} />
+      <JsonLd data={webSiteSchema} />
       <JsonLd data={softwareSchema} />
       <JsonLd data={webPageSchema} />
+      <JsonLd data={breadcrumbSchema} />
+      <JsonLd data={howToSchema} />
       {faqSchema && <JsonLd data={faqSchema} />}
     </>
   );
 }
 
 /**
- * Default FAQ data for different locales
+ * Default FAQ data for different locales — kept for use on the homepage.
+ * Questions are aligned with real "People Also Ask" queries from Google SERPs
+ * (validated via DataForSEO 2026-05).
  */
 export const defaultFAQs = {
-  ca: [
-    {
-      question: "Com funciona la transcripció automàtica?",
-      answer: "Transcriu utilitza intel·ligència artificial avançada especialitzada en català per convertir àudio en text amb una precisió del 98%. Simplement puja el teu arxiu d'àudio i en segons obtindràs una transcripció completa amb identificació d'interlocutors."
-    },
-    {
-      question: "Quin format d'àudio accepteu?",
-      answer: "Acceptem tots els formats d'àudio més comuns: MP3, WAV, M4A, FLAC, OGG i més. La mida màxima del fitxer és de 500MB per a usuaris individuals i sense límit per a equips."
-    },
-    {
-      question: "Puc compartir transcripcions amb el meu equip?",
-      answer: "Sí! Amb el pla Equip pots crear grups, compartir transcripcions amb col·legues, assignar pacients i col·laborar en temps real. Perfecte per a clíniques i centres educatius."
-    },
-    {
-      question: "Les meves dades estan segures?",
-      answer: "Absolutament. Totes les transcripcions s'emmagatzemen de forma segura amb xifratge end-to-end. Complim amb el RGPD i les dades mèdiques mai es comparteixen amb tercers. Tens control total sobre qui pot veure les teves transcripcions."
-    },
-    {
-      question: "Puc provar Transcriu gratuïtament?",
-      answer: "Sí! Oferim una prova gratuïta de 14 dies sense necessitat de targeta de crèdit. Podràs transcriure fins a 120 minuts d'àudio per veure com funciona la plataforma."
-    },
-  ],
   es: [
     {
-      question: "¿Cómo funciona la transcripción automática?",
-      answer: "Transcriu utiliza inteligencia artificial avanzada especializada en catalán para convertir audio en texto con una precisión del 98%. Simplemente sube tu archivo de audio y en segundos obtendrás una transcripción completa con identificación de interlocutores."
+      question: "¿Cómo se transcribe un audio a texto con IA?",
+      answer:
+        "Sube tu archivo (MP3, WAV, M4A, OGG…) o pega una nota de voz. La IA de Transcriu lo procesa en segundos con un 98% de precisión, identifica a los interlocutores automáticamente y te devuelve la transcripción lista para editar y exportar en PDF, DOCX o TXT.",
     },
     {
-      question: "¿Qué formato de audio aceptáis?",
-      answer: "Aceptamos todos los formatos de audio más comunes: MP3, WAV, M4A, FLAC, OGG y más. El tamaño máximo del archivo es de 500MB para usuarios individuales y sin límite para equipos."
+      question: "¿Puedo transcribir audio a texto gratis?",
+      answer:
+        "Sí. Transcriu ofrece una prueba gratuita sin tarjeta de crédito con hasta 120 minutos de audio para que pruebes la plataforma. Los planes de pago empiezan en 9,99 €/mes.",
     },
     {
-      question: "¿Puedo compartir transcripciones con mi equipo?",
-      answer: "¡Sí! Con el plan Equipo puedes crear grupos, compartir transcripciones con colegas, asignar pacientes y colaborar en tiempo real. Perfecto para clínicas y centros educativos."
+      question: "¿Cómo transcribir una nota de voz de WhatsApp?",
+      answer:
+        "Descarga la nota de voz desde WhatsApp (formato .ogg o .opus), súbela a Transcriu y obtén la transcripción en segundos. También puedes reenviar varias notas de voz juntas y transcribirlas en lote.",
     },
     {
-      question: "¿Mis datos están seguros?",
-      answer: "Absolutamente. Todas las transcripciones se almacenan de forma segura con cifrado end-to-end. Cumplimos con el RGPD y los datos médicos nunca se comparten con terceros. Tienes control total sobre quién puede ver tus transcripciones."
+      question: "¿Qué formatos de audio acepta Transcriu?",
+      answer:
+        "Aceptamos los formatos más habituales: MP3, WAV, M4A, FLAC, OGG, OPUS, AAC y más. El tamaño máximo es de 500 MB por archivo en planes individuales y sin límite en planes de equipo.",
     },
     {
-      question: "¿Puedo probar Transcriu gratuitamente?",
-      answer: "¡Sí! Ofrecemos una prueba gratuita de 14 días sin necesidad de tarjeta de crédito. Podrás transcribir hasta 120 minutos de audio para ver cómo funciona la plataforma."
+      question: "¿En qué idiomas funciona la transcripción?",
+      answer:
+        "Transcriu transcribe con alta precisión en español, catalán e inglés, y soporta más de 40 idiomas adicionales (francés, alemán, portugués, italiano, etc.). El catalán y el español son los idiomas con mejor precisión por estar especialmente afinados.",
+    },
+    {
+      question: "¿Es seguro subir audio confidencial (sesiones clínicas, entrevistas)?",
+      answer:
+        "Sí. Cumplimos con el RGPD, los datos se almacenan cifrados extremo a extremo y no se comparten con terceros ni se usan para entrenar modelos. Puedes borrar tus archivos en cualquier momento.",
+    },
+  ],
+  ca: [
+    {
+      question: "Com es transcriu un àudio a text amb IA?",
+      answer:
+        "Puja el fitxer (MP3, WAV, M4A, OGG…) o enganxa una nota de veu. La IA de Transcriu el processa en segons amb un 98% de precisió, identifica els interlocutors automàticament i et torna la transcripció a punt per editar i exportar en PDF, DOCX o TXT.",
+    },
+    {
+      question: "Puc transcriure àudio a text gratis?",
+      answer:
+        "Sí. Transcriu ofereix una prova gratuïta sense targeta de crèdit amb fins a 120 minuts d'àudio per provar la plataforma. Els plans de pagament comencen a 9,99 €/mes.",
+    },
+    {
+      question: "Com transcriure una nota de veu de WhatsApp?",
+      answer:
+        "Descarrega la nota de veu de WhatsApp (format .ogg o .opus), puja-la a Transcriu i obtindràs la transcripció en segons. També pots reenviar diverses notes de veu juntes i transcriure-les en lot.",
+    },
+    {
+      question: "Quins formats d'àudio accepta Transcriu?",
+      answer:
+        "Acceptem els formats més habituals: MP3, WAV, M4A, FLAC, OGG, OPUS, AAC i més. La mida màxima és de 500 MB per fitxer en plans individuals i sense límit en plans d'equip.",
+    },
+    {
+      question: "En quins idiomes funciona la transcripció?",
+      answer:
+        "Transcriu transcriu amb alta precisió en català, castellà i anglès, i suporta més de 40 idiomes addicionals (francès, alemany, portuguès, italià…). El català i el castellà són els idiomes amb millor precisió, perquè estan especialment afinats.",
+    },
+    {
+      question: "És segur pujar àudio confidencial (sessions clíniques, entrevistes)?",
+      answer:
+        "Sí. Complim amb el RGPD, les dades s'emmagatzemen amb xifratge end-to-end i no es comparteixen amb tercers ni s'utilitzen per entrenar models. Pots eliminar els teus fitxers en qualsevol moment.",
     },
   ],
   en: [
     {
-      question: "How does automatic transcription work?",
-      answer: "Transcriu uses advanced artificial intelligence specialized in Catalan to convert audio to text with 98% accuracy. Simply upload your audio file and in seconds you'll get a complete transcription with speaker identification."
+      question: "How do I transcribe audio to text with AI?",
+      answer:
+        "Upload your file (MP3, WAV, M4A, OGG…) or paste a voice note. Transcriu's AI processes it in seconds with 98% accuracy, identifies speakers automatically and returns a transcript ready to edit and export to PDF, DOCX or TXT.",
     },
     {
-      question: "What audio format do you accept?",
-      answer: "We accept all common audio formats: MP3, WAV, M4A, FLAC, OGG and more. The maximum file size is 500MB for individual users and unlimited for teams."
+      question: "Can I transcribe audio to text for free?",
+      answer:
+        "Yes. Transcriu offers a free trial — no credit card required — with up to 120 minutes of audio so you can try the platform. Paid plans start at €9.99/month.",
     },
     {
-      question: "Can I share transcriptions with my team?",
-      answer: "Yes! With the Team plan you can create groups, share transcriptions with colleagues, assign patients and collaborate in real-time. Perfect for clinics and educational centers."
+      question: "How do I transcribe a WhatsApp voice note?",
+      answer:
+        "Download the voice note from WhatsApp (.ogg or .opus), upload it to Transcriu and you'll get the transcript in seconds. You can also forward multiple voice notes at once and transcribe them in batch.",
     },
     {
-      question: "Is my data secure?",
-      answer: "Absolutely. All transcriptions are stored securely with end-to-end encryption. We comply with GDPR and medical data is never shared with third parties. You have full control over who can see your transcriptions."
+      question: "Which audio formats does Transcriu support?",
+      answer:
+        "We accept the most common formats: MP3, WAV, M4A, FLAC, OGG, OPUS, AAC and more. Maximum size is 500 MB per file on individual plans and unlimited on team plans.",
     },
     {
-      question: "Can I try Transcriu for free?",
-      answer: "Yes! We offer a 14-day free trial with no credit card required. You can transcribe up to 120 minutes of audio to see how the platform works."
+      question: "Which languages does the transcription work in?",
+      answer:
+        "Transcriu transcribes with high accuracy in Spanish, Catalan and English, and supports 40+ additional languages (French, German, Portuguese, Italian…). Spanish and Catalan are the most accurate, as they are specifically fine-tuned.",
+    },
+    {
+      question: "Is it safe to upload confidential audio (clinical sessions, interviews)?",
+      answer:
+        "Yes. We are GDPR-compliant, data is stored with end-to-end encryption and is never shared with third parties or used to train models. You can delete your files at any time.",
     },
   ],
 };
+

@@ -15,6 +15,12 @@ export interface Speaker {
   color: string;
 }
 
+export interface WordTiming {
+  word: string;
+  start: number;
+  end: number;
+}
+
 export interface TranscriptionSegment {
   id: number;
   seek: number;
@@ -22,6 +28,12 @@ export interface TranscriptionSegment {
   end: number;
   text: string;
   speakerId?: string;
+  /**
+   * Per-word timestamps from Whisper. Present for transcriptions produced after
+   * the word-anchoring change; absent on older data (editor falls back to
+   * paragraph-level audio sync).
+   */
+  words?: WordTiming[];
   // Optional heavy fields (not required in saved JSON)
   tokens?: number[];
   temperature?: number;

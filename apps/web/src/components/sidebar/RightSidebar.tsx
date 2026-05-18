@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,7 +11,26 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-import { Info, Loader2, Copy, Check, FileText, Mail, Cloud, ChevronDown } from 'lucide-react';
+import {
+  Loader2,
+  Copy,
+  Check,
+  FileText,
+  Mail,
+  Cloud,
+  Download,
+  Users,
+  GraduationCap,
+  Plus,
+  Pencil,
+  Trash2,
+  X,
+} from 'lucide-react';
+import {
+  MAX_SPEAKERS,
+  SPEAKER_COLOR_PALETTE,
+  createSpeaker,
+} from '@/lib/speakers';
 import { Audio, Transcription, Speaker } from '@/types';
 
 interface RightSidebarProps {
@@ -343,120 +362,373 @@ export function RightSidebar({
   }
 
   return (
-    <div className="fixed top-[73px] right-0 bottom-0 w-60 bg-gray-50/80 backdrop-blur-sm border-l border-gray-200/60 flex flex-col z-40 max-md:relative max-md:top-0 max-md:w-full max-md:border-l-0 max-md:border-t">
+    <aside className="flex h-full w-72 shrink-0 flex-col border-l border-neutral-200 bg-neutral-50/60">
+      {/* Title bar */}
+      <div className="sticky top-0 z-10 flex h-14 items-center border-b border-neutral-200 bg-white/80 px-4 backdrop-blur-sm">
+        <h2 className="text-[13px] font-semibold tracking-tight text-neutral-900">
+          {t('sidebar.title')}
+        </h2>
+      </div>
+
       <div className="flex-1 overflow-y-auto">
-        {/* Export Section */}
-        <div className="p-3 border-b border-gray-200/60">
-          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">{t("export.title")}</p>
+        {/* Export */}
+        <Section
+          icon={<Download className="h-3.5 w-3.5 text-neutral-500" />}
+          title={t("export.title")}
+        >
           <div className="grid grid-cols-2 gap-1.5">
-            <button
-              onClick={() => onExport('pdf')}
-              className="flex items-center justify-center gap-1.5 px-2 py-1.5 text-[11px] font-medium text-gray-700 bg-white rounded-md border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all"
-            >
-              <FileText className="h-3 w-3 text-red-500" />
+            <SidebarButton onClick={() => onExport('pdf')}>
+              <FileText className="h-3.5 w-3.5 text-rose-500" />
               {t("export.pdf")}
-            </button>
-            <button
-              onClick={() => onExport('docx')}
-              className="flex items-center justify-center gap-1.5 px-2 py-1.5 text-[11px] font-medium text-gray-700 bg-white rounded-md border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all"
-            >
-              <FileText className="h-3 w-3 text-blue-500" />
+            </SidebarButton>
+            <SidebarButton onClick={() => onExport('docx')}>
+              <FileText className="h-3.5 w-3.5 text-sky-500" />
               {t("export.word")}
-            </button>
-            <button
+            </SidebarButton>
+            <SidebarButton
               onClick={handleCopyTranscription}
-              className={`flex items-center justify-center gap-1.5 px-2 py-1.5 text-[11px] font-medium rounded-md border transition-all ${
-                isCopied
-                  ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
-                  : 'text-gray-700 bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-              }`}
               disabled={!transcription}
+              variant={isCopied ? 'success' : 'default'}
             >
-              {isCopied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+              {isCopied ? (
+                <Check className="h-3.5 w-3.5" />
+              ) : (
+                <Copy className="h-3.5 w-3.5" />
+              )}
               {isCopied ? t("export.copied") : t("export.copy")}
-            </button>
-            <button
-              onClick={handleEmailShare}
-              className="flex items-center justify-center gap-1.5 px-2 py-1.5 text-[11px] font-medium text-gray-700 bg-white rounded-md border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all"
-              disabled={!transcription}
-            >
-              <Mail className="h-3 w-3" />
+            </SidebarButton>
+            <SidebarButton onClick={handleEmailShare} disabled={!transcription}>
+              <Mail className="h-3.5 w-3.5 text-neutral-500" />
               {t("export.mail")}
-            </button>
+            </SidebarButton>
           </div>
-          <button
+          <SidebarButton
+            full
             onClick={handleGoogleDriveShare}
-            className="w-full mt-1.5 flex items-center justify-center gap-1.5 px-2 py-1.5 text-[11px] font-medium text-gray-700 bg-white rounded-md border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all disabled:opacity-50"
             disabled={!transcription || isDriveExporting}
+            className="mt-1.5"
           >
             {isDriveExporting ? (
-              <Loader2 className="h-3 w-3 animate-spin" />
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
             ) : (
-              <Cloud className="h-3 w-3" />
+              <Cloud className="h-3.5 w-3.5 text-emerald-500" />
             )}
             {isDriveExporting ? t("export.exporting") : t("export.drive")}
-          </button>
-        </div>
+          </SidebarButton>
+        </Section>
 
-        {/* Speakers Section */}
-        <div className="p-3 border-b border-gray-200/60">
-          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">{t("speakers.title")}</p>
-          <div className="space-y-1">
-            {speakers.map((speaker) => (
-              <div key={speaker.id} className="flex items-center gap-2 px-2 py-1.5 rounded-md bg-white border border-gray-100">
-                <span
-                  className="w-2 h-2 rounded-full shrink-0"
-                  style={{ backgroundColor: speaker.color }}
-                />
-                <span className="text-[12px] font-medium text-gray-700">{speaker.name}</span>
-              </div>
-            ))}
-            {speakers.length === 0 && (
-              <p className="text-[11px] text-gray-400 text-center py-2">
-                {t("speakers.noSpeakers")}
-              </p>
-            )}
-          </div>
-        </div>
+        {/* Speakers — add / rename / recolor / delete (cap MAX_SPEAKERS) */}
+        <Section
+          icon={<Users className="h-3.5 w-3.5 text-neutral-500" />}
+          title={t("speakers.title")}
+          trailing={
+            <span className="text-[10px] font-medium text-neutral-400">
+              {speakers.length}/{MAX_SPEAKERS}
+            </span>
+          }
+        >
+          <SpeakersManager
+            speakers={speakers}
+            onChange={onSpeakersChange}
+            emptyLabel={t("speakers.noSpeakers")}
+          />
+        </Section>
 
-        {/* Student Assignment Section */}
-        <div className="p-3">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">{t("student.title")}</p>
-            {assigningAlumne && (
-              <Loader2 className="h-3 w-3 animate-spin text-gray-400" />
-            )}
-          </div>
+        {/* Student assignment */}
+        <Section
+          icon={<GraduationCap className="h-3.5 w-3.5 text-neutral-500" />}
+          title={t("student.title")}
+          trailing={
+            assigningAlumne ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin text-neutral-400" />
+            ) : null
+          }
+        >
           <Select
             value={selectedAlumne}
             onValueChange={handleAssignAlumne}
             disabled={alumnesLoading || assigningAlumne}
           >
-            <SelectTrigger className="w-full h-8 text-[12px] bg-white border-gray-200 focus:ring-1 focus:ring-gray-300">
-              <SelectValue placeholder={alumnesLoading ? t("export.exporting").replace("...", "") + "..." : t("student.notAssigned")} />
+            <SelectTrigger className="h-9 w-full bg-white text-[13px] focus:ring-1 focus:ring-neutral-300">
+              <SelectValue
+                placeholder={
+                  alumnesLoading
+                    ? t("export.exporting").replace("...", "") + "..."
+                    : t("student.notAssigned")
+                }
+              />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="none" className="text-[12px]">{t("student.notAssigned")}</SelectItem>
+              <SelectItem value="none" className="text-[13px]">
+                {t("student.notAssigned")}
+              </SelectItem>
               {alumnes.map((alumne) => (
-                <SelectItem key={alumne.id} value={alumne.id} className="text-[12px]">
-                  {alumne.name}{alumne.age !== null ? ` · ${alumne.age}a` : ''}
+                <SelectItem
+                  key={alumne.id}
+                  value={alumne.id}
+                  className="text-[13px]"
+                >
+                  {alumne.name}
+                  {alumne.age !== null ? ` · ${alumne.age}a` : ''}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
           {alumnesError && (
-            <p className="mt-1.5 text-[10px] text-red-500">{alumnesError}</p>
+            <p className="mt-1.5 text-[11px] text-rose-500">{alumnesError}</p>
           )}
-        </div>
+        </Section>
       </div>
 
-      {/* Unsaved changes notification */}
       {hasUnsavedChanges && (
-        <div className="m-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2">
-          <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-          <p className="text-[11px] font-medium text-amber-700">{t("unsavedChanges")}</p>
+        <div className="m-2 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
+          <div className="size-1.5 animate-pulse rounded-full bg-amber-500" />
+          <p className="text-[12px] font-medium text-amber-800">
+            {t("unsavedChanges")}
+          </p>
         </div>
       )}
+    </aside>
+  );
+}
+
+/* ----------------------------- Subcomponents ----------------------------- */
+
+function Section({
+  icon,
+  title,
+  trailing,
+  children,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  trailing?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="border-b border-neutral-200/70 p-3 last:border-b-0">
+      <div className="mb-2 flex items-center justify-between">
+        <div className="flex items-center gap-1.5">
+          {icon}
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
+            {title}
+          </p>
+        </div>
+        {trailing}
+      </div>
+      {children}
     </div>
+  );
+}
+
+function SpeakersManager({
+  speakers,
+  onChange,
+  emptyLabel,
+}: {
+  speakers: Speaker[];
+  onChange: (next: Speaker[]) => void;
+  emptyLabel: string;
+}) {
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [draftName, setDraftName] = useState('');
+  const [colorPickerId, setColorPickerId] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Focus the rename input when entering edit mode.
+  useEffect(() => {
+    if (editingId && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [editingId]);
+
+  const startRename = (s: Speaker) => {
+    setEditingId(s.id);
+    setDraftName(s.name);
+  };
+
+  const commitRename = (id: string) => {
+    const name = draftName.trim();
+    if (!name) {
+      setEditingId(null);
+      return;
+    }
+    onChange(speakers.map((s) => (s.id === id ? { ...s, name } : s)));
+    setEditingId(null);
+  };
+
+  const removeSpeaker = (id: string) => {
+    onChange(speakers.filter((s) => s.id !== id));
+    if (editingId === id) setEditingId(null);
+    if (colorPickerId === id) setColorPickerId(null);
+  };
+
+  const setColor = (id: string, color: string) => {
+    onChange(speakers.map((s) => (s.id === id ? { ...s, color } : s)));
+    setColorPickerId(null);
+  };
+
+  const addSpeaker = () => {
+    if (speakers.length >= MAX_SPEAKERS) return;
+    const fresh = createSpeaker(speakers);
+    onChange([...speakers, fresh]);
+    // Drop straight into rename mode for the new entry.
+    setEditingId(fresh.id);
+    setDraftName(fresh.name);
+  };
+
+  const canAddMore = speakers.length < MAX_SPEAKERS;
+
+  return (
+    <div className="space-y-1">
+      {speakers.map((s) => {
+        const isEditing = editingId === s.id;
+        const showingPicker = colorPickerId === s.id;
+        return (
+          <div
+            key={s.id}
+            className="group/sp relative flex items-center gap-2 rounded-md border border-neutral-200/70 bg-white px-2 py-1.5 transition-colors hover:border-neutral-300"
+          >
+            {/* Color swatch — click to open inline palette */}
+            <button
+              type="button"
+              onClick={() => setColorPickerId((cur) => (cur === s.id ? null : s.id))}
+              aria-label="Change color"
+              className="size-3.5 shrink-0 rounded-full ring-1 ring-inset ring-black/5 transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400"
+              style={{ backgroundColor: s.color }}
+            />
+
+            {/* Name (or rename input) */}
+            {isEditing ? (
+              <input
+                ref={inputRef}
+                value={draftName}
+                onChange={(e) => setDraftName(e.target.value)}
+                onBlur={() => commitRename(s.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') commitRename(s.id);
+                  if (e.key === 'Escape') setEditingId(null);
+                }}
+                maxLength={32}
+                className="min-w-0 flex-1 rounded-sm bg-neutral-50 px-1 py-0.5 text-[13px] font-medium text-neutral-900 outline-none ring-1 ring-neutral-300 focus:ring-neutral-500"
+              />
+            ) : (
+              <button
+                type="button"
+                onDoubleClick={() => startRename(s)}
+                className="min-w-0 flex-1 truncate text-left text-[13px] font-medium text-neutral-800"
+                title="Double-click to rename"
+              >
+                {s.name}
+              </button>
+            )}
+
+            {/* Hover actions */}
+            {!isEditing && (
+              <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover/sp:opacity-100">
+                <button
+                  type="button"
+                  onClick={() => startRename(s)}
+                  aria-label="Rename speaker"
+                  title="Rename"
+                  className="rounded-sm p-1 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700"
+                >
+                  <Pencil className="size-3" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => removeSpeaker(s.id)}
+                  aria-label="Delete speaker"
+                  title="Delete"
+                  className="rounded-sm p-1 text-neutral-400 hover:bg-rose-50 hover:text-rose-600"
+                >
+                  <Trash2 className="size-3" />
+                </button>
+              </div>
+            )}
+
+            {/* Inline color picker */}
+            {showingPicker && (
+              <div className="absolute left-0 right-0 top-full z-20 mt-1 rounded-md border border-neutral-200 bg-white p-2 shadow-lg">
+                <div className="grid grid-cols-5 gap-1.5">
+                  {SPEAKER_COLOR_PALETTE.map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => setColor(s.id, c)}
+                      aria-label={`Pick ${c}`}
+                      className={`size-5 rounded-full ring-1 ring-inset ring-black/10 transition-transform hover:scale-110 ${
+                        s.color === c
+                          ? 'outline outline-2 outline-offset-2 outline-neutral-700'
+                          : ''
+                      }`}
+                      style={{ backgroundColor: c }}
+                    />
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setColorPickerId(null)}
+                  className="mt-1.5 inline-flex w-full items-center justify-center gap-1 rounded-sm py-1 text-[11px] text-neutral-500 hover:bg-neutral-50 hover:text-neutral-700"
+                >
+                  <X className="size-3" />
+                  Close
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      })}
+
+      {speakers.length === 0 && (
+        <p className="py-2 text-center text-[11px] text-neutral-400">
+          {emptyLabel}
+        </p>
+      )}
+
+      {/* Add speaker */}
+      <button
+        type="button"
+        onClick={addSpeaker}
+        disabled={!canAddMore}
+        className="mt-1 flex w-full items-center justify-center gap-1.5 rounded-md border border-dashed border-neutral-300 px-2.5 py-1.5 text-[12px] font-medium text-neutral-500 transition-colors hover:border-neutral-400 hover:bg-neutral-50 hover:text-neutral-700 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent"
+      >
+        <Plus className="size-3.5" />
+        {canAddMore ? 'Add speaker' : `Max ${MAX_SPEAKERS} speakers`}
+      </button>
+    </div>
+  );
+}
+
+function SidebarButton({
+  children,
+  onClick,
+  disabled,
+  full,
+  variant = 'default',
+  className,
+}: {
+  children: React.ReactNode;
+  onClick?: () => void;
+  disabled?: boolean;
+  full?: boolean;
+  variant?: 'default' | 'success';
+  className?: string;
+}) {
+  const base =
+    'flex items-center justify-center gap-1.5 rounded-md border px-2.5 py-1.5 text-[12px] font-medium transition-all disabled:cursor-not-allowed disabled:opacity-50';
+  const tones =
+    variant === 'success'
+      ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+      : 'border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50';
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={[base, tones, full ? 'w-full' : '', className ?? ''].join(' ')}
+    >
+      {children}
+    </button>
   );
 }

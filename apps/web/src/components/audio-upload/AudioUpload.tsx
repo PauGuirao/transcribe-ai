@@ -14,8 +14,7 @@ import { trackFileRejections } from "@/lib/failed-upload-tracker";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import Link from "next/link";
 import UpgradePopup from "@/components/UpgradePopup";
-import { compressAudio, needsCompression, CompressionProgress } from "@/lib/audio-compression";
-import { uploadToR2 } from "@/lib/r2-upload";
+import { uploadAudioChunked } from "@/lib/chunked-upload";
 
 const ACCEPTED_AUDIO_TYPES = {
   "audio/mpeg": [".mp3"],
@@ -30,8 +29,7 @@ const ACCEPTED_AUDIO_TYPES = {
 };
 
 // File size limits
-const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB max upload (uses presigned URLs for large files)
-const COMPRESSION_THRESHOLD = 20 * 1024 * 1024; // 20MB - files larger than this get compressed
+const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB. The browser decodes + chunks, so we can accept larger raw files now.
 
 export function AudioUpload({
   onUploadComplete,
@@ -51,111 +49,49 @@ export function AudioUpload({
 
   const uploadFile = async (file: File) => {
     try {
-      // Get the user session for authentication
       if (!session?.access_token) {
         throw new Error("Authentication required");
       }
 
-      let fileToUpload: Blob = file;
-      let finalFilename = file.name;
-
-      // Phase 1: Compression (if needed)
-      if (needsCompression(file)) {
-        setUploadProgress({
-          progress: 0,
-          status: "compressing",
-          message: tCompression("starting")
-        });
-
-        try {
-          const compressionResult = await compressAudio(file, (progress: CompressionProgress) => {
-            // Map compression progress to 0-30%
-            let overallProgress = 0;
-            if (progress.phase === 'decoding') {
-              overallProgress = progress.progress * 0.1; // 0-10%
-            } else if (progress.phase === 'encoding') {
-              overallProgress = 10 + progress.progress * 0.18; // 10-28%
-            } else {
-              overallProgress = 28 + progress.progress * 0.02; // 28-30%
-            }
-
-            setUploadProgress({
-              progress: overallProgress,
-              status: "compressing",
-              message: progress.phase === 'decoding'
-                ? tCompression("processing")
-                : progress.phase === 'encoding'
-                ? tCompression("encoding")
-                : tCompression("finalizing")
-            });
-          });
-
-          if (compressionResult.wasCompressed) {
-            fileToUpload = compressionResult.blob;
-            // Change extension to .mp3 for compressed files
-            const nameWithoutExt = file.name.replace(/\.[^/.]+$/, '');
-            finalFilename = `${nameWithoutExt}.mp3`;
-
-            console.log(`Compressed ${(file.size / (1024*1024)).toFixed(1)}MB → ${(compressionResult.compressedSize / (1024*1024)).toFixed(1)}MB`);
-          }
-        } catch (compressionError) {
-          console.error('Compression failed:', compressionError);
-          throw new Error(
-            compressionError instanceof Error
-              ? compressionError.message
-              : t("compressionError")
-          );
-        }
-      }
-
-      // Phase 2: Upload directly to R2 (with fallback to Worker)
-      setUploadProgress({ progress: 30, status: "uploading", message: t("uploadingAudio") });
-
-      const response = await uploadToR2(
-        fileToUpload,
-        finalFilename,
+      // Single chunked-upload flow handles: hashing → decode → slice → parallel upload → enqueue.
+      // No client-side MP3 re-encoding needed; the chunker downsamples to 16 kHz mono WAV.
+      const result = await uploadAudioChunked(
+        file,
+        file.name,
         session.access_token,
-        (progress) => {
-          // Map upload progress from 30% to 95%
-          const mappedProgress = 30 + (progress.progress * 0.65);
+        (p) => {
           setUploadProgress({
-            progress: mappedProgress,
-            status: "uploading",
-            message: progress.message,
+            progress: p.progress,
+            status: p.phase === 'chunking' || p.phase === 'init'
+              ? 'compressing'
+              : p.phase === 'done' || p.phase === 'duplicate'
+              ? 'completed'
+              : 'uploading',
+            message: p.message,
           });
         }
       );
 
-      if (!response.success) {
-        throw new Error(response.error || 'Upload failed');
-      }
-
       setUploadProgress({ progress: 100, status: "completed" });
 
-      // Upload completed - return the upload information
       onUploadComplete({
-        audioId: response.audioId,
-        filename: response.filename,
-        filePath: response.filePath,
-        originalName: response.originalName,
+        audioId: result.audioId,
+        filename: file.name,
+        filePath: `${result.audioId}`,
+        originalName: file.name,
         autoTranscribe,
       });
 
-      // Reset progress after a delay
-      setTimeout(() => {
-        setUploadProgress(null);
-      }, 2000);
+      setTimeout(() => setUploadProgress(null), 2000);
     } catch (error) {
+      console.error('Upload failed:', error);
       setUploadProgress({
         progress: 0,
         status: "error",
         message: t("uploadError"),
       });
       onUploadError(error instanceof Error ? error.message : t("uploadError"));
-
-      setTimeout(() => {
-        setUploadProgress(null);
-      }, 3000);
+      setTimeout(() => setUploadProgress(null), 3000);
     }
   };
 
@@ -221,11 +157,11 @@ export function AudioUpload({
 
   const dropzoneClassName =
     variant === "minimal"
-      ? `rounded-2xl border border-dashed bg-background/80 p-10 text-center transition-all duration-200 shadow-sm hover:shadow-md
+      ? `group cursor-pointer rounded-xl border border-dashed bg-neutral-50/60 px-6 py-10 text-center transition-all duration-150
         ${
           isDragActive
-            ? "border-primary/60 bg-primary/10"
-            : "border-muted-foreground/20"
+            ? "border-primary bg-primary/5 ring-2 ring-primary/15"
+            : "border-neutral-300 hover:border-neutral-400 hover:bg-neutral-50"
         }
         ${
           uploadProgress?.status === "uploading"
@@ -246,11 +182,11 @@ export function AudioUpload({
 
   const iconWrapperClassName =
     variant === "minimal"
-      ? "mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary"
+      ? "mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary transition-transform group-hover:scale-105"
       : "p-2 rounded-full bg-muted";
 
   const titleClassName =
-    variant === "minimal" ? "text-base font-semibold" : "text-sm font-medium";
+    variant === "minimal" ? "text-sm font-semibold text-neutral-900" : "text-sm font-medium";
 
   return (
     <div className="space-y-3">
@@ -273,21 +209,33 @@ export function AudioUpload({
               <Upload
                 className={
                   variant === "minimal"
-                    ? "h-6 w-6"
+                    ? "h-5 w-5"
                     : "h-5 w-5 text-muted-foreground"
                 }
               />
             </div>
-            <div className="space-y-2">
+            <div className={variant === "minimal" ? "space-y-1" : "space-y-2"}>
               <p className={titleClassName}>
                 {isDragActive
                   ? t("dropHere")
                   : t("uploadAudio")}
               </p>
-              <p className="text-md text-muted-foreground">
+              <p
+                className={
+                  variant === "minimal"
+                    ? "text-xs text-neutral-600"
+                    : "text-sm text-muted-foreground"
+                }
+              >
                 {t("dragDropHint")}
               </p>
-              <p className="text-lg text-muted-foreground">
+              <p
+                className={
+                  variant === "minimal"
+                    ? "pt-2 text-[11px] uppercase tracking-wide text-neutral-400"
+                    : "text-sm text-muted-foreground"
+                }
+              >
                 {t("formatHint")}
               </p>
             </div>

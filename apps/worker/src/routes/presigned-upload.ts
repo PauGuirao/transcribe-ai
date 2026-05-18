@@ -169,7 +169,7 @@ export async function confirmUpload(request: Request, env: Env) {
       return json({ error: 'Failed to create audio record' }, 500);
     }
 
-    const inserted = await res.json();
+    const inserted = (await res.json()) as any;
 
     // Cache the metadata in KV if available
     if (env.CACHE) {
@@ -187,7 +187,7 @@ export async function confirmUpload(request: Request, env: Env) {
       filePath,
       originalName: originalFilename,
       fileSize: obj.size,
-      record: inserted[0] || inserted,
+      record: inserted?.[0] ?? inserted,
     });
   } catch (e: any) {
     console.error('Confirm upload error:', e);
@@ -334,7 +334,7 @@ async function getSignatureKey(
   region: string,
   service: string
 ): Promise<ArrayBuffer> {
-  const kDate = await hmac(new TextEncoder().encode('AWS4' + secretKey), dateStamp);
+  const kDate = await hmac(new TextEncoder().encode('AWS4' + secretKey).buffer as ArrayBuffer, dateStamp);
   const kRegion = await hmac(kDate, region);
   const kService = await hmac(kRegion, service);
   return hmac(kService, 'aws4_request');

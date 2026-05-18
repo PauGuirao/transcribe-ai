@@ -1,7 +1,7 @@
 {
   "hero": {
-    "title": "Transcribe speech therapy sessions in seconds",
-    "description": "Use a platform designed for high accuracy. Trusted by professionals of all sizes to manage millions of words every month.",
+    "title": "Transcribe audio to text with AI",
+    "description": "Turn audio into text instantly with 98% accuracy in Spanish, Catalan and English. Upload an MP3, WAV or voice note and get a transcript ready to edit, export and share. Built for clinicians, journalists, researchers and podcasters.",
     "preparing": "Preparing...",
     "goToDashboard": "Go to dashboard",
     "signInWithEmail": "Sign in with email",
@@ -9,7 +9,10 @@
       "professionals": "Trusted professionals",
       "accuracy": "Average accuracy",
       "timeSaved": "Saved per week"
-    }
+    },
+    "ctaSecondary": "See how it works",
+    "signUpWithGoogle": "Sign up with Google",
+    "caption": "Free to start · no card required · cancel anytime"
   },
   "transcriptionExample": {
     "dropzone": "Drag your audio file here",
@@ -53,7 +56,12 @@
       "title": "Upload audio",
       "description": "Upload your speech therapy session audio files from any device quickly and securely.",
       "dropzone": "Drag your audio file here",
-      "processing": "Processing audio..."
+      "processing": "Processing audio...",
+      "items": [
+        "Works with MP3, WAV and M4A",
+        "Drag and drop or browse to upload",
+        "Files up to 500 MB"
+      ]
     },
     "step2": {
       "number": "02",
@@ -61,7 +69,12 @@
       "description": "Our specialized AI converts audio to text with high accuracy.",
       "transcribing": "Transcribing audio...",
       "duration": "Duration",
-      "accuracy": "Accuracy"
+      "accuracy": "Accuracy",
+      "items": [
+        "Automatic speaker identification",
+        "98% accuracy in Catalan, Spanish & English",
+        "Process while you keep working"
+      ]
     },
     "step3": {
       "number": "03",
@@ -72,7 +85,12 @@
       "exportDOCX": "Export as DOCX",
       "sendGmail": "Send via Gmail",
       "saveDrive": "Save to Drive",
-      "clickAny": "Click any option to export"
+      "clickAny": "Click any option to export",
+      "items": [
+        "Export as PDF, DOCX or TXT",
+        "Share to Gmail or Drive",
+        "Edit before exporting"
+      ]
     }
   },
   "features": {
@@ -181,7 +199,10 @@
         "question": "Can I cancel my subscription at any time?",
         "answer": "Yes, you can cancel your subscription at any time from your account settings. There is no commitment or penalties. If you cancel, you will keep access until the end of the current billing period and can download all your transcriptions."
       }
-    ]
+    ],
+    "badge": "FAQ",
+    "ctaLabel": "Can't find the answer?",
+    "ctaButton": "Get in touch"
   },
   "footer": {
     "products": {
@@ -218,7 +239,7 @@
       "terms": "Terms of service",
       "privacy": "Privacy policy"
     },
-    "copyright": "© 2025 Transcriu — All rights reserved",
+    "copyright": "© 2026 Transcriu — All rights reserved",
     "rating": "Rated by speech therapy professionals"
   },
   "dashboard": {
@@ -254,7 +275,7 @@
     "sidebar": {
       "home": "Home",
       "transcribe": "Transcribe",
-      "library": "Library",
+      "library": "Transcriptions",
       "blog": "Blog",
       "students": "Students",
       "tutorials": "Tutorials",
@@ -266,10 +287,14 @@
       "tokenError": "Could not load tokens"
     },
     "plans": {
-      "group": "Team",
-      "individual": "Individual",
-      "free": "Free",
-      "pro": "Professional"
+      "free": "Trial",
+      "basic": "Basic",
+      "pro": "Pro",
+      "studio": "Studio",
+      "individual": "Basic",
+      "team": "Pro",
+      "organization": "Studio",
+      "group": "Studio"
     },
     "navbar": {
       "loading": "Loading...",
@@ -293,10 +318,10 @@
       "libraryDesc": "Manage all your audios and transcriptions"
     },
     "library": {
-      "title": "Library",
+      "title": "Transcriptions",
       "filesCount": "{count} file",
       "filesCountPlural": "{count} files",
-      "emptyTitle": "Empty library",
+      "emptyTitle": "No transcriptions yet",
       "emptyDesc": "Upload your first audio file to start transcribing.",
       "uploadAudio": "Upload audio",
       "viewAll": "All",
@@ -308,7 +333,8 @@
         "name": "Name",
         "status": "Status",
         "student": "Student",
-        "date": "Date"
+        "date": "Date",
+        "duration": "Duration"
       },
       "status": {
         "completed": "Transcribed",
@@ -337,7 +363,34 @@
         "selectStudent": "Select student",
         "onlyTranscribed": "Only available for transcribed files",
         "saveChanges": "Save changes"
-      }
+      },
+      "retry": "Retry",
+      "errors": {
+        "assignStudent": "Could not assign student",
+        "loadStudents": "Could not load students"
+      },
+      "edit": {
+        "title": "Edit transcription",
+        "subtitle": "Rename the file or assign it to a student",
+        "info": "Information",
+        "originalName": "Original name",
+        "status": "Status",
+        "date": "Date",
+        "customName": "Custom name",
+        "customNamePlaceholder": "e.g. Maria session 12/03",
+        "assignStudent": "Student",
+        "selectStudent": "Select a student",
+        "unassigned": "Unassigned",
+        "onlyTranscribed": "Only for completed transcriptions",
+        "years": "years old",
+        "save": "Save changes",
+        "saving": "Saving...",
+        "cancel": "Cancel",
+        "loading": "Loading..."
+      },
+      "viewCalendar": "Calendar",
+      "today": "Today",
+      "noFilesThisDay": "No transcriptions on this day"
     },
     "profiles": {
       "title": "Students",
@@ -370,6 +423,8 @@
       }
     },
     "upload": {
+      "drawerTitle": "New transcription",
+      "drawerDescription": "Upload an audio file. Transcription runs in the background — you can close this panel while it processes.",
       "dropHere": "Drop your audio here",
       "uploadAudio": "Upload an audio file",
       "dragDropHint": "Drag and drop or click to select",
@@ -438,6 +493,9 @@
         "title": "Transcription Error",
         "description": "There was an error processing your audio file. Please try uploading it again.",
         "refreshPage": "Refresh Page"
+      },
+      "sidebar": {
+        "title": "Details"
       }
     },
     "team": {
@@ -452,6 +510,29 @@
       "teamMembers": "Team members",
       "invite": "Invite",
       "inviteMember": "Invite member",
+      "editOrganization": "Edit",
+      "editDrawer": {
+        "title": "Edit organization",
+        "description": "Update your organization's name, description and logo.",
+        "logoLabel": "Logo",
+        "changeImage": "Change image",
+        "uploading": "Uploading...",
+        "imageHint": "PNG, JPG, WebP or GIF. Max 5MB.",
+        "nameLabel": "Name",
+        "namePlaceholder": "My organization",
+        "descriptionLabel": "Description",
+        "descriptionPlaceholder": "A short description of your organization (optional)",
+        "cancel": "Cancel",
+        "save": "Save changes",
+        "saving": "Saving...",
+        "errors": {
+          "nameTooShort": "Name must be at least 2 characters.",
+          "nameTooLong": "Name must be less than 100 characters.",
+          "descTooLong": "Description must be less than 500 characters.",
+          "uploadFailed": "Failed to upload image.",
+          "saveFailed": "Failed to save changes."
+        }
+      },
       "inviteFirstMember": "Invite first member",
       "noMembers": "No members yet",
       "noMembersDesc": "Invite your teammates to start collaborating together.",

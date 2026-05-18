@@ -1,43 +1,29 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import React, { useCallback } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import AppLayout from "@/components/layout/AppLayout";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { AudioUploadResult } from "@/types";
-import { useRouter } from "next/navigation";
 
 export default function TranscribeClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [selectedAudioId, setSelectedAudioId] = useState<string | undefined>();
+  const selectedAudioId = searchParams.get("audioId") ?? undefined;
 
-  useEffect(() => {
-    const audioId = searchParams.get("audioId");
-    if (audioId) {
-      setSelectedAudioId(audioId);
-    }
-  }, [searchParams]);
+  const handleAudioSelect = useCallback(
+    (audioId: string) => {
+      router.push(`/transcribe?audioId=${audioId}`);
+    },
+    [router],
+  );
 
-  // Keep URL in sync when selectedAudioId changes and URL is missing or different
-  useEffect(() => {
-    if (selectedAudioId) {
-      const current = searchParams.get("audioId");
-      if (current !== selectedAudioId) {
-        router.replace(`/transcribe?audioId=${selectedAudioId}`);
-      }
-    }
-  }, [selectedAudioId]);
-
-  const handleAudioSelect = (audioId: string) => {
-    router.push(`/transcribe?audioId=${audioId}`);
-    setSelectedAudioId(audioId);
-  };
-
-  const handleUploadComplete = (result: AudioUploadResult) => {
-    router.push(`/transcribe?audioId=${result.audioId}`);
-    setSelectedAudioId(result.audioId);
-  };
+  const handleUploadComplete = useCallback(
+    (result: AudioUploadResult) => {
+      router.push(`/transcribe?audioId=${result.audioId}`);
+    },
+    [router],
+  );
 
   return (
     <AppLayout

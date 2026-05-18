@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { User, Globe, Loader2, Check, Settings } from "lucide-react";
+import { User, Globe, Loader2, Check, Settings, Phone } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 
@@ -45,6 +45,9 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
   const locale = useLocale();
 
   const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [initialPhone, setInitialPhone] = useState("");
+  const [phoneError, setPhoneError] = useState<string | null>(null);
   const [selectedLanguage, setSelectedLanguage] = useState(locale);
   const [isUpdating, setIsUpdating] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -57,9 +60,31 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
     setSelectedLanguage(locale);
   }, [user, locale, isOpen]);
 
+  // Load existing phone whenever the dialog opens.
+  useEffect(() => {
+    if (!isOpen) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/user/phone");
+        if (!res.ok) return;
+        const data = await res.json();
+        if (cancelled) return;
+        const value = data?.phone ?? "";
+        setPhone(value);
+        setInitialPhone(value);
+        setPhoneError(null);
+      } catch (err) {
+        console.error("Failed to load phone:", err);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [isOpen]);
+
   const handleSave = async () => {
     setIsUpdating(true);
     setShowSuccess(false);
+    setPhoneError(null);
 
     try {
       // Update user name if changed
@@ -78,6 +103,23 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
         } else {
           console.error("Failed to update user name");
         }
+      }
+
+      // Update phone if changed.
+      const trimmedPhone = phone.trim();
+      if (trimmedPhone !== initialPhone) {
+        const res = await fetch("/api/user/phone", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone: trimmedPhone || null }),
+        });
+        const payload = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          setPhoneError(payload?.error || "Failed to update phone");
+          setIsUpdating(false);
+          return;
+        }
+        setInitialPhone(payload?.phone ?? "");
       }
 
       // Change language if different
@@ -159,6 +201,45 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
                 placeholder={t("user.fullNamePlaceholder")}
                 className="h-9 text-[13px] border-gray-200 focus:border-blue-300 focus:ring-blue-200"
               />
+            </div>
+          </div>
+
+          {/* WhatsApp Phone Section */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-[13px] font-medium text-gray-500">
+              <Phone className="h-3.5 w-3.5" />
+              WhatsApp
+            </div>
+            <div className="space-y-1.5">
+              <Label
+                htmlFor="phone"
+                className="text-[13px] font-medium text-gray-700"
+              >
+                Número de WhatsApp
+              </Label>
+              <Input
+                id="phone"
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                value={phone}
+                onChange={(e) => {
+                  setPhone(e.target.value);
+                  if (phoneError) setPhoneError(null);
+                }}
+                placeholder="+34 612 345 678"
+                className={cn(
+                  "h-9 text-[13px] border-gray-200 focus:border-blue-300 focus:ring-blue-200",
+                  phoneError && "border-red-300 focus:border-red-400 focus:ring-red-200",
+                )}
+              />
+              {phoneError ? (
+                <p className="text-[11px] text-red-600">{phoneError}</p>
+              ) : (
+                <p className="text-[11px] text-gray-500">
+                  Vincula el teu número per enviar notes de veu al bot de Transcriu i rebre la transcripció.
+                </p>
+              )}
             </div>
           </div>
 

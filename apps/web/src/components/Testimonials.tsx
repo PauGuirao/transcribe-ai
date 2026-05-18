@@ -1,89 +1,98 @@
 'use client';
 
-import { Quote } from "lucide-react";
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 
 interface Testimonial {
-    name: string;
-    role: string;
-    text: string;
-    image?: string;
+  name: string;
+  role: string;
+  text: string;
+  image?: string;
 }
 
 interface TestimonialsProps {
-    testimonials?: Testimonial[];
+  testimonials?: Testimonial[];
 }
 
 export function Testimonials({ testimonials }: TestimonialsProps) {
-    const t = useTranslations('testimonials');
+  const t = useTranslations('testimonials');
+  const items = testimonials || (t.raw('items') as Testimonial[]);
+  if (items.length === 0) return null;
 
-    // Use translations if no custom testimonials provided
-    const items = testimonials || (t.raw('items') as Testimonial[]);
+  const lead = items[0];
+  const rest = items.slice(1, 4);
 
-    return (
-        <section className="my-20">
-            <div className="text-center mb-12">
-                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                    {t('title')}
-                </h2>
-                <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                    {t('subtitle')}
-                </p>
+  return (
+    <section className="mx-auto max-w-5xl px-6 py-24">
+      <div className="mx-auto max-w-3xl text-center">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-3 py-1 text-xs font-medium text-neutral-700 shadow-sm">
+          <span className="inline-flex size-1.5 rounded-full bg-indigo-500" />
+          Testimonials
+        </span>
+        <h2 className="mt-4 text-3xl font-normal tracking-tight text-neutral-900 sm:text-4xl">
+          {t('title')}
+        </h2>
+        <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-neutral-600">
+          {t('subtitle')}
+        </p>
+
+        <blockquote className="mx-auto mt-12 max-w-2xl text-xl leading-relaxed text-neutral-800">
+          “{lead.text}”
+        </blockquote>
+
+        <div className="mt-8 flex items-center justify-center gap-3">
+          {lead.image ? (
+            <Image
+              src={lead.image}
+              alt={lead.name}
+              width={36}
+              height={36}
+              className="size-9 rounded-full object-cover"
+            />
+          ) : (
+            <div className="flex size-9 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-fuchsia-400 text-sm font-medium text-white">
+              {lead.name.charAt(0)}
             </div>
+          )}
+          <div className="text-left text-sm">
+            <p className="font-medium text-neutral-900">{lead.name}</p>
+            <p className="text-neutral-500">{lead.role}</p>
+          </div>
+        </div>
+      </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {items.map((testimonial, idx) => (
-                    <div
-                        key={idx}
-                        className="bg-white rounded-xl p-6 shadow-md border border-gray-200 hover:shadow-lg transition-shadow duration-300 flex flex-col"
-                    >
-                        {/* Quote Icon */}
-                        <div className="mb-4">
-                            <Quote className="h-8 w-8 text-blue-500 opacity-50" />
-                        </div>
+      {rest.length > 0 && (
+        <div className="mt-20 grid grid-cols-1 gap-6 sm:grid-cols-3">
+          {rest.map((item, i) => (
+            <figure key={i} className="text-left">
+              <blockquote className="text-sm leading-relaxed text-neutral-700">
+                “{item.text}”
+              </blockquote>
+              <figcaption className="mt-4 flex items-center gap-3">
+                {item.image ? (
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    width={32}
+                    height={32}
+                    className="size-8 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="flex size-8 items-center justify-center rounded-full bg-neutral-200 text-xs font-medium text-neutral-700">
+                    {item.name.charAt(0)}
+                  </div>
+                )}
+                <div className="text-xs">
+                  <p className="font-medium text-neutral-900">{item.name}</p>
+                  <p className="text-neutral-500">{item.role}</p>
+                </div>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      )}
 
-                        {/* Testimonial Text */}
-                        <p className="text-gray-700 leading-relaxed mb-6 flex-grow italic">
-                            "{testimonial.text}"
-                        </p>
-
-                        {/* Author Info */}
-                        <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
-                            {/* Avatar */}
-                            <div className="flex-shrink-0">
-                                {testimonial.image ? (
-                                    <img
-                                        src={testimonial.image}
-                                        alt={testimonial.name}
-                                        className="h-12 w-12 rounded-full object-cover"
-                                    />
-                                ) : (
-                                    <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold text-lg">
-                                        {testimonial.name.charAt(0)}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Name and Role */}
-                            <div className="flex-grow min-w-0">
-                                <p className="font-semibold text-gray-900 truncate">
-                                    {testimonial.name}
-                                </p>
-                                <p className="text-sm text-gray-600 truncate">
-                                    {testimonial.role}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            {/* Optional: Trust Badge */}
-            <div className="mt-12 text-center">
-                <p className="text-sm text-gray-500">
-                    {t('trustBadge')}
-                </p>
-            </div>
-        </section>
-    );
+      <p className="mt-16 text-center text-xs text-neutral-500">{t('trustBadge')}</p>
+    </section>
+  );
 }
