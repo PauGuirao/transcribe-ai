@@ -1,0 +1,682 @@
+{
+  "hero": {
+    "title": "Transcribe sesiones de logopedia en segundos",
+    "description": "Utiliza una plataforma diseñada para alta precisión. Confiada por profesionales de todos los tamaños para gestionar millones de palabras cada mes.",
+    "preparing": "Preparando...",
+    "goToDashboard": "Ir al panel",
+    "signInWithEmail": "Entra con tu correo",
+    "trustSignals": {
+      "professionals": "Profesionales de confianza",
+      "accuracy": "Precisión media",
+      "timeSaved": "Ahorro por semana"
+    }
+  },
+  "transcriptionExample": {
+    "dropzone": "Arrastra tu archivo de audio aquí",
+    "processing": "Procesando audio...",
+    "filename": "Sesión Pau.mp3",
+    "duration": "Duración",
+    "words": "Palabras",
+    "accuracy": "Precisión",
+    "footer": "Transcripción automática con identificación de interlocutores",
+    "speaker1": "Logopeda",
+    "speaker2": "Paciente",
+    "lines": [
+      {
+        "speaker": "Logopeda",
+        "text": "¡Buenos días María! Hoy trabajaremos con los sonidos de la \"R\". Primero, haremos algunos ejercicios de respiración para preparar la lengua y los labios."
+      },
+      {
+        "speaker": "Paciente",
+        "text": "¡De acuerdo! Ya he estado practicando en casa como me dijiste. Creo que estoy mejorando un poco."
+      },
+      {
+        "speaker": "Logopeda",
+        "text": "¡Perfecto! Eso es muy importante. Ahora intentaremos decir estas palabras: \"rueda\", \"ratón\", \"calle\". Recuerda poner la lengua en la posición que hemos practicado."
+      },
+      {
+        "speaker": "Paciente",
+        "text": "Rueda... ratón... calle. ¿Cómo lo he hecho?"
+      },
+      {
+        "speaker": "Logopeda",
+        "text": "¡Muy bien! Has mejorado mucho. Ahora probaremos con frases más largas. Repite después de mí: \"El ratón corre por la carretera\"."
+      }
+    ]
+  },
+  "howItWorks": {
+    "title": "Transcribe sesiones en 3 pasos sencillos",
+    "description": "Proceso rápido y eficiente para convertir tus sesiones de audio en transcripciones profesionales listas para compartir",
+    "startNow": "Comienza ahora →",
+    "step1": {
+      "number": "01",
+      "title": "Sube el audio",
+      "description": "Carga los archivos de audio de tus sesiones de logopedia desde cualquier dispositivo de forma rápida y segura.",
+      "dropzone": "Arrastra tu archivo de audio aquí",
+      "processing": "Procesando audio..."
+    },
+    "step2": {
+      "number": "02",
+      "title": "Transcribe automáticamente",
+      "description": "Nuestra IA especializada en catalán convierte el audio en texto con alta precisión.",
+      "transcribing": "Transcribiendo audio...",
+      "duration": "Duración",
+      "accuracy": "Precisión"
+    },
+    "step3": {
+      "number": "03",
+      "title": "Exporta y comparte",
+      "description": "Descarga la transcripción en múltiples formatos o compártela directamente con tus colegas.",
+      "exportButton": "Exportar transcripción",
+      "exportPDF": "Exportar como PDF",
+      "exportDOCX": "Exportar como DOCX",
+      "sendGmail": "Enviar por Gmail",
+      "saveDrive": "Guardar en Drive",
+      "clickAny": "Haz clic en cualquier opción para exportar"
+    }
+  },
+  "features": {
+    "title": "Funcionalidades avanzadas para la educación",
+    "description": "Descubre una variedad de funciones avanzadas. Ilimitadas y gratuitas para individuales.",
+    "library": {
+      "title": "Biblioteca de transcripciones",
+      "description": "Organiza y gestiona todas tus transcripciones en un solo lugar. Busca, filtra y accede rápidamente al contenido que necesitas para tus clases.",
+      "label": "Biblioteca",
+      "count": "transcripciones"
+    },
+    "students": {
+      "title": "Gestión de alumnos",
+      "description": "Crea perfiles de alumnos, asigna transcripciones personalizadas y haz un seguimiento de su progreso académico de manera eficiente.",
+      "activeStudents": "Alumnos activos",
+      "count": "estudiantes"
+    },
+    "groups": {
+      "title": "Organización en grupos",
+      "description": "Crea grupos de trabajo, asigna proyectos colaborativos y facilita la comunicación entre los miembros del grupo.",
+      "activeGroups": "Grupos activos",
+      "count": "grupos",
+      "members": "miembros"
+    },
+    "annotations": {
+      "title": "Anotaciones inteligentes",
+      "description": "Añade notas, comentarios y marcas temporales a las transcripciones. Crea material de estudio personalizado y destaca los puntos clave.",
+      "recentAnnotations": "Anotaciones recientes",
+      "count": "notas",
+      "importantConcept": "Concepto importante",
+      "examQuestion": "Pregunta de examen",
+      "pendingTask": "Tarea pendiente"
+    }
+  },
+  "navbar": {
+    "features": "Funcionalidades",
+    "seeAllFeatures": "Ver todas las funcionalidades",
+    "seeAll": "Ver todas",
+    "menu": "Menú",
+    "blog": "Blog",
+    "pricing": "Precios",
+    "contact": "Contacto",
+    "goToDashboard": "Ir al panel",
+    "signIn": "Iniciar sesión",
+    "preparing": "Preparando...",
+    "openTranscriu": "Abrir Transcriu",
+    "start": "Comenzar"
+  },
+  "pricing": {
+    "title": "Planes para cada necesidad",
+    "subtitle": "Comienza gratis y escala según tus necesidades profesionales",
+    "mostPopular": "Más Popular",
+    "monthly": "Mensual",
+    "yearly": "Anual",
+    "month": "mes",
+    "year": "año",
+    "userMonth": "usuario/mes",
+    "users": "usuarios",
+    "numberOfUsers": "Número de usuarios",
+    "billedYearly": "Facturado anualmente",
+    "loading": "Cargando...",
+    "startFree": "Comienza gratis",
+    "subscribe": "Suscribirse"
+  },
+  "faq": {
+    "title": "Preguntas Frecuentes",
+    "subtitle": "Todo lo que necesitas saber sobre Transcriu",
+    "questions": [
+      {
+        "question": "¿Cómo funciona la transcripción automática para sesiones de logopedia?",
+        "answer": "Transcriu utiliza inteligencia artificial avanzada especializada en catalán para convertir el audio de tus sesiones de logopedia en texto. El sistema identifica automáticamente diferentes hablantes (logopeda y paciente) y transcribe con alta precisión términos técnicos de logopedia, fonoaudiología y terapia del lenguaje."
+      },
+      {
+        "question": "¿Qué precisión tiene la transcripción en catalán?",
+        "answer": "Nuestra IA está especialmente entrenada para el catalán y consigue una precisión superior al 95% en sesiones de logopedia. El sistema reconoce vocabulario técnico específico de logopedia, variantes dialectales del catalán y adapta la transcripción al contexto clínico."
+      },
+      {
+        "question": "¿Es seguro subir sesiones con datos de pacientes?",
+        "answer": "Sí, cumplimos con el RGPD y la LOPD. Todos los datos se cifran durante la transmisión y almacenamiento. Las transcripciones se procesan en servidores seguros en Europa y puedes eliminar cualquier dato en cualquier momento. Nunca compartimos ni utilizamos tus datos para entrenar modelos."
+      },
+      {
+        "question": "¿Puedo compartir transcripciones con mi equipo u otros profesionales?",
+        "answer": "Sí, Transcriu permite colaboración en tiempo real. Puedes compartir transcripciones con otros logopedas, psicólogos, maestros o profesionales de tu equipo. Cada miembro puede añadir anotaciones, comentarios y editar colaborativamente manteniendo un historial de cambios."
+      },
+      {
+        "question": "¿Qué formatos de audio son compatibles?",
+        "answer": "Aceptamos todos los formatos de audio habituales: MP3, WAV, M4A, OGG, FLAC y más. Puedes subir audios desde tu ordenador, móvil, tablet o directamente desde grabadoras digitales. No hay límite de duración para los audios."
+      },
+      {
+        "question": "¿Cómo puedo exportar las transcripciones?",
+        "answer": "Puedes exportar las transcripciones en múltiples formatos: PDF (para imprimir o archivar), DOCX (para editar en Word), TXT (texto plano) o compartir directamente por correo electrónico. También puedes integrar con Google Drive, Dropbox y otras herramientas de productividad."
+      },
+      {
+        "question": "¿Transcriu funciona offline o necesita conexión a internet?",
+        "answer": "Necesitas conexión a internet para subir los audios y procesarlos. Una vez transcrito, puedes acceder a las transcripciones offline desde la aplicación. Estamos trabajando en una versión con capacidades offline para zonas con conectividad limitada."
+      },
+      {
+        "question": "¿Cuál es el tiempo de procesamiento de una sesión?",
+        "answer": "El tiempo de transcripción es aproximadamente el 20-30% de la duración del audio. Por ejemplo, una sesión de 60 minutos se transcribe en unos 12-18 minutos. Sesiones más cortas se procesan aún más rápido, a menudo en menos de 5 minutos."
+      },
+      {
+        "question": "¿Hay descuentos para centros educativos o clínicas?",
+        "answer": "Sí, ofrecemos planes especiales para equipos, centros educativos, clínicas y organizaciones. Los planes grupales incluyen descuentos por volumen, gestión centralizada de usuarios, facturación única y soporte dedicado. Contáctanos para obtener un presupuesto personalizado."
+      },
+      {
+        "question": "¿Puedo cancelar la suscripción en cualquier momento?",
+        "answer": "Sí, puedes cancelar tu suscripción en cualquier momento desde la configuración de tu cuenta. No hay permanencia ni penalizaciones. Si cancelas, mantendrás acceso hasta el final del período de facturación actual y podrás descargar todas tus transcripciones."
+      }
+    ]
+  },
+  "footer": {
+    "products": {
+      "title": "Productos",
+      "transcription": "Transcripción automática",
+      "editor": "Editor de anotaciones",
+      "library": "Biblioteca de sesiones",
+      "teams": "Gestión de equipos",
+      "dashboard": "Panel de control"
+    },
+    "resources": {
+      "title": "Recursos",
+      "help": "Centro de ayuda",
+      "tutorials": "Tutoriales",
+      "apiDocs": "Documentación API",
+      "blog": "Blog"
+    },
+    "learn": {
+      "title": "Aprende",
+      "gettingStarted": "Guía de inicio",
+      "bestPractices": "Mejores prácticas",
+      "speechTherapy": "Logopedia digital",
+      "webinars": "Webinars"
+    },
+    "company": {
+      "title": "Empresa",
+      "about": "Sobre nosotros",
+      "pricing": "Precios",
+      "contact": "Contacto",
+      "careers": "Trabaja con nosotros"
+    },
+    "legal": {
+      "title": "Legal",
+      "terms": "Términos del servicio",
+      "privacy": "Política de privacidad"
+    },
+    "copyright": "© 2025 Transcriu — Todos los derechos reservados",
+    "rating": "Valorado por profesionales de la logopedia"
+  },
+  "dashboard": {
+    "common": {
+      "loading": "Cargando...",
+      "save": "Guardar",
+      "saving": "Guardando...",
+      "cancel": "Cancelar",
+      "delete": "Eliminar",
+      "edit": "Editar",
+      "close": "Cerrar",
+      "confirm": "Confirmar",
+      "back": "Volver",
+      "next": "Siguiente",
+      "previous": "Anterior",
+      "search": "Buscar",
+      "filter": "Filtrar",
+      "export": "Exportar",
+      "import": "Importar",
+      "download": "Descargar",
+      "upload": "Subir",
+      "retry": "Reintentar",
+      "ok": "De acuerdo",
+      "yes": "Sí",
+      "no": "No",
+      "none": "Ninguno",
+      "all": "Todos",
+      "notAssigned": "Sin asignar",
+      "unknown": "Desconocido",
+      "error": "Error",
+      "success": "Éxito"
+    },
+    "sidebar": {
+      "home": "Inicio",
+      "transcribe": "Transcribir",
+      "library": "Biblioteca",
+      "blog": "Blog",
+      "students": "Alumnos",
+      "tutorials": "Tutoriales",
+      "team": "Equipo",
+      "settings": "Configuración",
+      "help": "Ayuda",
+      "signOut": "Cerrar sesión",
+      "upgradePlan": "Mejora tu plan",
+      "tokenError": "No se pudieron cargar los tokens"
+    },
+    "plans": {
+      "group": "Grupal",
+      "individual": "Individual",
+      "free": "Gratuito",
+      "pro": "Profesional"
+    },
+    "navbar": {
+      "loading": "Cargando...",
+      "upgradePlan": "Mejorar plan",
+      "members": "miembros",
+      "organization": "Organización",
+      "viewTeam": "Ver equipo",
+      "inviteMembers": "Invitar miembros",
+      "manageBilling": "Gestionar facturación",
+      "restrictedAccess": "Acceso restringido",
+      "restrictedAccessDesc": "Esta funcionalidad solo está disponible para administradores y propietarios de la organización."
+    },
+    "home": {
+      "title": "¿Qué harás hoy?",
+      "subtitle": "Elige una de nuestras herramientas para comenzar tu proyecto",
+      "transcription": "Transcripción",
+      "transcriptionDesc": "Convierte tu audio a texto con IA",
+      "students": "Alumnos",
+      "studentsDesc": "Edita los perfiles de tus alumnos",
+      "library": "Biblioteca",
+      "libraryDesc": "Gestiona todos tus audios y transcripciones"
+    },
+    "library": {
+      "title": "Biblioteca",
+      "filesCount": "{count} archivo",
+      "filesCountPlural": "{count} archivos",
+      "emptyTitle": "Biblioteca vacía",
+      "emptyDesc": "Sube tu primer archivo de audio para comenzar a transcribir.",
+      "uploadAudio": "Subir audio",
+      "viewAll": "Todos",
+      "viewByDay": "Por día",
+      "unknownDate": "Fecha desconocida",
+      "loadingLibrary": "Cargando biblioteca...",
+      "errorLoading": "Error cargando",
+      "table": {
+        "name": "Nombre",
+        "status": "Estado",
+        "student": "Alumno",
+        "date": "Fecha"
+      },
+      "status": {
+        "completed": "Transcrito",
+        "processing": "Procesando",
+        "failed": "Fallido",
+        "uploaded": "Subido",
+        "pending": "Pendiente"
+      },
+      "actions": {
+        "transcribe": "Transcribir",
+        "exportPdf": "Exportar PDF",
+        "exportWord": "Exportar Word",
+        "edit": "Editar",
+        "delete": "Eliminar"
+      },
+      "editPanel": {
+        "title": "Editar archivo",
+        "subtitle": "Personaliza nombre y asigna alumno",
+        "info": "Información",
+        "originalName": "Nombre original",
+        "date": "Fecha",
+        "status": "Estado",
+        "customName": "Nombre personalizado",
+        "customNamePlaceholder": "Introduce un nuevo nombre...",
+        "assignStudent": "Asignar alumno",
+        "selectStudent": "Selecciona alumno",
+        "onlyTranscribed": "Solo disponible para archivos transcritos",
+        "saveChanges": "Guardar cambios"
+      }
+    },
+    "profiles": {
+      "title": "Alumnos",
+      "subtitle": "Gestiona los perfiles de tus alumnos",
+      "newStudent": "Nuevo alumno",
+      "addStudent": "Añadir alumno",
+      "createStudent": "Crear alumno",
+      "creatingStudent": "Creando alumno...",
+      "emptyTitle": "Sin alumnos todavía",
+      "emptyDesc": "Crea tu primer perfil de alumno para organizar las transcripciones.",
+      "noTranscriptions": "Sin transcripciones",
+      "transcriptionCount": "{count} transcripción",
+      "transcriptionCountPlural": "{count} transcripciones",
+      "years": "años",
+      "created": "Creado",
+      "form": {
+        "title": "Nuevo alumno",
+        "subtitle": "Añade un perfil para organizar",
+        "name": "Nombre",
+        "namePlaceholder": "Nombre completo del alumno",
+        "age": "Edad",
+        "ageOptional": "(opcional)",
+        "agePlaceholder": "Edad en años",
+        "helperText": "Podrás asignar transcripciones a este alumno después de crearlo."
+      },
+      "validation": {
+        "nameRequired": "El nombre es obligatorio",
+        "nameMinLength": "Mínimo 2 caracteres",
+        "ageRange": "Entre 0 y 25 años"
+      }
+    },
+    "upload": {
+      "dropHere": "Suelta aquí tu audio",
+      "uploadAudio": "Sube un archivo de audio",
+      "dragDropHint": "Arrastra y suelta o haz clic para seleccionar",
+      "formatHint": "MP3, WAV, M4A, OGG, WebM, FLAC, AAC, WMA, AIFF (máx. 100 MB)",
+      "compressing": "Comprimiendo...",
+      "uploading": "Subiendo...",
+      "uploadComplete": "¡Subida completada!",
+      "uploadFailed": "Subida fallida",
+      "uploadError": "Error de subida",
+      "uploadedFiles": "Archivos subidos",
+      "compressionError": "Error al comprimir el audio",
+      "uploadingAudio": "Subiendo audio...",
+      "invalidFileType": "El tipo de archivo debe ser uno de los siguientes: {extensions}",
+      "fileTooLarge": "El archivo es demasiado grande. El tamaño máximo es {size} MB"
+    },
+    "transcription": {
+      "untitled": "Sin título",
+      "titlePlaceholder": "Nombre de la transcripción...",
+      "unsavedChanges": "Cambios sin guardar",
+      "export": {
+        "title": "Exportar",
+        "pdf": "PDF",
+        "word": "Word",
+        "copy": "Copiar",
+        "copied": "Copiado",
+        "mail": "Mail",
+        "drive": "Google Drive",
+        "exporting": "Exportando..."
+      },
+      "speakers": {
+        "title": "Personas",
+        "noSpeakers": "Sin personas"
+      },
+      "student": {
+        "title": "Alumno",
+        "notAssigned": "Sin asignar",
+        "loadError": "No se pudieron cargar los alumnos",
+        "assignError": "No se pudo asignar el alumno"
+      },
+      "errors": {
+        "googleServices": "No se pudo cargar Google Identity Services",
+        "missingClientId": "Falta NEXT_PUBLIC_GOOGLE_CLIENT_ID en la configuración.",
+        "noAccessToken": "No se obtuvo ningún token de acceso",
+        "createDocError": "Error al crear el documento",
+        "writeDocError": "Error al escribir en el documento",
+        "googleDocError": "No se pudo crear el Google Doc"
+      },
+      "compression": {
+        "starting": "Comprimiendo audio para optimizar la subida...",
+        "processing": "Procesando audio...",
+        "encoding": "Comprimiendo...",
+        "finalizing": "Finalizando compresión..."
+      },
+      "saving": "Guardando...",
+      "save": "Guardar",
+      "segments": {
+        "noSegments": "No hay segmentos de transcripción disponibles",
+        "noPerson": "Sin persona",
+        "combineWithPrevious": "Combinar con anterior",
+        "addSegment": "Añadir segmento",
+        "delete": "Eliminar",
+        "placeholder": "Escribe el texto...",
+        "emptySegment": "Segmento vacío"
+      },
+      "errorState": {
+        "title": "Error en la transcripción",
+        "description": "Hubo un error procesando tu archivo de audio. Por favor, intenta subirlo de nuevo.",
+        "refreshPage": "Actualizar página"
+      }
+    },
+    "team": {
+      "title": "Equipo",
+      "noOrganization": "Sin organización",
+      "noOrganizationDesc": "No perteneces a ninguna organización actualmente.",
+      "setupOrganization": "Configurar organización",
+      "authRequired": "Acceso requerido",
+      "authRequiredDesc": "Debes iniciar sesión para ver esta página.",
+      "loadingTeam": "Cargando equipo...",
+      "membersCount": "{count} / {max} miembros",
+      "teamMembers": "Miembros del equipo",
+      "invite": "Invitar",
+      "inviteMember": "Invitar miembro",
+      "inviteFirstMember": "Invitar primer miembro",
+      "noMembers": "Aún no hay miembros",
+      "noMembersDesc": "Invita a tus compañeros de equipo para empezar a colaborar juntos.",
+      "error": "Error",
+      "retry": "Reintentar",
+      "user": "Usuario",
+      "removeFromTeam": "Eliminar del equipo",
+      "viewPlans": "Ver planes",
+      "ok": "OK",
+      "headerSubtitle": "Gestiona tu equipo y los permisos de los miembros",
+      "activeMembers": "Miembros activos",
+      "maxCapacity": "Capacidad máxima",
+      "administrators": "Administradores",
+      "table": {
+        "name": "Nombre",
+        "role": "Rol",
+        "joinedDate": "Fecha de unión"
+      },
+      "roles": {
+        "owner": "Propietario",
+        "admin": "Administrador",
+        "member": "Miembro"
+      },
+      "capacityReached": {
+        "title": "Límite alcanzado",
+        "desc": "Habéis llegado al límite de personas del grupo",
+        "ok": "OK"
+      },
+      "removeDialog": {
+        "title": "Eliminar miembro",
+        "desc": "¿Estás seguro de que quieres eliminar a {name} del equipo? Será movido a su propia organización gratuita y perderá acceso a los recursos del equipo.",
+        "cancel": "Cancelar",
+        "confirm": "Eliminar miembro",
+        "removing": "Eliminando..."
+      },
+      "upgradeDialog": {
+        "title": "Incrementa tu plan",
+        "desc": "¿Necesitas más miembros? Actualiza tu plan para añadir más usuarios.",
+        "currentPlan": "Plan actual:",
+        "currentMembers": "Miembros actuales:",
+        "membersLabel": "{count} miembros",
+        "availablePlans": "Planes disponibles:",
+        "teamPlan": "Equipo",
+        "organizationPlan": "Organización",
+        "usersRange": "{min}-{max} usuarios",
+        "pricePerUser": "{price}€/usuario/mes",
+        "addMoreMembers": "Añade más miembros",
+        "close": "Cerrar"
+      },
+      "wantMoreMembers": "¿Quieres más miembros? Incrementa tu plan"
+    },
+    "settings": {
+      "title": "Configuración",
+      "subtitle": "Gestiona tu configuración personal y de la organización",
+      "loading": "Cargando configuración...",
+      "cancel": "Cancelar",
+      "saved": "Guardado",
+      "tabs": {
+        "user": "Usuario",
+        "team": "Equipo",
+        "preferences": "Preferencias"
+      },
+      "user": {
+        "title": "Perfil de usuario",
+        "profilePhoto": "Foto de perfil",
+        "photoManaged": "La foto de perfil se gestiona automáticamente",
+        "fullName": "Nombre completo",
+        "fullNamePlaceholder": "Tu nombre completo",
+        "email": "Correo electrónico",
+        "saveChanges": "Guardar cambios",
+        "updating": "Actualizando...",
+        "notifications": "Notificaciones",
+        "emailNotifications": "Notificaciones por correo",
+        "emailNotificationsDesc": "Recibir notificaciones sobre transcripciones completadas",
+        "teamNotifications": "Notificaciones del equipo",
+        "teamNotificationsDesc": "Recibir notificaciones sobre actividad del equipo",
+        "enable": "Activar"
+      },
+      "teamSettings": {
+        "title": "Información de la organización",
+        "adminBadge": "Admin",
+        "orgLogo": "Logo de la organización",
+        "changeImage": "Cambiar imagen",
+        "uploading": "Subiendo...",
+        "imageHint": "JPEG, PNG, WebP o GIF. Máximo 5MB.",
+        "orgName": "Nombre de la organización",
+        "description": "Descripción",
+        "descriptionPlaceholder": "Descripción de la organización (opcional)",
+        "memberManagement": "Gestión de miembros",
+        "activeMembers": "Miembros activos",
+        "manageMembersDesc": "Gestiona los miembros de tu equipo",
+        "viewTeam": "Ver equipo",
+        "inviteMembers": "Invitar miembros",
+        "inviteMembersDesc": "Envía invitaciones a nuevos miembros",
+        "invite": "Invitar"
+      },
+      "preferences": {
+        "title": "Preferencias de transcripción",
+        "appLanguage": "Idioma de la aplicación",
+        "defaultLanguage": "Idioma por defecto",
+        "languages": {
+          "catalan": "Catalán",
+          "spanish": "Español",
+          "english": "Inglés",
+          "french": "Francés"
+        },
+        "autoDetect": "Detección automática de idioma",
+        "autoDetectDesc": "Detectar automáticamente el idioma del audio",
+        "speakerIdentification": "Identificación de interlocutores",
+        "speakerIdentificationDesc": "Identificar diferentes personas en el audio",
+        "appearance": "Apariencia",
+        "themes": {
+          "light": "Claro",
+          "dark": "Oscuro",
+          "system": "Sistema"
+        },
+        "privacy": "Privacidad y seguridad",
+        "autoDelete": "Eliminación automática",
+        "autoDeleteDesc": "Eliminar transcripciones después de 30 días",
+        "exportData": "Exportar datos",
+        "exportDataDesc": "Descargar todos tus datos",
+        "configure": "Configurar",
+        "exportBtn": "Exportar"
+      }
+    },
+    "invite": {
+      "title": "Invitar miembros",
+      "sendByEmail": "Enviar invitación por correo",
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "usuario@ejemplo.com",
+      "sendInvite": "Enviar invitación",
+      "sending": "Enviando...",
+      "successMessage": "Invitación enviada correctamente",
+      "helperText": "Se enviará un correo con un enlace de invitación seguro y personalizado válido por 7 días",
+      "linkRetrieved": "Enlace de invitación existente recuperado",
+      "linkGenerated": "Nuevo enlace de invitación generado",
+      "linkCopied": "Enlace copiado al portapapeles",
+      "linkError": "Error al obtener el enlace de invitación. Por favor, inténtalo de nuevo.",
+      "copyError": "Error al copiar el enlace",
+      "shareWhatsApp": "¡Te invito a unirte a nuestro equipo! Usa este enlace:",
+      "shareEmailSubject": "Invitación al equipo",
+      "shareEmailBody": "Hola,\\n\\nTe invito a unirte a nuestro equipo. Haz clic en el siguiente enlace para aceptar la invitación:\\n\\n{url}\\n\\nSaludos",
+      "shareTwitter": "¡Únete a nuestro equipo!",
+      "shareNativeTitle": "Invitación al equipo",
+      "shareNativeText": "¡Te invito a unirte a nuestro equipo!"
+    },
+    "welcome": {
+      "title": "¡Bienvenido/a a {organizationName}!",
+      "descriptionWithName": "¡Hola {userName}! Te has unido correctamente a la organización {organizationName}.",
+      "descriptionWithoutName": "Te has unido correctamente a la organización {organizationName}.",
+      "statusMessage": "Ahora formas parte del equipo",
+      "benefits": {
+        "fullAccess": "Acceso completo a todas las funcionalidades de la organización",
+        "collaboration": "Colaboración con los miembros del equipo",
+        "startTranscribing": "Comienza a transcribir y gestionar tus audios"
+      },
+      "continueButton": "¡Perfecto, vamos!"
+    },
+    "organization": {
+      "checkingAccess": "Verificando acceso...",
+      "brandName": "Transcriu",
+      "heroTitle": "Configura tu organización para comenzar.",
+      "heroDescription": "Crea un espacio de trabajo para tu equipo y comienza a transcribir sesiones de logopedia con IA.",
+      "heroFooter": "Un paso más para optimizar tus sesiones de logopedia.",
+      "groupSetupLabel": "Configuración del Plan Grupo",
+      "lastStepLabel": "¡Último paso!",
+      "groupSetupTitle": "Configura tu organización",
+      "regularTitle": "Nombre de la organización",
+      "groupSetupDesc": "Finaliza la configuración de tu organización con el plan grupo.",
+      "regularDesc": "Dale un nombre a tu organización para empezar a colaborar con tu equipo.",
+      "groupPlanActivated": "Plan Grupo Activado",
+      "orgNameLabel": "Nombre de la organización",
+      "orgNamePlaceholder": "Ej: Mi Clínica, Centro de Terapia...",
+      "validName": "Nombre válido",
+      "errorTitle": "Error",
+      "configuring": "Configurando...",
+      "continueButton": "Continuar al Dashboard",
+      "footerHint": "Podrás invitar miembros de tu equipo desde el dashboard.",
+      "validation": {
+        "required": "El nombre de la organización es obligatorio",
+        "minLength": "El nombre debe tener al menos 2 caracteres",
+        "maxLength": "El nombre no puede tener más de 50 caracteres",
+        "invalidChars": "El nombre no puede contener caracteres especiales como < > : \" / \\ | ? *"
+      },
+      "errors": {
+        "setupError": "Error al configurar la organización",
+        "unexpectedError": "Error inesperado"
+      }
+    }
+  },
+  "testimonials": {
+    "title": "Qué dicen los profesionales",
+    "subtitle": "Más de 500 logopedas confían en Transcriu para optimizar su documentación clínica",
+    "trustBadge": "⭐⭐⭐⭐⭐ Valoración media de 4.9/5 basada en más de 200 reseñas",
+    "items": [
+      {
+        "name": "María G.",
+        "role": "Logopeda infantil, Barcelona",
+        "text": "Transcriu me ha cambiado la vida profesional. Antes pasaba 2 horas al día escribiendo informes, ahora solo 20 minutos revisando transcripciones. Puedo atender más pacientes y tengo más tiempo para preparar materiales terapéuticos."
+      },
+      {
+        "name": "Jorge P.",
+        "role": "Centro de logopedia, Gracia",
+        "text": "En nuestro centro tenemos 5 logopedas y todos utilizan Transcriu. La calidad de las transcripciones en catalán es excelente y el soporte técnico siempre responde rápido. Totalmente recomendable."
+      },
+      {
+        "name": "Ana M.",
+        "role": "Logopeda especializada en TEA, Sarrià",
+        "text": "Trabajo con niños con TEA y las sesiones son muy dinámicas. Transcriu captura todo lo que pasa y puedo centrarme 100% en el niño sin preocuparme de tomar notas. Los informes para las familias son mucho más completos ahora."
+      },
+      {
+        "name": "David R.",
+        "role": "Logopeda en escuela de educación especial",
+        "text": "Utilizo Transcriu para documentar sesiones con adolescentes. La transcripción automática me ahorra horas de trabajo y los informes son mucho más detallados. Una herramienta imprescindible para mi día a día."
+      },
+      {
+        "name": "Laura S.",
+        "role": "Logopeda infantil, 12 años de experiencia",
+        "text": "Trabajo con niños de 2 a 8 años y Transcriu me ha facilitado mucho la documentación. Ahora me centro 100% en el niño durante la sesión y después reviso la transcripción en 10 minutos. Los padres valoran mucho la calidad de los informes."
+      },
+      {
+        "name": "Carlos M.",
+        "role": "Centro multidisciplinar, Eixample",
+        "text": "En nuestro centro tenemos logopedas, psicólogos y terapeutas ocupacionales. Transcriu facilita mucho la coordinación entre profesionales. La documentación ha mejorado significativamente y las familias lo notan."
+      }
+    ]
+  }
+}

@@ -1,0 +1,682 @@
+{
+  "hero": {
+    "title": "Transcribe speech therapy sessions in seconds",
+    "description": "Use a platform designed for high accuracy. Trusted by professionals of all sizes to manage millions of words every month.",
+    "preparing": "Preparing...",
+    "goToDashboard": "Go to dashboard",
+    "signInWithEmail": "Sign in with email",
+    "trustSignals": {
+      "professionals": "Trusted professionals",
+      "accuracy": "Average accuracy",
+      "timeSaved": "Saved per week"
+    }
+  },
+  "transcriptionExample": {
+    "dropzone": "Drag your audio file here",
+    "processing": "Processing audio...",
+    "filename": "Session Pau.mp3",
+    "duration": "Duration",
+    "words": "Words",
+    "accuracy": "Accuracy",
+    "footer": "Automatic transcription with speaker identification",
+    "speaker1": "Therapist",
+    "speaker2": "Patient",
+    "lines": [
+      {
+        "speaker": "Therapist",
+        "text": "Good morning Maria! Today we'll work on the 'R' sounds. First, we'll do some breathing exercises to prepare the tongue and lips."
+      },
+      {
+        "speaker": "Patient",
+        "text": "Okay! I've been practicing at home like you told me. I think I'm improving a bit."
+      },
+      {
+        "speaker": "Therapist",
+        "text": "Perfect! That's very important. Now let's try saying these words: 'red', 'rabbit', 'road'. Remember to place your tongue in the position we've practiced."
+      },
+      {
+        "speaker": "Patient",
+        "text": "Red... rabbit... road. How did I do?"
+      },
+      {
+        "speaker": "Therapist",
+        "text": "Very good! You've improved a lot. Now let's try longer sentences. Repeat after me: 'The rabbit runs down the road'."
+      }
+    ]
+  },
+  "howItWorks": {
+    "title": "Transcribe sessions in 3 simple steps",
+    "description": "Fast and efficient process to convert your audio sessions into professional transcriptions ready to share",
+    "startNow": "Start now →",
+    "step1": {
+      "number": "01",
+      "title": "Upload audio",
+      "description": "Upload your speech therapy session audio files from any device quickly and securely.",
+      "dropzone": "Drag your audio file here",
+      "processing": "Processing audio..."
+    },
+    "step2": {
+      "number": "02",
+      "title": "Transcribe automatically",
+      "description": "Our specialized AI converts audio to text with high accuracy.",
+      "transcribing": "Transcribing audio...",
+      "duration": "Duration",
+      "accuracy": "Accuracy"
+    },
+    "step3": {
+      "number": "03",
+      "title": "Export and share",
+      "description": "Download the transcription in multiple formats or share it directly with your colleagues.",
+      "exportButton": "Export transcription",
+      "exportPDF": "Export as PDF",
+      "exportDOCX": "Export as DOCX",
+      "sendGmail": "Send via Gmail",
+      "saveDrive": "Save to Drive",
+      "clickAny": "Click any option to export"
+    }
+  },
+  "features": {
+    "title": "Advanced features for education",
+    "description": "Discover a variety of advanced features. Unlimited and free for individuals.",
+    "library": {
+      "title": "Transcription library",
+      "description": "Organize and manage all your transcriptions in one place. Search, filter and quickly access the content you need for your classes.",
+      "label": "Library",
+      "count": "transcriptions"
+    },
+    "students": {
+      "title": "Student management",
+      "description": "Create student profiles, assign personalized transcriptions and efficiently track their academic progress.",
+      "activeStudents": "Active students",
+      "count": "students"
+    },
+    "groups": {
+      "title": "Group organization",
+      "description": "Create work groups, assign collaborative projects and facilitate communication between group members.",
+      "activeGroups": "Active groups",
+      "count": "groups",
+      "members": "members"
+    },
+    "annotations": {
+      "title": "Smart annotations",
+      "description": "Add notes, comments and timestamps to transcriptions. Create personalized study material and highlight key points.",
+      "recentAnnotations": "Recent annotations",
+      "count": "notes",
+      "importantConcept": "Important concept",
+      "examQuestion": "Exam question",
+      "pendingTask": "Pending task"
+    }
+  },
+  "navbar": {
+    "features": "Features",
+    "seeAllFeatures": "See all features",
+    "seeAll": "See all",
+    "menu": "Menu",
+    "blog": "Blog",
+    "pricing": "Pricing",
+    "contact": "Contact",
+    "goToDashboard": "Go to dashboard",
+    "signIn": "Sign in",
+    "preparing": "Preparing...",
+    "openTranscriu": "Open Transcriu",
+    "start": "Get started"
+  },
+  "pricing": {
+    "title": "Plans for every need",
+    "subtitle": "Start free and scale according to your professional needs",
+    "mostPopular": "Most Popular",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "month": "month",
+    "year": "year",
+    "userMonth": "user/month",
+    "users": "users",
+    "numberOfUsers": "Number of users",
+    "billedYearly": "Billed yearly",
+    "loading": "Loading...",
+    "startFree": "Start free",
+    "subscribe": "Subscribe"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Everything you need to know about Transcriu",
+    "questions": [
+      {
+        "question": "How does automatic transcription work for speech therapy sessions?",
+        "answer": "Transcriu uses advanced artificial intelligence to convert audio from your speech therapy sessions into text. The system automatically identifies different speakers (therapist and patient) and transcribes with high accuracy technical terms from speech therapy, phonology and language therapy."
+      },
+      {
+        "question": "What accuracy does the transcription achieve?",
+        "answer": "Our AI achieves accuracy above 95% in speech therapy sessions. The system recognizes specific technical vocabulary from speech therapy, dialectal variants and adapts the transcription to the clinical context."
+      },
+      {
+        "question": "Is it safe to upload sessions with patient data?",
+        "answer": "Yes, we comply with GDPR. All data is encrypted during transmission and storage. Transcriptions are processed on secure servers in Europe and you can delete any data at any time. We never share or use your data to train models."
+      },
+      {
+        "question": "Can I share transcriptions with my team or other professionals?",
+        "answer": "Yes, Transcriu allows real-time collaboration. You can share transcriptions with other speech therapists, psychologists, teachers or professionals on your team. Each member can add annotations, comments and collaboratively edit while maintaining a change history."
+      },
+      {
+        "question": "What audio formats are supported?",
+        "answer": "We accept all common audio formats: MP3, WAV, M4A, OGG, FLAC and more. You can upload audio from your computer, mobile, tablet or directly from digital recorders. There is no duration limit for audio files."
+      },
+      {
+        "question": "How can I export transcriptions?",
+        "answer": "You can export transcriptions in multiple formats: PDF (for printing or archiving), DOCX (for editing in Word), TXT (plain text) or share directly via email. You can also integrate with Google Drive, Dropbox and other productivity tools."
+      },
+      {
+        "question": "Does Transcriu work offline or need internet connection?",
+        "answer": "You need an internet connection to upload and process audio. Once transcribed, you can access transcriptions offline from the application. We are working on a version with offline capabilities for areas with limited connectivity."
+      },
+      {
+        "question": "What is the processing time for a session?",
+        "answer": "Transcription time is approximately 20-30% of the audio duration. For example, a 60-minute session is transcribed in about 12-18 minutes. Shorter sessions are processed even faster, often in less than 5 minutes."
+      },
+      {
+        "question": "Are there discounts for educational centers or clinics?",
+        "answer": "Yes, we offer special plans for teams, educational centers, clinics and organizations. Group plans include volume discounts, centralized user management, single billing and dedicated support. Contact us for a custom quote."
+      },
+      {
+        "question": "Can I cancel my subscription at any time?",
+        "answer": "Yes, you can cancel your subscription at any time from your account settings. There is no commitment or penalties. If you cancel, you will keep access until the end of the current billing period and can download all your transcriptions."
+      }
+    ]
+  },
+  "footer": {
+    "products": {
+      "title": "Products",
+      "transcription": "Automatic transcription",
+      "editor": "Annotation editor",
+      "library": "Session library",
+      "teams": "Team management",
+      "dashboard": "Dashboard"
+    },
+    "resources": {
+      "title": "Resources",
+      "help": "Help center",
+      "tutorials": "Tutorials",
+      "apiDocs": "API Documentation",
+      "blog": "Blog"
+    },
+    "learn": {
+      "title": "Learn",
+      "gettingStarted": "Getting started",
+      "bestPractices": "Best practices",
+      "speechTherapy": "Digital speech therapy",
+      "webinars": "Webinars"
+    },
+    "company": {
+      "title": "Company",
+      "about": "About us",
+      "pricing": "Pricing",
+      "contact": "Contact",
+      "careers": "Careers"
+    },
+    "legal": {
+      "title": "Legal",
+      "terms": "Terms of service",
+      "privacy": "Privacy policy"
+    },
+    "copyright": "© 2025 Transcriu — All rights reserved",
+    "rating": "Rated by speech therapy professionals"
+  },
+  "dashboard": {
+    "common": {
+      "loading": "Loading...",
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "edit": "Edit",
+      "close": "Close",
+      "confirm": "Confirm",
+      "back": "Back",
+      "next": "Next",
+      "previous": "Previous",
+      "search": "Search",
+      "filter": "Filter",
+      "export": "Export",
+      "import": "Import",
+      "download": "Download",
+      "upload": "Upload",
+      "retry": "Retry",
+      "ok": "OK",
+      "yes": "Yes",
+      "no": "No",
+      "none": "None",
+      "all": "All",
+      "notAssigned": "Not assigned",
+      "unknown": "Unknown",
+      "error": "Error",
+      "success": "Success"
+    },
+    "sidebar": {
+      "home": "Home",
+      "transcribe": "Transcribe",
+      "library": "Library",
+      "blog": "Blog",
+      "students": "Students",
+      "tutorials": "Tutorials",
+      "team": "Team",
+      "settings": "Settings",
+      "help": "Help",
+      "signOut": "Sign out",
+      "upgradePlan": "Upgrade your plan",
+      "tokenError": "Could not load tokens"
+    },
+    "plans": {
+      "group": "Team",
+      "individual": "Individual",
+      "free": "Free",
+      "pro": "Professional"
+    },
+    "navbar": {
+      "loading": "Loading...",
+      "upgradePlan": "Upgrade plan",
+      "members": "members",
+      "organization": "Organization",
+      "viewTeam": "View team",
+      "inviteMembers": "Invite members",
+      "manageBilling": "Manage billing",
+      "restrictedAccess": "Restricted access",
+      "restrictedAccessDesc": "This feature is only available for administrators and organization owners."
+    },
+    "home": {
+      "title": "What will you do today?",
+      "subtitle": "Choose one of our tools to start your project",
+      "transcription": "Transcription",
+      "transcriptionDesc": "Convert your audio to text with AI",
+      "students": "Students",
+      "studentsDesc": "Edit your student profiles",
+      "library": "Library",
+      "libraryDesc": "Manage all your audios and transcriptions"
+    },
+    "library": {
+      "title": "Library",
+      "filesCount": "{count} file",
+      "filesCountPlural": "{count} files",
+      "emptyTitle": "Empty library",
+      "emptyDesc": "Upload your first audio file to start transcribing.",
+      "uploadAudio": "Upload audio",
+      "viewAll": "All",
+      "viewByDay": "By day",
+      "unknownDate": "Unknown date",
+      "loadingLibrary": "Loading library...",
+      "errorLoading": "Error loading",
+      "table": {
+        "name": "Name",
+        "status": "Status",
+        "student": "Student",
+        "date": "Date"
+      },
+      "status": {
+        "completed": "Transcribed",
+        "processing": "Processing",
+        "failed": "Failed",
+        "uploaded": "Uploaded",
+        "pending": "Pending"
+      },
+      "actions": {
+        "transcribe": "Transcribe",
+        "exportPdf": "Export PDF",
+        "exportWord": "Export Word",
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "editPanel": {
+        "title": "Edit file",
+        "subtitle": "Customize name and assign student",
+        "info": "Information",
+        "originalName": "Original name",
+        "date": "Date",
+        "status": "Status",
+        "customName": "Custom name",
+        "customNamePlaceholder": "Enter a new name...",
+        "assignStudent": "Assign student",
+        "selectStudent": "Select student",
+        "onlyTranscribed": "Only available for transcribed files",
+        "saveChanges": "Save changes"
+      }
+    },
+    "profiles": {
+      "title": "Students",
+      "subtitle": "Manage your student profiles",
+      "newStudent": "New student",
+      "addStudent": "Add student",
+      "createStudent": "Create student",
+      "creatingStudent": "Creating student...",
+      "emptyTitle": "No students yet",
+      "emptyDesc": "Create your first student profile to organize transcriptions.",
+      "noTranscriptions": "No transcriptions",
+      "transcriptionCount": "{count} transcription",
+      "transcriptionCountPlural": "{count} transcriptions",
+      "years": "years",
+      "created": "Created",
+      "form": {
+        "title": "New student",
+        "subtitle": "Add a profile to organize",
+        "name": "Name",
+        "namePlaceholder": "Student's full name",
+        "age": "Age",
+        "ageOptional": "(optional)",
+        "agePlaceholder": "Age in years",
+        "helperText": "You can assign transcriptions to this student after creating them."
+      },
+      "validation": {
+        "nameRequired": "Name is required",
+        "nameMinLength": "Minimum 2 characters",
+        "ageRange": "Between 0 and 25 years"
+      }
+    },
+    "upload": {
+      "dropHere": "Drop your audio here",
+      "uploadAudio": "Upload an audio file",
+      "dragDropHint": "Drag and drop or click to select",
+      "formatHint": "MP3, WAV, M4A, OGG, WebM, FLAC, AAC, WMA, AIFF (max. 100 MB)",
+      "compressing": "Compressing...",
+      "uploading": "Uploading...",
+      "uploadComplete": "Upload Complete!",
+      "uploadFailed": "Upload failed",
+      "uploadError": "Upload error",
+      "uploadedFiles": "Uploaded files",
+      "compressionError": "Error compressing audio",
+      "uploadingAudio": "Uploading audio...",
+      "invalidFileType": "File type must be one of: {extensions}",
+      "fileTooLarge": "File is too large. Maximum size is {size} MB"
+    },
+    "transcription": {
+      "untitled": "Untitled",
+      "titlePlaceholder": "Transcription name...",
+      "unsavedChanges": "Unsaved changes",
+      "export": {
+        "title": "Export",
+        "pdf": "PDF",
+        "word": "Word",
+        "copy": "Copy",
+        "copied": "Copied",
+        "mail": "Mail",
+        "drive": "Google Drive",
+        "exporting": "Exporting..."
+      },
+      "speakers": {
+        "title": "Speakers",
+        "noSpeakers": "No speakers"
+      },
+      "student": {
+        "title": "Student",
+        "notAssigned": "Not assigned",
+        "loadError": "Could not load students",
+        "assignError": "Could not assign student"
+      },
+      "errors": {
+        "googleServices": "Could not load Google Identity Services",
+        "missingClientId": "Missing NEXT_PUBLIC_GOOGLE_CLIENT_ID in configuration.",
+        "noAccessToken": "No access token obtained",
+        "createDocError": "Error creating document",
+        "writeDocError": "Error writing to document",
+        "googleDocError": "Could not create Google Doc"
+      },
+      "compression": {
+        "starting": "Compressing audio to optimize upload...",
+        "processing": "Processing audio...",
+        "encoding": "Compressing...",
+        "finalizing": "Finalizing compression..."
+      },
+      "saving": "Saving...",
+      "save": "Save",
+      "segments": {
+        "noSegments": "No transcription segments available",
+        "noPerson": "No person",
+        "combineWithPrevious": "Combine with previous",
+        "addSegment": "Add segment",
+        "delete": "Delete",
+        "placeholder": "Write the text...",
+        "emptySegment": "Empty segment"
+      },
+      "errorState": {
+        "title": "Transcription Error",
+        "description": "There was an error processing your audio file. Please try uploading it again.",
+        "refreshPage": "Refresh Page"
+      }
+    },
+    "team": {
+      "title": "Team",
+      "noOrganization": "No organization",
+      "noOrganizationDesc": "You don't belong to any organization currently.",
+      "setupOrganization": "Set up organization",
+      "authRequired": "Access required",
+      "authRequiredDesc": "You must sign in to view this page.",
+      "loadingTeam": "Loading team...",
+      "membersCount": "{count} / {max} members",
+      "teamMembers": "Team members",
+      "invite": "Invite",
+      "inviteMember": "Invite member",
+      "inviteFirstMember": "Invite first member",
+      "noMembers": "No members yet",
+      "noMembersDesc": "Invite your teammates to start collaborating together.",
+      "error": "Error",
+      "retry": "Try again",
+      "user": "User",
+      "removeFromTeam": "Remove from team",
+      "viewPlans": "View plans",
+      "ok": "OK",
+      "headerSubtitle": "Manage your team and member permissions",
+      "activeMembers": "Active members",
+      "maxCapacity": "Max capacity",
+      "administrators": "Administrators",
+      "table": {
+        "name": "Name",
+        "role": "Role",
+        "joinedDate": "Joined date"
+      },
+      "roles": {
+        "owner": "Owner",
+        "admin": "Administrator",
+        "member": "Member"
+      },
+      "capacityReached": {
+        "title": "Limit reached",
+        "desc": "You have reached the group member limit",
+        "ok": "OK"
+      },
+      "removeDialog": {
+        "title": "Remove member",
+        "desc": "Are you sure you want to remove {name} from the team? They will be moved to their own free organization and will lose access to this team's resources.",
+        "cancel": "Cancel",
+        "confirm": "Remove member",
+        "removing": "Removing..."
+      },
+      "upgradeDialog": {
+        "title": "Upgrade your plan",
+        "desc": "Need more members? Upgrade your plan to add more users.",
+        "currentPlan": "Current plan:",
+        "currentMembers": "Current members:",
+        "membersLabel": "{count} members",
+        "availablePlans": "Available plans:",
+        "teamPlan": "Team",
+        "organizationPlan": "Organization",
+        "usersRange": "{min}-{max} users",
+        "pricePerUser": "€{price}/user/month",
+        "addMoreMembers": "Add more members",
+        "close": "Close"
+      },
+      "wantMoreMembers": "Want more members? Upgrade your plan"
+    },
+    "settings": {
+      "title": "Settings",
+      "subtitle": "Manage your personal and organization settings",
+      "loading": "Loading settings...",
+      "cancel": "Cancel",
+      "saved": "Saved",
+      "tabs": {
+        "user": "User",
+        "team": "Team",
+        "preferences": "Preferences"
+      },
+      "user": {
+        "title": "User profile",
+        "profilePhoto": "Profile photo",
+        "photoManaged": "Profile photo is managed automatically",
+        "fullName": "Full name",
+        "fullNamePlaceholder": "Your full name",
+        "email": "Email",
+        "saveChanges": "Save changes",
+        "updating": "Updating...",
+        "notifications": "Notifications",
+        "emailNotifications": "Email notifications",
+        "emailNotificationsDesc": "Receive notifications about completed transcriptions",
+        "teamNotifications": "Team notifications",
+        "teamNotificationsDesc": "Receive notifications about team activity",
+        "enable": "Enable"
+      },
+      "teamSettings": {
+        "title": "Organization information",
+        "adminBadge": "Admin",
+        "orgLogo": "Organization logo",
+        "changeImage": "Change image",
+        "uploading": "Uploading...",
+        "imageHint": "JPEG, PNG, WebP or GIF. Maximum 5MB.",
+        "orgName": "Organization name",
+        "description": "Description",
+        "descriptionPlaceholder": "Organization description (optional)",
+        "memberManagement": "Member management",
+        "activeMembers": "Active members",
+        "manageMembersDesc": "Manage your team members",
+        "viewTeam": "View team",
+        "inviteMembers": "Invite members",
+        "inviteMembersDesc": "Send invitations to new members",
+        "invite": "Invite"
+      },
+      "preferences": {
+        "title": "Transcription preferences",
+        "appLanguage": "App language",
+        "defaultLanguage": "Default language",
+        "languages": {
+          "catalan": "Catalan",
+          "spanish": "Spanish",
+          "english": "English",
+          "french": "French"
+        },
+        "autoDetect": "Automatic language detection",
+        "autoDetectDesc": "Automatically detect the audio language",
+        "speakerIdentification": "Speaker identification",
+        "speakerIdentificationDesc": "Identify different people in the audio",
+        "appearance": "Appearance",
+        "themes": {
+          "light": "Light",
+          "dark": "Dark",
+          "system": "System"
+        },
+        "privacy": "Privacy and security",
+        "autoDelete": "Automatic deletion",
+        "autoDeleteDesc": "Delete transcriptions after 30 days",
+        "exportData": "Export data",
+        "exportDataDesc": "Download all your data",
+        "configure": "Configure",
+        "exportBtn": "Export"
+      }
+    },
+    "invite": {
+      "title": "Invite members",
+      "sendByEmail": "Send invitation by email",
+      "emailLabel": "Email",
+      "emailPlaceholder": "user@example.com",
+      "sendInvite": "Send invitation",
+      "sending": "Sending...",
+      "successMessage": "Invitation sent successfully",
+      "helperText": "An email will be sent with a secure, personalized invitation link valid for 7 days",
+      "linkRetrieved": "Existing invitation link retrieved",
+      "linkGenerated": "New invitation link generated",
+      "linkCopied": "Link copied to clipboard",
+      "linkError": "Error getting invitation link. Please try again.",
+      "copyError": "Error copying link",
+      "shareWhatsApp": "I'm inviting you to join our team! Use this link:",
+      "shareEmailSubject": "Team invitation",
+      "shareEmailBody": "Hi,\\n\\nI'm inviting you to join our team. Click the following link to accept the invitation:\\n\\n{url}\\n\\nBest regards",
+      "shareTwitter": "Join our team!",
+      "shareNativeTitle": "Team invitation",
+      "shareNativeText": "I'm inviting you to join our team!"
+    },
+    "welcome": {
+      "title": "Welcome to {organizationName}!",
+      "descriptionWithName": "Hi {userName}! You have successfully joined the organization {organizationName}.",
+      "descriptionWithoutName": "You have successfully joined the organization {organizationName}.",
+      "statusMessage": "You are now part of the team",
+      "benefits": {
+        "fullAccess": "Full access to all organization features",
+        "collaboration": "Collaboration with team members",
+        "startTranscribing": "Start transcribing and managing your audios"
+      },
+      "continueButton": "Perfect, let's go!"
+    },
+    "organization": {
+      "checkingAccess": "Checking access...",
+      "brandName": "Transcriu",
+      "heroTitle": "Set up your organization to get started.",
+      "heroDescription": "Create a workspace for your team and start transcribing speech therapy sessions with AI.",
+      "heroFooter": "One more step to optimize your speech therapy sessions.",
+      "groupSetupLabel": "Group Plan Setup",
+      "lastStepLabel": "Last step!",
+      "groupSetupTitle": "Set up your organization",
+      "regularTitle": "Organization name",
+      "groupSetupDesc": "Finalize the setup of your organization with the group plan.",
+      "regularDesc": "Name your organization to start collaborating with your team.",
+      "groupPlanActivated": "Group Plan Activated",
+      "orgNameLabel": "Organization name",
+      "orgNamePlaceholder": "E.g.: My Clinic, Therapy Center...",
+      "validName": "Valid name",
+      "errorTitle": "Error",
+      "configuring": "Configuring...",
+      "continueButton": "Continue to Dashboard",
+      "footerHint": "You can invite team members from the dashboard.",
+      "validation": {
+        "required": "Organization name is required",
+        "minLength": "Name must be at least 2 characters",
+        "maxLength": "Name cannot exceed 50 characters",
+        "invalidChars": "Name cannot contain special characters like < > : \" / \\ | ? *"
+      },
+      "errors": {
+        "setupError": "Error setting up organization",
+        "unexpectedError": "Unexpected error"
+      }
+    }
+  },
+  "testimonials": {
+    "title": "What professionals say",
+    "subtitle": "Over 500 speech therapists trust Transcriu to optimize their clinical documentation",
+    "trustBadge": "⭐⭐⭐⭐⭐ Average rating of 4.9/5 based on over 200 reviews",
+    "items": [
+      {
+        "name": "Maria G.",
+        "role": "Pediatric speech therapist, Barcelona",
+        "text": "Transcriu has changed my professional life. I used to spend 2 hours a day writing reports, now just 20 minutes reviewing transcriptions. I can see more patients and have more time to prepare therapeutic materials."
+      },
+      {
+        "name": "George P.",
+        "role": "Speech therapy center, Gracia",
+        "text": "Our center has 5 speech therapists and they all use Transcriu. The quality of the transcriptions is excellent and technical support always responds quickly. Totally recommended."
+      },
+      {
+        "name": "Anna M.",
+        "role": "Speech therapist specialized in ASD, Sarrià",
+        "text": "I work with children with ASD and sessions are very dynamic. Transcriu captures everything that happens and I can focus 100% on the child without worrying about taking notes. Reports for families are much more complete now."
+      },
+      {
+        "name": "David R.",
+        "role": "Speech therapist in special education school",
+        "text": "I use Transcriu to document sessions with adolescents. Automatic transcription saves me hours of work and reports are much more detailed. An essential tool for my day to day."
+      },
+      {
+        "name": "Laura S.",
+        "role": "Pediatric speech therapist, 12 years experience",
+        "text": "I work with children aged 2 to 8 and Transcriu has made documentation much easier. Now I focus 100% on the child during the session and then review the transcription in 10 minutes. Parents really value the quality of the reports."
+      },
+      {
+        "name": "Charles M.",
+        "role": "Multidisciplinary center, Eixample",
+        "text": "Our center has speech therapists, psychologists and occupational therapists. Transcriu greatly facilitates coordination between professionals. Documentation has improved significantly and families notice it."
+      }
+    ]
+  }
+}

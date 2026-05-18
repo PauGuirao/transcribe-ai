@@ -1,0 +1,59 @@
+name = "transcribe-worker"
+main = "src/index.ts"
+compatibility_date = "2024-09-01"
+
+# Bind environment variables at deploy time via `wrangler secret put` or Cloudflare dashboard
+[vars]
+SUPABASE_URL = "https://qtjbjxtujdjvauzwzfkw.supabase.co"
+
+# Workers AI binding for Whisper models
+[ai]
+binding = "AI"
+
+# R2 Storage bindings
+[[r2_buckets]]
+binding = "AUDIO_FILES"
+bucket_name = "transcribe-audio-files"
+preview_bucket_name = "transcribe-audio-files-dev"
+
+[[r2_buckets]]
+binding = "TRANSCRIPTIONS"
+bucket_name = "transcribe-transcriptions"
+preview_bucket_name = "transcribe-transcriptions-dev"
+
+[[r2_buckets]]
+binding = "ORGANIZATION_IMAGES"
+bucket_name = "transcribe-org-images"
+preview_bucket_name = "transcribe-org-images-dev"
+
+# Queue bindings
+[[queues.producers]]
+queue = "transcribe-jobs"
+binding = "TRANSCRIBE_JOBS"
+
+[[queues.consumers]]
+queue = "transcribe-jobs"
+
+# KV Namespace for caching
+[[kv_namespaces]]
+binding = "CACHE"
+id = "transcribe-cache"
+preview_id = "transcribe-cache-dev"
+
+# Durable Objects for real-time status
+[durable_objects]
+bindings = [
+  { name = "TRANSCRIPTION_STATUS", class_name = "TranscriptionStatus" }
+]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["TranscriptionStatus"]
+
+# Observability configuration
+[observability]
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
+persist = true

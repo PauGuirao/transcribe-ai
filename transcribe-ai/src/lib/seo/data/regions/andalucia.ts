@@ -1,0 +1,250 @@
+// Andalucía region data
+import { CityData } from '../../types';
+
+export const andaluciaCities: Record<string, CityData> = {
+  sevilla: {
+    slug: 'sevilla',
+    tier: 1,
+    localInfo: {
+      city: 'Sevilla',
+      province: 'Sevilla',
+      region: 'Sevilla',
+      autonomousCommunity: 'Andalucía',
+      population: 684234,
+      coordinates: { lat: 37.3891, lng: -5.9845 },
+      speechTherapists: 420,
+      hospitals: [
+        'Hospital Universitario Virgen del Rocío',
+        'Hospital Universitario Virgen Macarena',
+        'Hospital Universitario Virgen de Valme',
+      ],
+      neighborhoods: [
+        'Centro', 'Triana', 'Nervión', 'Los Remedios', 'Macarena',
+        'Santa Cruz', 'San Pablo', 'Bellavista',
+      ],
+    },
+    specialties: ['dislexia', 'afasia', 'tartamudez', 'autismo', 'disfagia'],
+    relatedCities: ['malaga', 'cordoba', 'dos-hermanas', 'alcala-guadaira'],
+    content: {
+      es: {
+        title: 'Transcripción para Logopedas en Sevilla',
+        metaDescription: 'Transcribe sesiones de logopedia en Sevilla con IA. Más de 420 logopedas colegiados. 98% precisión. Prueba gratuita.',
+        heroTitle: 'Transcripción para Logopedas en Sevilla',
+        heroDescription: 'Sevilla cuenta con más de 420 logopedas colegiados en el Colegio de Logopedas de Andalucía. Transcribe tus sesiones con precisión profesional.',
+        keywords: ['logopeda sevilla', 'transcripción logopedia sevilla', 'logopedia sevilla'],
+      },
+      en: {
+        title: 'Transcription for Speech Therapists in Seville',
+        metaDescription: 'Transcribe speech therapy sessions in Seville with AI. Over 420 registered speech therapists. 98% accuracy. Free trial.',
+        heroTitle: 'Transcription for Speech Therapists in Seville',
+        heroDescription: 'Seville has over 420 registered speech therapists. Transcribe your sessions with professional accuracy.',
+        keywords: ['speech therapist seville', 'speech therapy sevilla', 'logopeda sevilla'],
+      },
+    },
+  },
+
+  malaga: {
+    slug: 'malaga',
+    tier: 1,
+    localInfo: {
+      city: 'Málaga',
+      province: 'Málaga',
+      region: 'Málaga',
+      autonomousCommunity: 'Andalucía',
+      population: 578460,
+      coordinates: { lat: 36.7213, lng: -4.4214 },
+      speechTherapists: 380,
+      hospitals: [
+        'Hospital Regional Universitario de Málaga',
+        'Hospital Clínico Universitario Virgen de la Victoria',
+      ],
+      neighborhoods: [
+        'Centro', 'Malagueta', 'El Palo', 'Teatinos', 'Carretera de Cádiz',
+        'Huelin', 'Cruz de Humilladero', 'Puerto de la Torre',
+      ],
+    },
+    specialties: ['dislexia', 'afasia', 'autismo', 'disfagia'],
+    relatedCities: ['sevilla', 'marbella', 'torremolinos', 'benalmadena'],
+    content: {
+      es: {
+        title: 'Transcripción para Logopedas en Málaga',
+        metaDescription: 'Transcribe sesiones de logopedia en Málaga con IA. 98% precisión. Ahorra 5h/semana en documentación. Prueba gratuita.',
+        heroTitle: 'Transcripción para Logopedas en Málaga',
+        heroDescription: 'Málaga es uno de los principales centros de logopedia de Andalucía. Transcribe tus sesiones con tecnología IA y ahorra tiempo.',
+        keywords: ['logopeda malaga', 'transcripción logopedia malaga', 'logopedia malaga'],
+      },
+      en: {
+        title: 'Transcription for Speech Therapists in Malaga',
+        metaDescription: 'Transcribe speech therapy sessions in Malaga with AI. 98% accuracy. Save 5h/week. Free trial.',
+        heroTitle: 'Transcription for Speech Therapists in Malaga',
+        heroDescription: 'Malaga is one of the main speech therapy centers in Andalusia. Transcribe your sessions with AI technology.',
+        keywords: ['speech therapist malaga', 'speech therapy malaga', 'logopeda malaga'],
+      },
+    },
+  },
+
+  cordoba: {
+    slug: 'cordoba',
+    tier: 1,
+    localInfo: {
+      city: 'Córdoba',
+      province: 'Córdoba',
+      region: 'Córdoba',
+      autonomousCommunity: 'Andalucía',
+      population: 322767,
+      coordinates: { lat: 37.8882, lng: -4.7794 },
+      speechTherapists: 185,
+      hospitals: ['Hospital Universitario Reina Sofía'],
+      neighborhoods: ['Centro', 'Levante', 'Poniente', 'Norte', 'Sur'],
+    },
+    specialties: ['dislexia', 'afasia', 'autismo'],
+    relatedCities: ['sevilla', 'jaen', 'lucena'],
+    content: {},
+  },
+
+  granada: {
+    slug: 'granada',
+    tier: 1,
+    localInfo: {
+      city: 'Granada',
+      province: 'Granada',
+      region: 'Granada',
+      autonomousCommunity: 'Andalucía',
+      population: 231775,
+      coordinates: { lat: 37.1773, lng: -3.5986 },
+      speechTherapists: 165,
+      hospitals: [
+        'Hospital Universitario Virgen de las Nieves',
+        'Hospital Universitario San Cecilio',
+      ],
+      neighborhoods: ['Centro', 'Albaicín', 'Realejo', 'Zaidín', 'Chana'],
+    },
+    specialties: ['dislexia', 'afasia', 'autismo', 'tartamudez'],
+    relatedCities: ['malaga', 'jaen', 'motril'],
+    content: {},
+  },
+
+  jerez: {
+    slug: 'jerez-de-la-frontera',
+    tier: 2,
+    localInfo: {
+      city: 'Jerez de la Frontera',
+      province: 'Cádiz',
+      region: 'Cádiz',
+      autonomousCommunity: 'Andalucía',
+      population: 212879,
+      coordinates: { lat: 36.6850, lng: -6.1261 },
+      speechTherapists: 95,
+      hospitals: ['Hospital Universitario de Jerez'],
+      neighborhoods: ['Centro', 'San Telmo', 'La Plata', 'Estancia'],
+    },
+    specialties: ['dislexia', 'autismo'],
+    relatedCities: ['cadiz', 'sevilla', 'el-puerto'],
+    content: {},
+  },
+
+  almeria: {
+    slug: 'almeria',
+    tier: 2,
+    localInfo: {
+      city: 'Almería',
+      province: 'Almería',
+      region: 'Almería',
+      autonomousCommunity: 'Andalucía',
+      population: 200753,
+      coordinates: { lat: 36.8340, lng: -2.4637 },
+      speechTherapists: 88,
+      hospitals: ['Hospital Universitario Torrecárdenas'],
+      neighborhoods: ['Centro', 'Oliveros', 'Nueva Almería', 'La Chanca'],
+    },
+    specialties: ['dislexia', 'autismo'],
+    relatedCities: ['granada', 'roquetas'],
+    content: {},
+  },
+
+  marbella: {
+    slug: 'marbella',
+    tier: 2,
+    localInfo: {
+      city: 'Marbella',
+      province: 'Málaga',
+      region: 'Costa del Sol',
+      autonomousCommunity: 'Andalucía',
+      population: 147633,
+      coordinates: { lat: 36.5099, lng: -4.8865 },
+      speechTherapists: 65,
+      hospitals: ['Hospital Costa del Sol'],
+      neighborhoods: ['Centro', 'Puerto Banús', 'San Pedro Alcántara', 'Nueva Andalucía'],
+    },
+    specialties: ['dislexia', 'autismo'],
+    relatedCities: ['malaga', 'fuengirola', 'estepona'],
+    content: {
+      en: {
+        title: 'Transcription for Speech Therapists in Marbella',
+        metaDescription: 'Transcribe speech therapy sessions in Marbella with AI. Ideal for international speech therapists on the Costa del Sol. Free trial.',
+        heroTitle: 'Transcription for Speech Therapists in Marbella',
+        heroDescription: 'Marbella\'s international community requires multilingual speech therapy services. Transcribe sessions in Spanish, English, and more.',
+        keywords: ['speech therapist marbella', 'speech therapy costa del sol', 'logopeda marbella'],
+      },
+    },
+  },
+
+  huelva: {
+    slug: 'huelva',
+    tier: 2,
+    localInfo: {
+      city: 'Huelva',
+      province: 'Huelva',
+      region: 'Huelva',
+      autonomousCommunity: 'Andalucía',
+      population: 143663,
+      coordinates: { lat: 37.2614, lng: -6.9447 },
+      speechTherapists: 62,
+      hospitals: ['Hospital Juan Ramón Jiménez'],
+      neighborhoods: ['Centro', 'La Orden', 'Isla Chica', 'Huerta Mena'],
+    },
+    specialties: ['dislexia', 'autismo'],
+    relatedCities: ['sevilla', 'ayamonte'],
+    content: {},
+  },
+
+  cadiz: {
+    slug: 'cadiz',
+    tier: 2,
+    localInfo: {
+      city: 'Cádiz',
+      province: 'Cádiz',
+      region: 'Cádiz',
+      autonomousCommunity: 'Andalucía',
+      population: 116027,
+      coordinates: { lat: 36.5271, lng: -6.2886 },
+      speechTherapists: 58,
+      hospitals: ['Hospital Universitario Puerta del Mar'],
+      neighborhoods: ['Centro', 'La Viña', 'Santa María', 'Bahía Blanca'],
+    },
+    specialties: ['dislexia', 'autismo'],
+    relatedCities: ['jerez', 'san-fernando', 'el-puerto'],
+    content: {},
+  },
+
+  jaen: {
+    slug: 'jaen',
+    tier: 2,
+    localInfo: {
+      city: 'Jaén',
+      province: 'Jaén',
+      region: 'Jaén',
+      autonomousCommunity: 'Andalucía',
+      population: 112999,
+      coordinates: { lat: 37.7796, lng: -3.7849 },
+      speechTherapists: 52,
+      hospitals: ['Hospital Universitario de Jaén'],
+      neighborhoods: ['Centro', 'La Gloria', 'Peñamefécit', 'San Felipe'],
+    },
+    specialties: ['dislexia', 'autismo'],
+    relatedCities: ['granada', 'cordoba', 'linares'],
+    content: {},
+  },
+};
+
+export default andaluciaCities;

@@ -1,0 +1,706 @@
+{
+  "transcripcion-automatica": {
+    "title": "Transcripció automàtica amb IA | Transcriu",
+    "metaDescription": "Transcriu automàticament sessions de logopèdia amb intel·ligència artificial. Alta precisió en català, castellà i altres idiomes. Prova gratuïta disponible.",
+    "keywords": ["transcripció automàtica", "transcripció IA", "transcriure àudio", "speech to text català", "transcripció sessions logopèdia"],
+    "heroTitle": "Transcripció automàtica d'alta precisió per a logopedes",
+    "heroDescription": "Converteix les teves sessions d'àudio a text en segons amb la nostra tecnologia d'intel·ligència artificial especialitzada en català. Estalvia hores de transcripció manual.",
+    "icon": "🎯",
+    "h2Sections": [
+      {
+        "title": "Què és la transcripció automàtica amb IA?",
+        "content": "La transcripció automàtica utilitza models avançats d'intel·ligència artificial per convertir l'àudio de les teves sessions de logopèdia en text escrit de forma instantània. El nostre sistema està entrenat específicament per entendre el context mèdic i educatiu de les sessions de teràpia del llenguatge.",
+        "points": [
+          "98% de precisió en català i castellà",
+          "Processament en menys de 5 minuts per hora d'àudio",
+          "Reconeixement de terminologia especialitzada de logopèdia",
+          "Suport per a múltiples accents i dialectes",
+          "Identificació automàtica de logopeda i pacient",
+          "Sense límit de durada dels arxius"
+        ]
+      },
+      {
+        "title": "Com funciona la transcripció automàtica a Transcriu?",
+        "content": "El nostre procés de transcripció està optimitzat per a la màxima qualitat i velocitat. En només 3 passos pots tenir les teves sessions transcrites i llestes per utilitzar.",
+        "points": [
+          "Puja el teu arxiu d'àudio (MP3, WAV, M4A, OGG)",
+          "La nostra IA processa l'àudio i identifica els interlocutors",
+          "Revisa i edita la transcripció amb el nostre editor avançat",
+          "Exporta en el format que necessitis (PDF, DOCX, TXT)"
+        ],
+        "useCases": [
+          "Sessions de logopèdia infantil",
+          "Teràpia de veu i articulació",
+          "Sessions de rehabilitació del llenguatge",
+          "Avaluacions diagnòstiques",
+          "Sessions grupals i familiars",
+          "Seguiment de l'evolució del pacient"
+        ]
+      },
+      {
+        "title": "Avantatges de la transcripció automàtica per a logopedes",
+        "content": "Deixa que la tecnologia faci la feina pesada mentre tu et centres en el que realment importa: l'atenció als teus pacients. La transcripció automàtica t'ofereix beneficis immediats en el teu dia a dia professional.",
+        "points": [
+          "Estalvia fins a 5 hores setmanals en tasques administratives",
+          "Millora la qualitat de la documentació clínica",
+          "Facilita el seguiment i l'anàlisi de l'evolució del pacient",
+          "Comparteix fàcilment amb altres professionals",
+          "Compleix amb la normativa de protecció de dades (RGPD)",
+          "Accés des de qualsevol dispositiu"
+        ]
+      }
+    ],
+    "faqs": [
+      {
+        "question": "Quina precisió té la transcripció automàtica?",
+        "answer": "La nostra tecnologia ofereix una precisió del 98% en català i castellà. La precisió pot variar lleugerament segons la qualitat de l'àudio, els accents i el soroll de fons. Per obtenir els millors resultats, recomanem utilitzar gravacions d'àudio clares."
+      },
+      {
+        "question": "Quant temps triga a transcriure una sessió?",
+        "answer": "El temps de processament és d'aproximadament 5 minuts per cada hora d'àudio. Una sessió típica de 30 minuts es transcriu en menys de 3 minuts."
+      },
+      {
+        "question": "Puc editar la transcripció després?",
+        "answer": "Sí! Oferim un editor avançat que et permet revisar i editar la transcripció de forma fàcil. Pots corregir errors, afegir puntuació, reorganitzar segments i molt més."
+      },
+      {
+        "question": "Quins formats d'àudio són compatibles?",
+        "answer": "Acceptem els formats més comuns: MP3, WAV, M4A, OGG, FLAC i WMA. Si tens un format diferent, contacta'ns i et podem ajudar."
+      },
+      {
+        "question": "Les meves dades estan segures?",
+        "answer": "Absolutament. Complim amb el RGPD i utilitzem encriptació d'extrem a extrem. Els teus àudios i transcripcions són privats i només tu tens accés a ells. Pots eliminar-los en qualsevol moment."
+      },
+      {
+        "question": "Funciona amb altres idiomes a part del català?",
+        "answer": "Sí, també oferim transcripció en castellà, anglès, francès, alemany, italià, portuguès i molts més idiomes. El català i el castellà són els idiomes amb millor precisió."
+      }
+    ],
+    "testimonials": [
+      {
+        "name": "Marta Rovira",
+        "role": "Logopeda pediàtrica",
+        "text": "Abans dedicava hores a transcriure sessions manualment. Ara amb Transcriu puc documentar tot automàticament i dedicar més temps als meus pacients. La precisió és impressionant!"
+      },
+      {
+        "name": "Jordi Puig",
+        "role": "Director de clínica de logopèdia",
+        "text": "Hem implementat Transcriu a tota la clínica i l'eficiència ha millorat molt. El personal està encantat i els informes ara són molt més complets i professionals."
+      },
+      {
+        "name": "Laura Sánchez",
+        "role": "Logopeda escolar",
+        "text": "La funció de diarització automàtica és fantàstica. Identifica perfectament quan parla l'alumne i quan parlo jo. M'estalvia molta feina d'edició posterior."
+      }
+    ],
+    "relatedFeatures": [
+      "diarizacion-interlocutores",
+      "biblioteca-transcripciones",
+      "exportar-transcripciones"
+    ]
+  },
+  "diarizacion-interlocutores": {
+    "title": "Identificació automàtica d'interlocutors | Transcriu",
+    "metaDescription": "Diarització automàtica que identifica qui parla en cada moment de la sessió. Diferencia entre logopeda i pacient automàticament amb IA.",
+    "keywords": ["diarització", "identificació interlocutors", "speaker diarization", "qui parla", "identificar veus"],
+    "heroTitle": "Identifica automàticament qui parla en cada moment",
+    "heroDescription": "La nostra tecnologia de diarització amb IA detecta i separa automàticament les veus de logopeda i pacient, organitzant la transcripció per interlocutor.",
+    "icon": "👥",
+    "h2Sections": [
+      {
+        "title": "Què és la diarització d'interlocutors?",
+        "content": "La diarització és el procés d'identificar i separar les diferents veus en una gravació d'àudio. A Transcriu, utilitzem intel·ligència artificial avançada per detectar automàticament quan canvia l'interlocutor i etiquetar cada segment amb el parlant corresponent.",
+        "points": [
+          "Detecció automàtica de canvis d'interlocutor",
+          "Identificació precisa entre 2 o més parlants",
+          "Etiquetatge intel·ligent (Logopeda, Pacient)",
+          "Personalització dels noms dels interlocutors",
+          "Separació visual clara per parlant",
+          "Funciona fins i tot amb veus similars"
+        ]
+      },
+      {
+        "title": "Per què és important la diarització en logopèdia?",
+        "content": "En les sessions de logopèdia, és crucial documentar les intervencions de cada participant per analitzar l'evolució, patrons de parla i interaccions. La diarització automàtica fa aquesta tasca instantània i precisa.",
+        "points": [
+          "Analitza fàcilment les intervencions del pacient",
+          "Avalua el temps de participació de cadascú",
+          "Identifica patrons de comunicació",
+          "Facilita la revisió d'exercicis específics",
+          "Millora la qualitat dels informes clínics",
+          "Estalvia hores d'edició manual"
+        ],
+        "useCases": [
+          "Sessions individuals de teràpia",
+          "Sessions familiars amb múltiples participants",
+          "Avaluacions diagnòstiques",
+          "Sessions grupals amb diversos pacients",
+          "Supervisió i formació de nous logopedes",
+          "Investigació i anàlisi de casos"
+        ]
+      },
+      {
+        "title": "Com funciona la diarització a Transcriu?",
+        "content": "El nostre sistema analitza les característiques acústiques de cada veu i agrupa els segments segons el parlant. Després, assigna automàticament etiquetes intel·ligents basades en el context de la sessió.",
+        "points": [
+          "Anàlisi de les característiques vocals úniques",
+          "Agrupació automàtica per similitud de veu",
+          "Assignació intel·ligent d'etiquetes (Logopeda/Pacient)",
+          "Opció de revisar i corregir assignacions",
+          "Reetiquetatge ràpid amb un sol clic",
+          "Exportació amb formats per interlocutor"
+        ]
+      }
+    ],
+    "faqs": [
+      {
+        "question": "Quants interlocutors pot identificar el sistema?",
+        "answer": "El nostre sistema pot identificar fins a 10 interlocutors diferents en una mateixa gravació. Per sessions de logopèdia, normalment detecta 2-3 parlants amb alta precisió."
+      },
+      {
+        "question": "Funciona si les veus són similars?",
+        "answer": "Sí, el nostre algoritme està optimitzat per detectar diferències subtils entre veus. Tot i així, per obtenir millors resultats en veus molt similars, recomanem usar micròfons de bona qualitat."
+      },
+      {
+        "question": "Puc canviar els noms dels interlocutors?",
+        "answer": "Sí, pots personalitzar completament els noms dels interlocutors. Per defecte assignem 'Logopeda' i 'Pacient', però pots canviar-los per noms reals o altres etiquetes."
+      },
+      {
+        "question": "Què passa si el sistema s'equivoca en una assignació?",
+        "answer": "Pots corregir fàcilment qualsevol error amb el nostre editor. Selecciona el segment incorrecte i reassigna'l a l'interlocutor correcte amb un sol clic."
+      },
+      {
+        "question": "La diarització funciona en tots els idiomes?",
+        "answer": "Sí, la diarització és independent de l'idioma ja que analitza les característiques de la veu, no el contingut. Funciona igual de bé en català, castellà, anglès i altres idiomes."
+      }
+    ],
+    "testimonials": [
+      {
+        "name": "Anna Ferrer",
+        "role": "Logopeda clínica",
+        "text": "La diarització automàtica és una meravella! Abans havia d'escoltar l'àudio sencer per marcar qui parlava. Ara és tot automàtic i puc revisar directament les intervencions del pacient."
+      },
+      {
+        "name": "Pere Martínez",
+        "role": "Logopeda infantil",
+        "text": "Amb nens petits, les sessions poden ser caòtiques. El sistema identifica perfectament quan parla el nen, jo o fins i tot els pares quan estan presents. M'estalvia moltíssim temps."
+      },
+      {
+        "name": "Carla Gómez",
+        "role": "Supervisora clínica",
+        "text": "Per supervisar sessions de logopedes en formació, la diarització és essencial. Puc analitzar ràpidament la dinàmica de la sessió i donar feedback concret."
+      }
+    ],
+    "relatedFeatures": [
+      "transcripcion-automatica",
+      "anotaciones-inteligentes",
+      "gestion-pacientes"
+    ]
+  },
+  "anotaciones-inteligentes": {
+    "title": "Anotacions intel·ligents en transcripcions | Transcriu",
+    "metaDescription": "Afegeix notes, comentaris i marques temporals a les teves transcripcions. Crea material d'estudi personalitzat i destaca punts clau de les sessions.",
+    "keywords": ["anotacions transcripcions", "notes sessions", "comentaris àudio", "marques temporals", "anàlisi sessions"],
+    "heroTitle": "Afegeix anotacions intel·ligents a les teves transcripcions",
+    "heroDescription": "Millora les teves transcripcions amb notes, comentaris i marques visuals. Organitza la informació i crea materials d'anàlisi professionals.",
+    "icon": "✏️",
+    "h2Sections": [
+      {
+        "title": "Què són les anotacions intel·ligents?",
+        "content": "Les anotacions intel·ligents et permeten enriquir les teves transcripcions amb informació addicional. Pots afegir notes, destacar fragments importants, marcar errors de pronunciació, i crear un registre visual complet de la sessió.",
+        "points": [
+          "Afegeix notes i comentaris en qualsevol punt",
+          "Marca fragments amb cercles, ressaltats i dibuixos lliures",
+          "Etiqueta errors de pronunciació o objectius de teràpia",
+          "Organitza per colors per tipus d'anotació",
+          "Exporta a PDF amb totes les anotacions visibles",
+          "Comparteix versions anotades amb altres professionals"
+        ]
+      },
+      {
+        "title": "Tipus d'anotacions disponibles",
+        "content": "Oferim diverses eines d'anotació per adaptar-nos a les teves necessitats professionals. Cada tipus d'anotació té un propòsit específic per documentar diferents aspectes de la sessió.",
+        "points": [
+          "Cercles/ovals per destacar paraules o frases clau",
+          "Ressaltats per marcar fragments importants",
+          "Dibuixos lliures per marcar patrons o connexions",
+          "Notes de text per afegir comentaris detallats",
+          "Etiquetes de colors per categoritzar informació",
+          "Marques temporals vinculades a l'àudio original"
+        ],
+        "useCases": [
+          "Marcar errors de pronunciació específics",
+          "Destacar objectius assolits durant la sessió",
+          "Anotar observacions sobre el comportament",
+          "Identificar patrons en el discurs del pacient",
+          "Preparar material per informes clínics",
+          "Crear guies d'estudi personalitzades"
+        ]
+      },
+      {
+        "title": "Beneficis de les anotacions per a logopedes",
+        "content": "Les anotacions transformen una transcripció simple en un document clínic complet. Faciliten l'anàlisi, el seguiment i la comunicació amb altres professionals.",
+        "points": [
+          "Millora la qualitat dels informes clínics",
+          "Facilita la revisió ràpida de sessions anteriors",
+          "Ajuda a identificar patrons i evolució",
+          "Optimitza la preparació de sessions futures",
+          "Facilita la col·laboració amb altres professionals",
+          "Crea materials visuals per compartir amb famílies"
+        ]
+      }
+    ],
+    "faqs": [
+      {
+        "question": "Les anotacions s'exporten juntament amb la transcripció?",
+        "answer": "Sí! Quan exportes a PDF, totes les anotacions visuals (cercles, ressaltats, dibuixos) i les notes de text s'inclouen en el document exportat, mantenint la seva posició exacta."
+      },
+      {
+        "question": "Puc utilitzar colors personalitzats per les anotacions?",
+        "answer": "Oferim una paleta de colors predefinida (vermell, blau, verd, groc, taronja) optimitzada per a visualització i impressió. Pots assignar significats específics a cada color segons les teves necessitats."
+      },
+      {
+        "question": "Es poden esborrar o modificar les anotacions?",
+        "answer": "Sí, pots esborrar qualsevol anotació en qualsevol moment. També pots editar el text de les notes i canviar els colors de les marques visuals."
+      },
+      {
+        "question": "Les anotacions es guarden automàticament?",
+        "answer": "Sí, totes les anotacions es guarden automàticament al núvol. No perdràs cap canvi i pots accedir-hi des de qualsevol dispositiu."
+      },
+      {
+        "question": "Puc compartir transcripcions anotades amb altres professionals?",
+        "answer": "Sí, pots exportar la transcripció anotada a PDF i compartir-la per email o altres mitjans. En el pla Grupal, també pots compartir accés directe amb altres membres del teu equip."
+      }
+    ],
+    "testimonials": [
+      {
+        "name": "Núria Bosch",
+        "role": "Logopeda escolar",
+        "text": "Les anotacions m'han canviat la manera de treballar. Puc marcar errors específics, afegir notes per la propera sessió i preparar informes visuals per als pares. És genial!"
+      },
+      {
+        "name": "Marc Olivé",
+        "role": "Logopeda especialitzat en veu",
+        "text": "Utilitzo diferents colors per marcar diferents tipus d'observacions: verd per progressos, vermell per aspectes a millorar, groc per dubtes. M'ajuda molt a l'anàlisi."
+      },
+      {
+        "name": "Sofia Riera",
+        "role": "Coordinadora de logopèdia",
+        "text": "Quan reviso sessions dels logopedes del meu equip, les anotacions em permeten deixar feedback directament sobre la transcripció. Facilita molt la supervisió."
+      }
+    ],
+    "relatedFeatures": [
+      "transcripcion-automatica",
+      "biblioteca-transcripciones",
+      "exportar-transcripciones"
+    ]
+  },
+  "biblioteca-transcripciones": {
+    "title": "Biblioteca de transcripcions organitzada | Transcriu",
+    "metaDescription": "Organitza i gestiona totes les teves sessions de logopèdia en una biblioteca digital. Cerca, filtra i accedeix ràpidament a qualsevol transcripció.",
+    "keywords": ["biblioteca transcripcions", "gestió sessions", "organitzar àudios", "arxiu digital logopèdia", "cerca transcripcions"],
+    "heroTitle": "Totes les teves sessions organitzades en un sol lloc",
+    "heroDescription": "Gestiona fàcilment totes les transcripcions de les teves sessions amb una biblioteca digital potent i intuïtiva. Troba el que necessites en segons.",
+    "icon": "📚",
+    "h2Sections": [
+      {
+        "title": "Què és la biblioteca de transcripcions?",
+        "content": "La biblioteca de transcripcions és el teu arxiu digital centralitzat on pots guardar, organitzar i accedir a totes les sessions de logopèdia. Pensa-hi com el teu arxivador digital, però infinitament més potent i accessible.",
+        "points": [
+          "Emmagatzematge il·limitat de transcripcions",
+          "Organització automàtica per data i pacient",
+          "Cerca instantània per paraules clau",
+          "Filtres avançats per pacient, data, durada",
+          "Vista prèvia ràpida sense obrir l'arxiu",
+          "Accés des de qualsevol dispositiu"
+        ]
+      },
+      {
+        "title": "Funcionalitats de la biblioteca",
+        "content": "Hem dissenyat la biblioteca pensant en les necessitats dels logopedes. Cada funcionalitat està optimitzada per estalviar-te temps i facilitar-te l'accés a la informació.",
+        "points": [
+          "Cerca per text complet dins de les transcripcions",
+          "Etiquetes personalitzades per categoritzar sessions",
+          "Ordenació per data, nom, durada o última modificació",
+          "Previsualització d'àudio integrada",
+          "Descàrrega massiva de múltiples transcripcions",
+          "Compartició selectiva amb col·legues"
+        ],
+        "useCases": [
+          "Revisar l'evolució d'un pacient al llarg del temps",
+          "Trobar sessions específiques sobre un tema concret",
+          "Preparar informes clínics amb historial complet",
+          "Accedir ràpidament a sessions recents",
+          "Analitzar patrons en múltiples sessions",
+          "Compartir casos amb supervisors o formadors"
+        ]
+      },
+      {
+        "title": "Avantatges d'una biblioteca digital",
+        "content": "Passa del paper i els arxivadors físics a un sistema digital que et fa més eficient, organitzat i professional.",
+        "points": [
+          "Estalvia espai físic i paperassa",
+          "Accés instantani des de casa, clínica o escola",
+          "Mai perdràs una transcripció",
+          "Còpies de seguretat automàtiques al núvol",
+          "Compleix amb RGPD i protecció de dades",
+          "Redueix la petjada ecològica"
+        ]
+      }
+    ],
+    "faqs": [
+      {
+        "question": "Hi ha límit d'emmagatzematge?",
+        "answer": "No! Pots guardar tantes transcripcions com necessitis sense cap límit d'emmagatzematge. Tant el pla Individual com el Grupal ofereixen espai il·limitat."
+      },
+      {
+        "question": "Puc organitzar les transcripcions per pacient?",
+        "answer": "Sí, pots assignar cada transcripció a un perfil de pacient. Això et permet veure tot l'historial de sessions d'un pacient específic de manera organitzada."
+      },
+      {
+        "question": "Com funciona la cerca dins de les transcripcions?",
+        "answer": "La cerca indexa tot el contingut de text de les teves transcripcions. Escriu una paraula o frase i el sistema trobarà totes les sessions que la contenen, destacant on apareix."
+      },
+      {
+        "question": "Puc descarregar múltiples transcripcions alhora?",
+        "answer": "Sí, pots seleccionar múltiples transcripcions i descarregar-les totes en un arxiu ZIP. Això és útil per crear còpies de seguretat o compartir casos."
+      },
+      {
+        "question": "Què passa amb les meves transcripcions si cancel·lo la subscripció?",
+        "answer": "Si cancel·les, tens 30 dies per descarregar totes les teves transcripcions abans que s'eliminin. Et notificarem per email durant aquest període."
+      },
+      {
+        "question": "Les transcripcions estan protegides?",
+        "answer": "Sí, utilitzem encriptació d'extrem a extrem. Les teves transcripcions són completament privades i només tu (i els membres del teu equip si és aplicable) podeu accedir-hi."
+      }
+    ],
+    "testimonials": [
+      {
+        "name": "Elena Torres",
+        "role": "Logopeda amb consulta privada",
+        "text": "Abans tenia carpetes i carpetes de papers. Ara tot està a la biblioteca digital, perfectament organitzat. Trobo qualsevol sessió en segons. Ha canviat la meva manera de treballar!"
+      },
+      {
+        "name": "David Camps",
+        "role": "Logopeda en centre de rehabilitació",
+        "text": "La cerca per text és increïblement útil. Si vull revisar totes les sessions on vam treballar un fonema específic, simplement ho cerco i apareixen totes. Genial per l'anàlisi."
+      },
+      {
+        "name": "Montserrat Vila",
+        "role": "Logopeda escolar",
+        "text": "Treballo amb desenes d'alumnes. La biblioteca m'ajuda a mantenir-ho tot organitzat i puc accedir ràpidament a l'historial de qualsevol alumne quan preparo les sessions."
+      }
+    ],
+    "relatedFeatures": [
+      "gestion-pacientes",
+      "grupos-colaborativos",
+      "exportar-transcripciones"
+    ]
+  },
+  "gestion-pacientes": {
+    "title": "Gestió de pacients de logopèdia | Transcriu",
+    "metaDescription": "Crea perfils de pacients, assigna transcripcions i fes seguiment de l'evolució. Sistema de gestió completa per a logopedes professionals.",
+    "keywords": ["gestió pacients logopèdia", "perfils pacients", "seguiment evolució", "historial clínic", "pacients logopèdia"],
+    "heroTitle": "Gestiona els teus pacients amb perfils professionals",
+    "heroDescription": "Crea perfils detallats per cada pacient, assigna sessions i fes un seguiment complet de la seva evolució al llarg del temps.",
+    "icon": "👤",
+    "h2Sections": [
+      {
+        "title": "Sistema complet de gestió de pacients",
+        "content": "Organitza tota la informació dels teus pacients en perfils individuals. Cada perfil centralitza l'historial de sessions, notes clíniques, objectius terapèutics i progressos.",
+        "points": [
+          "Perfils individuals per cada pacient",
+          "Historial complet de totes les sessions",
+          "Notes clíniques i observacions",
+          "Objectius terapèutics i seguiment",
+          "Informació demogràfica i de contacte",
+          "Accés ràpid a totes les transcripcions del pacient"
+        ]
+      },
+      {
+        "title": "Seguiment de l'evolució",
+        "content": "Documenta i analitza l'evolució dels teus pacients al llarg del temps. Visualitza progressos, identifica patrons i pren decisions informades sobre la teràpia.",
+        "points": [
+          "Línia temporal de sessions i progressos",
+          "Comparació entre sessions anteriors i actuals",
+          "Registre d'objectius assolits",
+          "Notes sobre millores o dificultats",
+          "Gràfics d'evolució (proper update)",
+          "Exportació d'informes d'evolució"
+        ],
+        "useCases": [
+          "Preparar informes per a famílies o escoles",
+          "Planificar sessions futures segons l'evolució",
+          "Identificar patrons de millora o estancament",
+          "Documentar resultats per avaluacions",
+          "Comunicar progressos a altres professionals",
+          "Mantenir un registre clínic complet"
+        ]
+      },
+      {
+        "title": "Organització i eficiència",
+        "content": "Deixa d'utilitzar fulls de càlcul o carpetes desorganitzades. Amb la gestió de pacients de Transcriu, tota la informació està centralitzada, segura i accessible.",
+        "points": [
+          "Vista unificada de tots els teus pacients",
+          "Cerca ràpida per nom o ID",
+          "Filtres per edat, tipus de teràpia, etc.",
+          "Recordatoris de sessions pendents",
+          "Compliment de RGPD i protecció de dades",
+          "Còpies de seguretat automàtiques"
+        ]
+      }
+    ],
+    "faqs": [
+      {
+        "question": "Puc crear perfils per a quants pacients vulgui?",
+        "answer": "Sí, pots crear perfils il·limitats de pacients tant en el pla Individual com en el Grupal. No hi ha cap restricció en el nombre de pacients que pots gestionar."
+      },
+      {
+        "question": "Quina informació puc guardar en cada perfil?",
+        "answer": "Pots guardar nom, data de naixement, informació de contacte, diagnòstic, objectius terapèutics, notes clíniques, i assignar totes les sessions transcrites relacionades amb aquest pacient."
+      },
+      {
+        "question": "Com assigno una transcripció a un pacient?",
+        "answer": "Quan puges o visualitzes una transcripció, simplement selecciona el pacient del menú desplegable. També pots reassignar transcripcions més tard si cal."
+      },
+      {
+        "question": "Puc compartir perfils de pacients amb altres professionals?",
+        "answer": "En el pla Grupal, pots compartir accés a perfils de pacients amb altres membres del teu equip. Pots controlar els permisos (lectura, edició) per cada membre."
+      },
+      {
+        "question": "Les dades dels pacients estan protegides?",
+        "answer": "Absolutament. Complim estrictament amb el RGPD. Totes les dades es guarden encriptades i només les persones autoritzades hi tenen accés. Pots eliminar perfils en qualsevol moment."
+      },
+      {
+        "question": "Puc exportar la informació d'un pacient?",
+        "answer": "Sí, pots exportar un informe complet amb tota la informació, historial de sessions i notes d'un pacient en format PDF per compartir o arxivar."
+      }
+    ],
+    "testimonials": [
+      {
+        "name": "Rosa Mir",
+        "role": "Logopeda pediàtrica",
+        "text": "Gestionar els perfils dels meus pacients infantils és molt més fàcil ara. Puc veure ràpidament l'historial complet i preparar les sessions amb tota la informació a mà."
+      },
+      {
+        "name": "Albert Font",
+        "role": "Director de centre de logopèdia",
+        "text": "Tenim 5 logopedes al centre i gestionem més de 100 pacients. El sistema de perfils ens permet coordinar-nos perfectament i mantenir tota la informació actualitzada."
+      },
+      {
+        "name": "Cristina Pla",
+        "role": "Logopeda especialitzada en adults",
+        "text": "Per preparar informes d'evolució, el sistema és perfecte. Puc revisar totes les sessions anteriors, veure els progressos i generar l'informe en minuts."
+      }
+    ],
+    "relatedFeatures": [
+      "biblioteca-transcripciones",
+      "grupos-colaborativos",
+      "anotaciones-inteligentes"
+    ]
+  },
+  "grupos-colaborativos": {
+    "title": "Grups col·laboratius per a equips | Transcriu",
+    "metaDescription": "Treballa en equip amb altres logopedes. Comparteix transcripcions, gestiona pacients col·lectivament i col·labora en temps real.",
+    "keywords": ["treball en equip logopèdia", "col·laboració logopedes", "equip clínica", "compartir transcripcions", "gestió equips"],
+    "heroTitle": "Treballa en equip de forma eficient i organitzada",
+    "heroDescription": "Crea grups de treball, comparteix recursos amb el teu equip i col·labora en la gestió de pacients i sessions de forma segura i professional.",
+    "icon": "👥",
+    "h2Sections": [
+      {
+        "title": "Col·laboració professional per a equips",
+        "content": "Si treballes en una clínica, centre educatiu o gabinet amb múltiples professionals, els grups col·laboratius et permeten treballar coordinadament mantenint l'organització i la seguretat de les dades.",
+        "points": [
+          "Crea múltiples grups de treball",
+          "Convida col·legues amb permisos personalitzats",
+          "Comparteix transcripcions i perfils de pacients",
+          "Col·labora en temps real en transcripcions",
+          "Gestió centralitzada de l'equip",
+          "Auditoria completa d'activitat del grup"
+        ]
+      },
+      {
+        "title": "Funcionalitats avançades per a equips",
+        "content": "Cada grup té les seves pròpies configuracions, membres i recursos. Pots tenir diferents grups per diferents finalitats: equip clínic, supervisió, formació, etc.",
+        "points": [
+          "Permisos granulars (administrador, editor, lector)",
+          "Biblioteca compartida de transcripcions",
+          "Perfils de pacients accessibles per l'equip",
+          "Comentaris i notes col·laboratives",
+          "Notificacions d'activitat del grup",
+          "Estadístiques d'ús per membre"
+        ],
+        "useCases": [
+          "Coordinació en clíniques amb múltiples logopedes",
+          "Supervisió de logopedes en formació",
+          "Equips de logopèdia escolar",
+          "Projectes de recerca col·laborativa",
+          "Programes d'intercanvi professional",
+          "Comunitats de pràctica i aprenentatge"
+        ]
+      },
+      {
+        "title": "Seguretat i control en tot moment",
+        "content": "Mantens el control total sobre qui accedeix a quina informació. Pots gestionar membres, permisos i revocar accessos en qualsevol moment.",
+        "points": [
+          "Control d'accés basat en rols",
+          "Invitacions segures per email",
+          "Eliminació de membres en qualsevol moment",
+          "Registre d'activitat per auditoria",
+          "Compliment de RGPD per equips",
+          "Dades encriptades i protegides"
+        ]
+      }
+    ],
+    "faqs": [
+      {
+        "question": "Quants membres pot tenir un grup?",
+        "answer": "En el pla Grupal pots tenir membres il·limitats. Pots crear diferents grups per diferents equips o finalitats sense restriccions."
+      },
+      {
+        "question": "Com funcionen els permisos dins d'un grup?",
+        "answer": "Hi ha 3 nivells: Administrador (pot gestionar el grup i membres), Editor (pot crear i editar contingut) i Lector (només pot visualitzar). Tu decideixes el rol de cada membre."
+      },
+      {
+        "question": "Puc compartir només algunes transcripcions amb el grup?",
+        "answer": "Sí! Tens control complet. Pots mantenir transcripcions privades o compartir-les selectivament amb grups específics o membres individuals."
+      },
+      {
+        "question": "Què passa si elimino un membre del grup?",
+        "answer": "Quan elimines un membre, aquest perd immediatament l'accés a tots els recursos del grup. Les transcripcions i dades que va crear mentre era membre es mantenen al grup."
+      },
+      {
+        "question": "Es poden fer comentaris en transcripcions compartides?",
+        "answer": "Sí! Els membres del grup poden afegir comentaris i notes a les transcripcions compartides. Això facilita la discussió i supervisió de casos."
+      },
+      {
+        "question": "Com convido algú al meu grup?",
+        "answer": "Des del panell de gestió del grup, afegeix l'email del col·lega que vols convidar. Rebrà una invitació segura i podrà unir-se acceptant-la."
+      }
+    ],
+    "testimonials": [
+      {
+        "name": "Sandra Obiols",
+        "role": "Coordinadora de logopèdia escolar",
+        "text": "Gestiono un equip de 8 logopedes en diferents escoles. Els grups col·laboratius ens permeten compartir casos, fer supervisions i mantenir-nos coordinats. És imprescindible!"
+      },
+      {
+        "name": "Pau Rius",
+        "role": "Director de clínica multidisciplinar",
+        "text": "Tenim logopedes, psicòlegs i fisioterapeutes. Els grups ens permeten col·laborar en casos complexos mantenint la privacitat quan cal. Molt flexible i segur."
+      },
+      {
+        "name": "Míriam Soler",
+        "role": "Formadora de logopedes",
+        "text": "Utilitzo grups per supervisar pràctiques d'estudiants. Poden pujar sessions, jo les reviso, deixo comentaris i fem seguiment. Una eina perfecta per la formació."
+      }
+    ],
+    "relatedFeatures": [
+      "gestion-pacientes",
+      "biblioteca-transcripciones",
+      "anotaciones-inteligentes"
+    ]
+  },
+  "exportar-transcripciones": {
+    "title": "Exporta transcripcions en múltiples formats | Transcriu",
+    "metaDescription": "Exporta les teves transcripcions a PDF, DOCX, TXT. Envia per Gmail, guarda a Google Drive. Màxima flexibilitat i compatibilitat.",
+    "keywords": ["exportar transcripcions", "PDF transcripcions", "DOCX logopèdia", "compartir sessions", "enviar transcripcions"],
+    "heroTitle": "Exporta i comparteix transcripcions en el format que necessitis",
+    "heroDescription": "Màxima flexibilitat per compartir les teves transcripcions. Múltiples formats d'exportació i integracions amb les eines que ja utilitzes.",
+    "icon": "📤",
+    "h2Sections": [
+      {
+        "title": "Múltiples formats d'exportació",
+        "content": "Exporta les teves transcripcions en el format més adequat per a cada situació. Cada format està optimitzat per mantenir la qualitat i el format professional.",
+        "points": [
+          "PDF amb format professional i anotacions",
+          "DOCX editable per a Microsoft Word",
+          "TXT per a màxima compatibilitat",
+          "Subtítols SRT per a vídeos (proper update)",
+          "Format personalitzat amb el teu logo (pla Grupal)",
+          "Exportació per lots de múltiples transcripcions"
+        ]
+      },
+      {
+        "title": "Integracions i compartició",
+        "content": "Envia directament les teves transcripcions a les aplicacions que utilitzes diàriament. Estalvia temps evitant haver de descarregar i pujar arxius manualment.",
+        "points": [
+          "Envia per Gmail amb un clic",
+          "Guarda directament a Google Drive",
+          "Comparteix enllaços segurs amb expiració",
+          "Genera PDFs amb protecció per contrasenya",
+          "Exporta amb marca d'aigua personalitzada",
+          "Integració amb sistemes de gestió clínica (proper update)"
+        ],
+        "useCases": [
+          "Enviar informes a famílies de pacients",
+          "Compartir casos amb supervisors",
+          "Arxivar en sistemes de gestió documental",
+          "Preparar materials per a presentacions",
+          "Col·laborar amb altres professionals sanitaris",
+          "Complir amb requeriments administratius"
+        ]
+      },
+      {
+        "title": "Personalització i flexibilitat",
+        "content": "Cada exportació pot ser personalitzada segons les teves necessitats. Controla què s'inclou, el format, l'aspecte i la seguretat.",
+        "points": [
+          "Selecciona quins segments incloure",
+          "Afegeix o oculta informació del pacient",
+          "Personalitza l'aparença (fonts, colors, logo)",
+          "Inclou o exclou anotacions visuals",
+          "Afegeix capçalera i peu de pàgina personalitzats",
+          "Control de permisos en comparticions"
+        ]
+      }
+    ],
+    "faqs": [
+      {
+        "question": "Les anotacions s'exporten també?",
+        "answer": "Sí! Quan exportes a PDF, totes les anotacions visuals (cercles, ressaltats, notes) s'inclouen. En DOCX i TXT s'exporten només les notes de text."
+      },
+      {
+        "question": "Puc exportar múltiples transcripcions alhora?",
+        "answer": "Sí, pots seleccionar diverses transcripcions i exportar-les totes juntes. Es crea un ZIP amb tots els arxius o un únic document consolidat si ho prefereixes."
+      },
+      {
+        "question": "Com funciona l'enviament per Gmail?",
+        "answer": "Amb un clic, s'obre una finestra de Gmail amb l'arxiu ja adjuntat i un missatge predefinit que pots editar. Només has d'afegir el destinatari i enviar."
+      },
+      {
+        "question": "Els PDFs es poden protegir amb contrasenya?",
+        "answer": "Sí, en exportar a PDF pots establir una contrasenya. Això és útil per compartir informació sensible de pacients de forma segura."
+      },
+      {
+        "question": "Puc personalitzar el format del PDF amb el meu logo?",
+        "answer": "En el pla Grupal pots afegir el logo de la teva clínica o centre, personalitzar colors i crear plantilles d'exportació per mantenir la coherència visual."
+      },
+      {
+        "question": "Hi ha límit d'exportacions?",
+        "answer": "No, pots exportar tantes transcripcions com necessitis, tantes vegades com vulguis, en tots els formats disponibles sense cap restricció."
+      }
+    ],
+    "testimonials": [
+      {
+        "name": "Laia Martí",
+        "role": "Logopeda en consulta privada",
+        "text": "L'exportació a PDF amb anotacions és perfecta per enviar informes a les famílies. Queda molt professional i amb tota la informació visual clara."
+      },
+      {
+        "name": "Guillem Serra",
+        "role": "Logopeda en centre educatiu",
+        "text": "Necessito enviar transcripcions a l'EAP i al CSMIJ regularment. Amb l'enviament directe per Gmail m'estalvio molta feina. Molt pràctic!"
+      },
+      {
+        "name": "Júlia Rovira",
+        "role": "Responsable de qualitat en clínica",
+        "text": "Hem personalitzat les exportacions amb el nostre logo i colors corporatius. Tots els informes que surten de la clínica tenen un aspecte coherent i professional."
+      }
+    ],
+    "relatedFeatures": [
+      "anotaciones-inteligentes",
+      "biblioteca-transcripciones",
+      "grupos-colaborativos"
+    ]
+  }
+}

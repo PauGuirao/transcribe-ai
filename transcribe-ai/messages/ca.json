@@ -1,0 +1,682 @@
+{
+  "hero": {
+    "title": "Transcriu sessions de logopèdia en segons",
+    "description": "Utilitza una plataforma dissenyada per a alta precisió. Confiada per professionals de totes les mides per gestionar milions de paraules cada mes.",
+    "preparing": "Preparant...",
+    "goToDashboard": "Anar al panell",
+    "signInWithEmail": "Entra amb el teu correu",
+    "trustSignals": {
+      "professionals": "Professionals confiats",
+      "accuracy": "Precisió mitjana",
+      "timeSaved": "Estalvi per setmana"
+    }
+  },
+  "transcriptionExample": {
+    "dropzone": "Arrossega el teu arxiu d'àudio aquí",
+    "processing": "Processant àudio...",
+    "filename": "Sessió Pau.mp3",
+    "duration": "Durada",
+    "words": "Paraules",
+    "accuracy": "Precisió",
+    "footer": "Transcripció automàtica amb identificació d'interlocutors",
+    "speaker1": "Logopeda",
+    "speaker2": "Pacient",
+    "lines": [
+      {
+        "speaker": "Logopeda",
+        "text": "Bon dia Maria! Avui treballarem amb els sons de la \"R\". Primer, farem alguns exercicis de respiració per preparar la llengua i els llavis."
+      },
+      {
+        "speaker": "Pacient",
+        "text": "D'acord! Ja he estat practicant a casa com em vas dir. Crec que estic millorant una mica."
+      },
+      {
+        "speaker": "Logopeda",
+        "text": "Perfecte! Això és molt important. Ara intentarem dir aquestes paraules: \"roda\", \"ratolí\", \"carrer\". Recorda de posar la llengua en la posició que hem practicat."
+      },
+      {
+        "speaker": "Pacient",
+        "text": "Roda... ratolí... carrer. Com ho he fet?"
+      },
+      {
+        "speaker": "Logopeda",
+        "text": "Molt bé! Has millorat molt. Ara provarem amb frases més llargues. Repeteix després de mi: \"El ratolí corre per la carretera\"."
+      }
+    ]
+  },
+  "howItWorks": {
+    "title": "Transcriu sessions en 3 passos senzills",
+    "description": "Procés ràpid i eficient per convertir les teves sessions d'àudio en transcripcions professionals llestes per compartir",
+    "startNow": "Comença ara →",
+    "step1": {
+      "number": "01",
+      "title": "Puja l'àudio",
+      "description": "Carrega els fitxers d'àudio de les teves sessions de logopèdia des de qualsevol dispositiu de forma ràpida i segura.",
+      "dropzone": "Arrossega el teu fitxer d'àudio aquí",
+      "processing": "Processant àudio..."
+    },
+    "step2": {
+      "number": "02",
+      "title": "Transcriu automàticament",
+      "description": "La nostra IA especialitzada en català converteix l'àudio en text amb alta precisió.",
+      "transcribing": "Transcrivint àudio...",
+      "duration": "Durada",
+      "accuracy": "Precisió"
+    },
+    "step3": {
+      "number": "03",
+      "title": "Exporta i comparteix",
+      "description": "Descarrega la transcripció en múltiples formats o comparteix-la directament amb els teus col·legues.",
+      "exportButton": "Exportar transcripció",
+      "exportPDF": "Exportar com PDF",
+      "exportDOCX": "Exportar com DOCX",
+      "sendGmail": "Enviar per Gmail",
+      "saveDrive": "Guardar a Drive",
+      "clickAny": "Fes clic en qualsevol opció per exportar"
+    }
+  },
+  "features": {
+    "title": "Funcionalitats avançades per a l'educació",
+    "description": "Descobreix una varietat de funcions avançades. Il·limitades i gratuïtes per a individuals.",
+    "library": {
+      "title": "Biblioteca de transcripcions",
+      "description": "Organitza i gestiona totes les teves transcripcions en un sol lloc. Cerca, filtra i accedeix ràpidament al contingut que necessites per a les teves classes.",
+      "label": "Biblioteca",
+      "count": "transcripcions"
+    },
+    "students": {
+      "title": "Gestió d'alumnes",
+      "description": "Crea perfils d'alumnes, assigna transcripcions personalitzades i fes un seguiment del seu progrés acadèmic de manera eficient.",
+      "activeStudents": "Alumnes actius",
+      "count": "estudiants"
+    },
+    "groups": {
+      "title": "Organització en grups",
+      "description": "Crea grups de treball, assigna projectes col·laboratius i facilita la comunicació entre els membres del grup.",
+      "activeGroups": "Grups actius",
+      "count": "grups",
+      "members": "membres"
+    },
+    "annotations": {
+      "title": "Anotacions intel·ligents",
+      "description": "Afegeix notes, comentaris i marques temporals a les transcripcions. Crea material d'estudi personalitzat i destaca els punts clau.",
+      "recentAnnotations": "Anotacions recents",
+      "count": "notes",
+      "importantConcept": "Concepte important",
+      "examQuestion": "Pregunta d'examen",
+      "pendingTask": "Tasca pendent"
+    }
+  },
+  "navbar": {
+    "features": "Funcionalitats",
+    "seeAllFeatures": "Veure totes les funcionalitats",
+    "seeAll": "Veure totes",
+    "menu": "Menú",
+    "blog": "Blog",
+    "pricing": "Preus",
+    "contact": "Contacte",
+    "goToDashboard": "Anar al panell",
+    "signIn": "Inicia sessió",
+    "preparing": "Preparant...",
+    "openTranscriu": "Obrir Transcriu",
+    "start": "Comença"
+  },
+  "pricing": {
+    "title": "Plans per a cada necessitat",
+    "subtitle": "Comença gratis i escala segons les teves necessitats professionals",
+    "mostPopular": "Més Popular",
+    "monthly": "Mensual",
+    "yearly": "Anual",
+    "month": "mes",
+    "year": "any",
+    "userMonth": "usuari/mes",
+    "users": "usuaris",
+    "numberOfUsers": "Nombre d'usuaris",
+    "billedYearly": "Facturat anualment",
+    "loading": "Carregant...",
+    "startFree": "Comença gratis",
+    "subscribe": "Subscriure's"
+  },
+  "faq": {
+    "title": "Preguntes Freqüents",
+    "subtitle": "Tot el que necessites saber sobre Transcriu",
+    "questions": [
+      {
+        "question": "Com funciona la transcripció automàtica per a sessions de logopèdia?",
+        "answer": "Transcriu utilitza intel·ligència artificial avançada especialitzada en català per convertir l'àudio de les teves sessions de logopèdia en text. El sistema identifica automàticament diferents parlants (logopeda i pacient) i transcriu amb alta precisió termes tècnics de logopèdia, fonoaudiologia i teràpia del llenguatge."
+      },
+      {
+        "question": "Quina precisió té la transcripció en català?",
+        "answer": "La nostra IA està especialment entrenada per al català i aconsegueix una precisió superior al 95% en sessions de logopèdia. El sistema reconeix vocabulari tècnic específic de logopèdia, variants dialectals del català i adapta la transcripció al context clínic."
+      },
+      {
+        "question": "És segur pujar sessions amb dades de pacients?",
+        "answer": "Sí, complim amb el RGPD i la LOPD. Totes les dades es xifren durant la transmissió i emmagatzematge. Les transcripcions es processen en servidors segurs a Europa i pots eliminar qualsevol dada en qualsevol moment. Mai compartim ni utilitzem les teves dades per entrenar models."
+      },
+      {
+        "question": "Puc compartir transcripcions amb el meu equip o altres professionals?",
+        "answer": "Sí, Transcriu permet col·laboració en temps real. Pots compartir transcripcions amb altres logopedes, psicòlegs, mestres o professionals del teu equip. Cada membre pot afegir anotacions, comentaris i editar col·laborativament mantenint un historial de canvis."
+      },
+      {
+        "question": "Quins formats d'àudio són compatibles?",
+        "answer": "Acceptem tots els formats d'àudio habituals: MP3, WAV, M4A, OGG, FLAC i més. Pots pujar àudios des del teu ordinador, mòbil, tablet o directament des de gravadores digitals. No hi ha límit de durada per als àudios."
+      },
+      {
+        "question": "Com puc exportar les transcripcions?",
+        "answer": "Pots exportar les transcripcions en múltiples formats: PDF (per imprimir o arxivar), DOCX (per editar a Word), TXT (text pla) o compartir directament per correu electrònic. També pots integrar amb Google Drive, Dropbox i altres eines de productivitat."
+      },
+      {
+        "question": "Transcriu funciona offline o necessita connexió a internet?",
+        "answer": "Necessites connexió a internet per pujar els àudios i processar-los. Un cop transcrit, pots accedir a les transcripcions offline des de l'aplicació. Estem treballant en una versió amb capacitats offline per a zones amb connectivitat limitada."
+      },
+      {
+        "question": "Quin és el temps de processament d'una sessió?",
+        "answer": "El temps de transcripció és aproximadament el 20-30% de la durada de l'àudio. Per exemple, una sessió de 60 minuts es transcriu en uns 12-18 minuts. Sessions més curtes es processen encara més ràpid, sovint en menys de 5 minuts."
+      },
+      {
+        "question": "Hi ha descomptes per a centres educatius o clíniques?",
+        "answer": "Sí, oferim plans especials per a equips, centres educatius, clíniques i organitzacions. Els plans grupals inclouen descomptes per volum, gestió centralitzada d'usuaris, facturació única i suport dedicat. Contacta'ns per obtenir un pressupost personalitzat."
+      },
+      {
+        "question": "Puc cancel·lar la subscripció en qualsevol moment?",
+        "answer": "Sí, pots cancel·lar la teva subscripció en qualsevol moment des de la configuració del teu compte. No hi ha permanència ni penalitzacions. Si cancel·les, mantindràs accés fins al final del període de facturació actual i podràs descarregar totes les teves transcripcions."
+      }
+    ]
+  },
+  "footer": {
+    "products": {
+      "title": "Productes",
+      "transcription": "Transcripció automàtica",
+      "editor": "Editor d'anotacions",
+      "library": "Biblioteca de sessions",
+      "teams": "Gestió d'equips",
+      "dashboard": "Panell de control"
+    },
+    "resources": {
+      "title": "Recursos",
+      "help": "Centre d'ajuda",
+      "tutorials": "Tutorials",
+      "apiDocs": "Documentació API",
+      "blog": "Blog"
+    },
+    "learn": {
+      "title": "Aprèn",
+      "gettingStarted": "Guia d'inici",
+      "bestPractices": "Millors pràctiques",
+      "speechTherapy": "Logopèdia digital",
+      "webinars": "Webinars"
+    },
+    "company": {
+      "title": "Empresa",
+      "about": "Sobre nosaltres",
+      "pricing": "Preus",
+      "contact": "Contacte",
+      "careers": "Treballa amb nosaltres"
+    },
+    "legal": {
+      "title": "Legal",
+      "terms": "Termes del servei",
+      "privacy": "Política de privacitat"
+    },
+    "copyright": "© 2025 Transcriu — Tots els drets reservats",
+    "rating": "Valorat per professionals de la logopèdia"
+  },
+  "dashboard": {
+    "common": {
+      "loading": "Carregant...",
+      "save": "Guardar",
+      "saving": "Guardant...",
+      "cancel": "Cancel·lar",
+      "delete": "Eliminar",
+      "edit": "Editar",
+      "close": "Tancar",
+      "confirm": "Confirmar",
+      "back": "Tornar",
+      "next": "Següent",
+      "previous": "Anterior",
+      "search": "Cercar",
+      "filter": "Filtrar",
+      "export": "Exportar",
+      "import": "Importar",
+      "download": "Descarregar",
+      "upload": "Pujar",
+      "retry": "Tornar a intentar",
+      "ok": "D'acord",
+      "yes": "Sí",
+      "no": "No",
+      "none": "Cap",
+      "all": "Tots",
+      "notAssigned": "Sense assignar",
+      "unknown": "Desconegut",
+      "error": "Error",
+      "success": "Èxit"
+    },
+    "sidebar": {
+      "home": "Inici",
+      "transcribe": "Transcriure",
+      "library": "Biblioteca",
+      "blog": "Blog",
+      "students": "Alumnes",
+      "tutorials": "Tutorials",
+      "team": "Equip",
+      "settings": "Configuració",
+      "help": "Ajuda",
+      "signOut": "Tancar sessió",
+      "upgradePlan": "Millora el teu pla",
+      "tokenError": "No s'han pogut carregar els tokens"
+    },
+    "plans": {
+      "group": "Grupal",
+      "individual": "Individual",
+      "free": "Gratuït",
+      "pro": "Professional"
+    },
+    "navbar": {
+      "loading": "Carregant...",
+      "upgradePlan": "Millorar pla",
+      "members": "membres",
+      "organization": "Organització",
+      "viewTeam": "Veure equip",
+      "inviteMembers": "Convidar membres",
+      "manageBilling": "Gestionar facturació",
+      "restrictedAccess": "Accés restringit",
+      "restrictedAccessDesc": "Aquesta funcionalitat només està disponible per a administradors i propietaris de l'organització."
+    },
+    "home": {
+      "title": "Què faràs avui?",
+      "subtitle": "Tria una de les nostres eines per començar el teu projecte",
+      "transcription": "Transcripció",
+      "transcriptionDesc": "Converteix el teu àudio a text amb IA",
+      "students": "Alumnes",
+      "studentsDesc": "Edita els perfils dels teus alumnes",
+      "library": "Biblioteca",
+      "libraryDesc": "Gestiona tots els teus àudios i transcripcions"
+    },
+    "library": {
+      "title": "Biblioteca",
+      "filesCount": "{count} arxiu",
+      "filesCountPlural": "{count} arxius",
+      "emptyTitle": "Biblioteca buida",
+      "emptyDesc": "Puja el teu primer fitxer d'àudio per començar a transcriure.",
+      "uploadAudio": "Pujar àudio",
+      "viewAll": "Tots",
+      "viewByDay": "Per dia",
+      "unknownDate": "Data desconeguda",
+      "loadingLibrary": "Carregant biblioteca...",
+      "errorLoading": "Error carregant",
+      "table": {
+        "name": "Nom",
+        "status": "Estat",
+        "student": "Alumne",
+        "date": "Data"
+      },
+      "status": {
+        "completed": "Transcrit",
+        "processing": "Processant",
+        "failed": "Fallit",
+        "uploaded": "Pujat",
+        "pending": "Pendent"
+      },
+      "actions": {
+        "transcribe": "Transcriure",
+        "exportPdf": "Exportar PDF",
+        "exportWord": "Exportar Word",
+        "edit": "Editar",
+        "delete": "Eliminar"
+      },
+      "editPanel": {
+        "title": "Editar arxiu",
+        "subtitle": "Personalitza nom i assigna alumne",
+        "info": "Informació",
+        "originalName": "Nom original",
+        "date": "Data",
+        "status": "Estat",
+        "customName": "Nom personalitzat",
+        "customNamePlaceholder": "Introdueix un nou nom...",
+        "assignStudent": "Assignar alumne",
+        "selectStudent": "Selecciona alumne",
+        "onlyTranscribed": "Només disponible per arxius transcrits",
+        "saveChanges": "Guardar canvis"
+      }
+    },
+    "profiles": {
+      "title": "Alumnes",
+      "subtitle": "Gestiona els perfils dels teus alumnes",
+      "newStudent": "Nou alumne",
+      "addStudent": "Afegir alumne",
+      "createStudent": "Crear alumne",
+      "creatingStudent": "Creant alumne...",
+      "emptyTitle": "Cap alumne encara",
+      "emptyDesc": "Crea el teu primer perfil d'alumne per organitzar les transcripcions.",
+      "noTranscriptions": "Sense transcripcions",
+      "transcriptionCount": "{count} transcripció",
+      "transcriptionCountPlural": "{count} transcripcions",
+      "years": "anys",
+      "created": "Creat",
+      "form": {
+        "title": "Nou alumne",
+        "subtitle": "Afegeix un perfil per organitzar",
+        "name": "Nom",
+        "namePlaceholder": "Nom complet de l'alumne",
+        "age": "Edat",
+        "ageOptional": "(opcional)",
+        "agePlaceholder": "Edat en anys",
+        "helperText": "Podràs assignar transcripcions a aquest alumne després de crear-lo."
+      },
+      "validation": {
+        "nameRequired": "El nom és obligatori",
+        "nameMinLength": "Mínim 2 caràcters",
+        "ageRange": "Entre 0 i 25 anys"
+      }
+    },
+    "upload": {
+      "dropHere": "Deixa anar aquí el teu àudio",
+      "uploadAudio": "Puja un arxiu d'àudio",
+      "dragDropHint": "Arrossega i deixa anar o fes clic per seleccionar",
+      "formatHint": "MP3, WAV, M4A, OGG, WebM, FLAC, AAC, WMA, AIFF (màx. 100 MB)",
+      "compressing": "Comprimint...",
+      "uploading": "Pujant...",
+      "uploadComplete": "Pujada completada!",
+      "uploadFailed": "Pujada fallida",
+      "uploadError": "Error de pujada",
+      "uploadedFiles": "Fitxers pujats",
+      "compressionError": "Error en comprimir l'àudio",
+      "uploadingAudio": "Pujant àudio...",
+      "invalidFileType": "El tipus de fitxer ha de ser un dels següents: {extensions}",
+      "fileTooLarge": "El fitxer és massa gran. La mida màxima és {size} MB"
+    },
+    "transcription": {
+      "untitled": "Sense títol",
+      "titlePlaceholder": "Nom de la transcripció...",
+      "unsavedChanges": "Canvis sense guardar",
+      "export": {
+        "title": "Exportar",
+        "pdf": "PDF",
+        "word": "Word",
+        "copy": "Copiar",
+        "copied": "Copiat",
+        "mail": "Mail",
+        "drive": "Google Drive",
+        "exporting": "Exportant..."
+      },
+      "speakers": {
+        "title": "Persones",
+        "noSpeakers": "Sense persones"
+      },
+      "student": {
+        "title": "Alumne",
+        "notAssigned": "Sense assignar",
+        "loadError": "No s'han pogut carregar els alumnes",
+        "assignError": "No s'ha pogut assignar l'alumne"
+      },
+      "errors": {
+        "googleServices": "No s'ha pogut carregar Google Identity Services",
+        "missingClientId": "Falta NEXT_PUBLIC_GOOGLE_CLIENT_ID a la configuració.",
+        "noAccessToken": "No s'ha obtingut cap token d'accés",
+        "createDocError": "Error al crear el document",
+        "writeDocError": "Error al escriure al document",
+        "googleDocError": "No s'ha pogut crear el Google Doc"
+      },
+      "compression": {
+        "starting": "Comprimint àudio per optimitzar la pujada...",
+        "processing": "Processant àudio...",
+        "encoding": "Comprimint...",
+        "finalizing": "Finalitzant compressió..."
+      },
+      "saving": "Guardant...",
+      "save": "Guardar",
+      "segments": {
+        "noSegments": "No hi ha segments de transcripció disponibles",
+        "noPerson": "Sense persona",
+        "combineWithPrevious": "Combinar amb anterior",
+        "addSegment": "Afegir segment",
+        "delete": "Eliminar",
+        "placeholder": "Escriu el text...",
+        "emptySegment": "Segment buit"
+      },
+      "errorState": {
+        "title": "Error en la transcripció",
+        "description": "Hi ha hagut un error processant el teu fitxer d'àudio. Si us plau, prova de pujar-lo de nou.",
+        "refreshPage": "Actualitzar pàgina"
+      }
+    },
+    "team": {
+      "title": "Equip",
+      "noOrganization": "Sense organització",
+      "noOrganizationDesc": "No pertanys a cap organització actualment.",
+      "setupOrganization": "Configurar organització",
+      "authRequired": "Accés requerit",
+      "authRequiredDesc": "Has d'iniciar sessió per veure aquesta pàgina.",
+      "loadingTeam": "Carregant equip...",
+      "membersCount": "{count} / {max} membres",
+      "teamMembers": "Membres de l'equip",
+      "invite": "Convidar",
+      "inviteMember": "Convidar membre",
+      "inviteFirstMember": "Convidar primer membre",
+      "noMembers": "Encara no hi ha membres",
+      "noMembersDesc": "Convida els teus companys d'equip per començar a col·laborar junts.",
+      "error": "Error",
+      "retry": "Tornar a intentar",
+      "user": "Usuari",
+      "removeFromTeam": "Eliminar de l'equip",
+      "viewPlans": "Veure plans",
+      "ok": "D'acord",
+      "headerSubtitle": "Gestiona el teu equip i els permisos dels membres",
+      "activeMembers": "Membres actius",
+      "maxCapacity": "Capacitat màxima",
+      "administrators": "Administradors",
+      "table": {
+        "name": "Nom",
+        "role": "Rol",
+        "joinedDate": "Data d'unió"
+      },
+      "roles": {
+        "owner": "Propietari",
+        "admin": "Administrador",
+        "member": "Membre"
+      },
+      "capacityReached": {
+        "title": "Límit assolit",
+        "desc": "Heu arribat al límit de persones del grup",
+        "ok": "D'acord"
+      },
+      "removeDialog": {
+        "title": "Eliminar membre",
+        "desc": "Estàs segur que vols eliminar {name} de l'equip? Serà mogut a la seva pròpia organització gratuïta i perdrà accés als recursos de l'equip.",
+        "cancel": "Cancel·lar",
+        "confirm": "Eliminar membre",
+        "removing": "Eliminant..."
+      },
+      "upgradeDialog": {
+        "title": "Incrementa el teu pla",
+        "desc": "Necessites més membres? Actualitza el teu pla per afegir més usuaris.",
+        "currentPlan": "Pla actual:",
+        "currentMembers": "Membres actuals:",
+        "membersLabel": "{count} membres",
+        "availablePlans": "Plans disponibles:",
+        "teamPlan": "Equip",
+        "organizationPlan": "Organització",
+        "usersRange": "{min}-{max} usuaris",
+        "pricePerUser": "{price}€/usuari/mes",
+        "addMoreMembers": "Afegeix més membres",
+        "close": "Tancar"
+      },
+      "wantMoreMembers": "Vols més membres? Incrementa el teu pla"
+    },
+    "settings": {
+      "title": "Configuració",
+      "subtitle": "Gestiona la teva configuració personal i de l'organització",
+      "loading": "Carregant configuració...",
+      "cancel": "Cancel·lar",
+      "saved": "Desat",
+      "tabs": {
+        "user": "Usuari",
+        "team": "Equip",
+        "preferences": "Preferències"
+      },
+      "user": {
+        "title": "Perfil d'usuari",
+        "profilePhoto": "Foto de perfil",
+        "photoManaged": "La foto de perfil es gestiona automàticament",
+        "fullName": "Nom complet",
+        "fullNamePlaceholder": "El teu nom complet",
+        "email": "Correu electrònic",
+        "saveChanges": "Desar canvis",
+        "updating": "Actualitzant...",
+        "notifications": "Notificacions",
+        "emailNotifications": "Notificacions per correu",
+        "emailNotificationsDesc": "Rebre notificacions sobre transcripcions completades",
+        "teamNotifications": "Notificacions de l'equip",
+        "teamNotificationsDesc": "Rebre notificacions sobre activitat de l'equip",
+        "enable": "Activar"
+      },
+      "teamSettings": {
+        "title": "Informació de l'organització",
+        "adminBadge": "Admin",
+        "orgLogo": "Logo de l'organització",
+        "changeImage": "Canviar imatge",
+        "uploading": "Pujant...",
+        "imageHint": "JPEG, PNG, WebP o GIF. Màxim 5MB.",
+        "orgName": "Nom de l'organització",
+        "description": "Descripció",
+        "descriptionPlaceholder": "Descripció de l'organització (opcional)",
+        "memberManagement": "Gestió de membres",
+        "activeMembers": "Membres actius",
+        "manageMembersDesc": "Gestiona els membres del teu equip",
+        "viewTeam": "Veure equip",
+        "inviteMembers": "Convidar membres",
+        "inviteMembersDesc": "Envia invitacions a nous membres",
+        "invite": "Convidar"
+      },
+      "preferences": {
+        "title": "Preferències de transcripció",
+        "appLanguage": "Idioma de l'aplicació",
+        "defaultLanguage": "Idioma per defecte",
+        "languages": {
+          "catalan": "Català",
+          "spanish": "Espanyol",
+          "english": "Anglès",
+          "french": "Francès"
+        },
+        "autoDetect": "Detecció automàtica d'idioma",
+        "autoDetectDesc": "Detectar automàticament l'idioma de l'àudio",
+        "speakerIdentification": "Identificació d'interlocutors",
+        "speakerIdentificationDesc": "Identificar diferents persones en l'àudio",
+        "appearance": "Aparença",
+        "themes": {
+          "light": "Clar",
+          "dark": "Fosc",
+          "system": "Sistema"
+        },
+        "privacy": "Privacitat i seguretat",
+        "autoDelete": "Eliminació automàtica",
+        "autoDeleteDesc": "Eliminar transcripcions després de 30 dies",
+        "exportData": "Exportar dades",
+        "exportDataDesc": "Descarregar totes les teves dades",
+        "configure": "Configurar",
+        "exportBtn": "Exportar"
+      }
+    },
+    "invite": {
+      "title": "Convidar membres",
+      "sendByEmail": "Enviar invitació per correu",
+      "emailLabel": "Correu electrònic",
+      "emailPlaceholder": "usuari@exemple.com",
+      "sendInvite": "Enviar invitació",
+      "sending": "Enviant...",
+      "successMessage": "Invitació enviada correctament",
+      "helperText": "S'enviarà un correu amb un enllaç d'invitació segur i personalitzat vàlid per 7 dies",
+      "linkRetrieved": "Enllaç d'invitació existent recuperat",
+      "linkGenerated": "Nou enllaç d'invitació generat",
+      "linkCopied": "Enllaç copiat al porta-retalls",
+      "linkError": "Error en obtenir l'enllaç d'invitació. Si us plau, torna-ho a intentar.",
+      "copyError": "Error en copiar l'enllaç",
+      "shareWhatsApp": "T'invito a unir-te al nostre equip! Fes servir aquest enllaç:",
+      "shareEmailSubject": "Invitació a l'equip",
+      "shareEmailBody": "Hola,\\n\\nT'invito a unir-te al nostre equip. Fes clic en l'enllaç següent per acceptar la invitació:\\n\\n{url}\\n\\nSalutacions",
+      "shareTwitter": "Uneix-te al nostre equip!",
+      "shareNativeTitle": "Invitació a l'equip",
+      "shareNativeText": "T'invito a unir-te al nostre equip!"
+    },
+    "welcome": {
+      "title": "Benvingut/da a {organizationName}!",
+      "descriptionWithName": "Hola {userName}! T'has unit correctament a l'organització {organizationName}.",
+      "descriptionWithoutName": "T'has unit correctament a l'organització {organizationName}.",
+      "statusMessage": "Ara formes part de l'equip",
+      "benefits": {
+        "fullAccess": "Accés complet a totes les funcionalitats de l'organització",
+        "collaboration": "Col·laboració amb els membres de l'equip",
+        "startTranscribing": "Comença a transcriure i gestionar els teus àudios"
+      },
+      "continueButton": "Perfecte, anem-hi!"
+    },
+    "organization": {
+      "checkingAccess": "Verificant accés...",
+      "brandName": "Transcriu",
+      "heroTitle": "Configura la teva organització per començar.",
+      "heroDescription": "Crea un espai de treball per al teu equip i comença a transcriure sessions de logopèdia amb IA.",
+      "heroFooter": "Un pas més per optimitzar les teves sessions logopèdiques.",
+      "groupSetupLabel": "Configuració del Pla Grup",
+      "lastStepLabel": "Últim pas!",
+      "groupSetupTitle": "Configura la teva organització",
+      "regularTitle": "Nom de l'organització",
+      "groupSetupDesc": "Finalitza la configuració de la teva organització amb el pla grup.",
+      "regularDesc": "Dona un nom a la teva organització per començar a col·laborar amb el teu equip.",
+      "groupPlanActivated": "Pla Grup Activat",
+      "orgNameLabel": "Nom de l'organització",
+      "orgNamePlaceholder": "Ex: La Meva Clínica, Centre de Teràpia...",
+      "validName": "Nom vàlid",
+      "errorTitle": "Error",
+      "configuring": "Configurant...",
+      "continueButton": "Continuar al Dashboard",
+      "footerHint": "Podràs convidar membres del teu equip des del dashboard.",
+      "validation": {
+        "required": "El nom de l'organització és obligatori",
+        "minLength": "El nom ha de tenir almenys 2 caràcters",
+        "maxLength": "El nom no pot tenir més de 50 caràcters",
+        "invalidChars": "El nom no pot contenir caràcters especials com < > : \" / \\ | ? *"
+      },
+      "errors": {
+        "setupError": "Error en configurar l'organització",
+        "unexpectedError": "Error inesperat"
+      }
+    }
+  },
+  "testimonials": {
+    "title": "Què diuen els professionals",
+    "subtitle": "Més de 500 logopedes confien en Transcriu per optimitzar la seva documentació clínica",
+    "trustBadge": "⭐⭐⭐⭐⭐ Valoració mitjana de 4.9/5 basada en més de 200 ressenyes",
+    "items": [
+      {
+        "name": "Maria G.",
+        "role": "Logopeda infantil, Barcelona",
+        "text": "Transcriu m'ha canviat la vida professional. Abans passava 2 hores al dia escrivint informes, ara només 20 minuts revisant transcripcions. Puc atendre més pacients i tinc més temps per preparar materials terapèutics."
+      },
+      {
+        "name": "Jordi P.",
+        "role": "Centre de logopèdia, Gràcia",
+        "text": "Al nostre centre tenim 5 logopedes i tots utilitzen Transcriu. La qualitat de les transcripcions en català és excel·lent i el suport tècnic sempre respon ràpid. Totalment recomanable."
+      },
+      {
+        "name": "Anna M.",
+        "role": "Logopeda especialitzada en TEA, Sarrià",
+        "text": "Treballo amb nens amb TEA i les sessions són molt dinàmiques. Transcriu captura tot el que passa i puc centrar-me 100% en el nen sense preocupar-me de prendre notes. Els informes per a les famílies són molt més complets ara."
+      },
+      {
+        "name": "David R.",
+        "role": "Logopeda en escola d'educació especial",
+        "text": "Utilitzo Transcriu per documentar sessions amb adolescents. La transcripció automàtica m'estalvia hores de feina i els informes són molt més detallats. Una eina imprescindible per al meu dia a dia."
+      },
+      {
+        "name": "Laura S.",
+        "role": "Logopeda infantil, 12 anys d'experiència",
+        "text": "Treballo amb nens de 2 a 8 anys i Transcriu m'ha facilitat molt la documentació. Ara em centro 100% en el nen durant la sessió i després reviso la transcripció en 10 minuts. Els pares valoren molt la qualitat dels informes."
+      },
+      {
+        "name": "Carles M.",
+        "role": "Centre multidisciplinari, Eixample",
+        "text": "Al nostre centre tenim logopedes, psicòlegs i terapeutes ocupacionals. Transcriu facilita molt la coordinació entre professionals. La documentació ha millorat significativament i les famílies ho noten."
+      }
+    ]
+  }
+}
