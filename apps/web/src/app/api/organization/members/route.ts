@@ -57,7 +57,7 @@ export async function GET(_request: NextRequest) {
 
     // Single round-trip: fetch completed audios for all org members since the
     // period start. We sum on the server (in JS) to keep this Postgres-agnostic.
-    let usageByUserId = new Map<string, number>();
+    const usageByUserId = new Map<string, number>();
     if (memberUserIds.length > 0) {
       const { data: audioRows, error: audioErr } = await supabase
         .from('audios')

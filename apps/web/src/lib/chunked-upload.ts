@@ -201,7 +201,9 @@ async function runWithConcurrency<T>(
     if (inFlight.size >= concurrency) {
       await Promise.race(inFlight);
     }
-    // Forward-declare so the IIFE's `finally` can self-remove from the set.
+    // Forward-declare so the IIFE's `finally` can self-remove from the set;
+    // `let` is required for TS definite-assignment, despite the single write.
+    // eslint-disable-next-line prefer-const
     let pRef!: Promise<void>;
     const p: Promise<void> = (async () => {
       try { await worker(item); }
