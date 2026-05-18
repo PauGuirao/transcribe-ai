@@ -49,7 +49,7 @@
     "lamejs": "^1.2.1",
     "lucide-react": "^0.542.0",
     "multer": "^2.0.2",
-    "next": "15.5.2",
+    "next": "15.5.9",
     "next-intl": "^4.5.7",
     "node-fetch": "^3.3.2",
     "openai": "^5.16.0",
