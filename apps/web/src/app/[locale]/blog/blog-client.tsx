@@ -29,7 +29,7 @@ export default function BlogClient({ blogPosts }: BlogClientProps) {
     const body = encodeURIComponent(
       "Hola,\n\nVoldria proposar un article per al vostre blog. Aquí teniu els detalls:\n\nTítol: [Títol del vostre article]\nArticle: [descripció del contingut]\n\nGràcies!",
     );
-    window.location.href = `mailto:guiraocastells@gmail.com?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:pau@transcriu.com?subject=${subject}&body=${body}`;
   };
 
   return (
