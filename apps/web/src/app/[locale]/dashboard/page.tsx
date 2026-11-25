@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import AppLayout from '@/components/layout/AppLayout';
-import WhatsAppButton from '@/components/WhatsAppButton';
 import { NewTranscriptionModal } from '@/components/transcription/NewTranscriptionModal';
 import { RecentTranscriptionsList, type RecentAudio } from '@/components/transcription/RecentTranscriptionsList';
 import { useAuth } from '@/contexts/AuthContext';
@@ -91,7 +90,6 @@ export default function DashboardPage() {
         onOpenChange={setModalOpen}
         onSubmitted={handleSubmitted}
       />
-      <WhatsAppButton />
     </AppLayout>
   );
 }
